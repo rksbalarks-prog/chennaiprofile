@@ -260,7 +260,16 @@ export default function MatrimonySearch() {
           {paged.map(p => (
             <div key={p.id} style={{ display:'flex', background:'#fff', borderRadius:12, overflow:'hidden', boxShadow:'0 1px 6px rgba(0,0,0,0.06)', border:'1px solid #f0f0f0', cursor:'pointer' }}
               onClick={() => navigate(`/detail/${p.id}`, { state: { profile: p } })}>
-              {p.photo ? (() => {
+              {(() => {
+                const genderFallback = p.gender === 'Male' ? '/default-male.png' : '/default-female.png';
+                if (!p.photo) {
+                  return (
+                    <img src={genderFallback} alt={p.name}
+                      loading="lazy" decoding="async"
+                      width="110" height="130"
+                      style={{ width:110, height:130, objectFit:'cover', flexShrink:0, background:'#f5f5f5' }} />
+                  );
+                }
                 const urls = getPhotoUrls(p.photoRaw);
                 return (
                   <picture>
@@ -269,14 +278,10 @@ export default function MatrimonySearch() {
                       loading="lazy" decoding="async"
                       width="110" height="130"
                       style={{ width:110, height:130, objectFit:'cover', flexShrink:0, background:'#f5f5f5' }}
-                      onError={e => { e.target.onerror=null; e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=${p.gender==='Male'?'1a6ea8':'c0392b'}&color=fff&size=110`; }} />
+                      onError={e => { e.target.onerror=null; e.target.src = genderFallback; }} />
                   </picture>
                 );
-              })() : (
-                <div style={{ width:110, height:130, flexShrink:0, background:'#f8f8f8', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ccc" strokeWidth="1.5"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>
-                </div>
-              )}
+              })()}
               <div style={{ flex:1, padding:'10px 12px', display:'flex', flexDirection:'column', gap:3, minWidth:0 }}>
                 <div style={{ fontSize:14, fontWeight:700, color:'#222', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.name}</div>
                 <span style={{ fontSize:11, color:'#8B0000', fontWeight:600, background:'#fef2f2', padding:'1px 8px', borderRadius:4, width:'fit-content' }}>{p.regId}</span>
