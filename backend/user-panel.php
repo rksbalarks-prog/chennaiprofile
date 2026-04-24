@@ -392,6 +392,9 @@ input,select,textarea{outline:none}
 <div class="app-shell" id="appShell">
   <!-- Mobile Top Bar -->
   <div class="mob-topbar" style="display:none">
+    <button onclick="if(history.length>1){history.back();}else{location.href='/';}" aria-label="Back" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:#fff;width:34px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
     <button class="mob-hamburger" onclick="document.querySelector('.sidebar').classList.add('mob-open');document.getElementById('mobOverlay').classList.add('open')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </button>

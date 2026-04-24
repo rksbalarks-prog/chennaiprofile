@@ -80,6 +80,19 @@ export default function Navbar() {
           text-decoration: none; color: inherit;
         }
 
+        .mobile-back-btn {
+          width: 36px; height: 36px; border-radius: 50%;
+          background: #f5f5f5; border: none; cursor: pointer;
+          display: flex; align-items: center; justify-content: center;
+          margin-right: 6px; color: #333; flex-shrink: 0;
+          transition: background 0.15s;
+        }
+        .mobile-back-btn:active { background: #e8e8e8; }
+        .mobile-back-btn svg { width: 20px; height: 20px; }
+        @media (min-width: 769px) {
+          .mobile-back-btn { display: none; }
+        }
+
         .top-bar-logo {
           width: 40px; height: 40px; border-radius: 50%;
           border: 2px solid #8B0000; overflow: hidden;
@@ -284,6 +297,16 @@ export default function Navbar() {
 
       {/* ═══ TOP BAR ═══ */}
       <header className="top-bar">
+        {location.pathname !== '/' && (
+          <button
+            className="mobile-back-btn"
+            aria-label="Back"
+            onClick={() => { if (window.history.length > 1) navigate(-1); else navigate('/'); }}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+          </button>
+        )}
         <Link to="/" className="top-bar-brand">
           <div className="top-bar-logo">
             <img src="/assets/kumbakonam_logo.svg" alt="Logo"
