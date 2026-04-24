@@ -95,29 +95,14 @@ export default function Home() {
   //     of their confirmed profile gender (target_gender is ignored).
   //   - If verified-only (no profile row), the server uses target_gender to pick
   //     which gender's "All Profiles" fallback to return.
+  // Effect A — fetch personalized suggestions. Runs ONCE per user/tab change,
+  // NOT on every allProfiles update. Without this split, each Load More would
+  // refetch suggestions and overwrite sections, discarding the newly-appended
+  // profiles and leaving the feed stuck at its initial size.
   useEffect(() => {
-    if (allProfiles.length === 0) return; // wait for bootstrap
+    if (!userMobile) return;               // incognito path handled in Effect B
+    if (allProfiles.length === 0) return;  // wait for bootstrap
     const targetGender = activeTab === 'groom' ? 'Male' : 'Female';
-
-    // No verified mobile → pure browse. Shuffle the FIRST batch for variety,
-    // then stably append newly-loaded profiles to the end so Load More grows
-    // the list predictably (no reshuffling cards the user already scrolled past).
-    if (!userMobile) {
-      const shuffle = (arr) => { const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
-      setSections(prev => {
-        const isFirstLoad = prev.withPhotos.length === 0 && prev.others.length === 0;
-        const seenPhoto = new Set(prev.withPhotos.map(p => p.id));
-        const seenOther = new Set(prev.others.map(p => p.id));
-        const newPhoto  = allProfiles.filter(p => p.photo && !seenPhoto.has(p.id));
-        const newOther  = allProfiles.filter(p => !p.photo && !seenOther.has(p.id));
-        return {
-          interest: [], preference: [], notViewed: [], viewed: [],
-          withPhotos: isFirstLoad ? shuffle(newPhoto) : [...prev.withPhotos, ...newPhoto],
-          others:     isFirstLoad ? shuffle(newOther) : [...prev.others,     ...newOther],
-        };
-      });
-      return;
-    }
 
     (async () => {
       try {
@@ -135,25 +120,59 @@ export default function Home() {
         const totalSuggested = interest.length + preference.length + withPhotos.length + notViewed.length + viewed.length;
 
         if (totalSuggested > 0) {
-          // Registered user path — personalized sections
           setHasUserProfile(interest.length > 0 || preference.length > 0);
-          const usedIds = new Set([...interest, ...preference, ...withPhotos, ...notViewed, ...viewed].map(p => p.id));
-          const others = sortPhotosFirst(allProfiles.filter(p => !usedIds.has(p.id)));
-          setSections({ interest, preference, withPhotos, notViewed, viewed, others });
+          setSections(prev => {
+            const usedIds = new Set([...interest, ...preference, ...withPhotos, ...notViewed, ...viewed].map(p => p.id));
+            // Start others from current allProfiles minus personalized sections.
+            // Effect B will keep it in sync as more profiles arrive.
+            const others = sortPhotosFirst(allProfiles.filter(p => !usedIds.has(p.id)));
+            return { interest, preference, withPhotos, notViewed, viewed, others };
+          });
         } else if (allP.length > 0) {
-          // Verified but no registered profile — server returned the target-gender browse
           setHasUserProfile(false);
           setSections({ interest:[], preference:[], withPhotos: allP, notViewed:[], viewed:[], others:[] });
         } else {
-          // Last-resort fallback — shuffle the bootstrap pool
           const shuffle = (arr) => { const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
-          const wp = shuffle(allProfiles.filter(p => p.photo));
-          const nop = shuffle(allProfiles.filter(p => !p.photo));
-          setSections({ interest:[], preference:[], withPhotos:wp, notViewed:[], viewed:[], others:nop });
+          setSections({ interest:[], preference:[], withPhotos: shuffle(allProfiles.filter(p => p.photo)), notViewed:[], viewed:[], others: shuffle(allProfiles.filter(p => !p.photo)) });
         }
       } catch (e) { console.error('Suggestions error:', e); }
     })();
-  }, [userMobile, activeTab, allProfiles]);
+  }, [userMobile, activeTab]);
+
+  // Effect B — append new profiles into the feed on every Load More.
+  // For incognito: shuffle first batch, stably append afterward.
+  // For logged-in: append into `others` (suggestion sections stay server-sourced).
+  useEffect(() => {
+    if (allProfiles.length === 0) return;
+    if (!userMobile) {
+      const shuffle = (arr) => { const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+      setSections(prev => {
+        const isFirstLoad = prev.withPhotos.length === 0 && prev.others.length === 0;
+        const seenPhoto = new Set(prev.withPhotos.map(p => p.id));
+        const seenOther = new Set(prev.others.map(p => p.id));
+        const newPhoto  = allProfiles.filter(p => p.photo && !seenPhoto.has(p.id));
+        const newOther  = allProfiles.filter(p => !p.photo && !seenOther.has(p.id));
+        if (newPhoto.length === 0 && newOther.length === 0) return prev;
+        return {
+          interest: [], preference: [], notViewed: [], viewed: [],
+          withPhotos: isFirstLoad ? shuffle(newPhoto) : [...prev.withPhotos, ...newPhoto],
+          others:     isFirstLoad ? shuffle(newOther) : [...prev.others,     ...newOther],
+        };
+      });
+      return;
+    }
+    // Logged-in: only grow `others`. Sections from the suggestions API are
+    // server-authoritative and should not be mutated here.
+    setSections(prev => {
+      const usedIds = new Set([
+        ...prev.interest, ...prev.preference, ...prev.withPhotos,
+        ...prev.notViewed, ...prev.viewed, ...prev.others,
+      ].map(p => p.id));
+      const newOthers = allProfiles.filter(p => !usedIds.has(p.id));
+      if (newOthers.length === 0) return prev;
+      return { ...prev, others: [...prev.others, ...sortPhotosFirst(newOthers)] };
+    });
+  }, [allProfiles, userMobile]);
 
   useEffect(() => { if(otpTimer<=0)return; const t=setTimeout(()=>setOtpTimer(otpTimer-1),1000); return()=>clearTimeout(t); }, [otpTimer]);
 
