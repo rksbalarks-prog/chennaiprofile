@@ -275,8 +275,21 @@ export default function Home() {
   };
 
   const ProfileCard = ({ p }) => (
-    <div style={{ display:'flex', background:'#fff', borderRadius:12, overflow:'hidden', boxShadow:'0 1px 6px rgba(0,0,0,0.06)', border:'1px solid #f0f0f0', cursor:'pointer' }}
+    <div style={{ position:'relative', display:'flex', background:'#fff', borderRadius:12, overflow:'hidden', boxShadow:'0 1px 6px rgba(0,0,0,0.06)', border:'1px solid #f0f0f0', cursor:'pointer' }}
       onClick={() => navigate(`/detail/${p.id}`, { state: { profile: p } })}>
+      {/* Floating report button — always visible, top-right of card, outside
+          the flex layout so it can never be squeezed out by the bottom row. */}
+      <button
+        title="Report profile"
+        aria-label="Report profile"
+        onClick={e=>{e.stopPropagation();setReportProfileId(p.cpId);setReportReason('');setShowReportModal(true);}}
+        style={{ position:'absolute', top:6, right:6, zIndex:2, width:26, height:26, padding:0, background:'#fff', color:'#8B0000', border:'1.5px solid #8B0000', borderRadius:6, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 1px 3px rgba(0,0,0,0.08)' }}>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8B0000" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </button>
       {(() => {
         const svgFallback = p.gender === 'Male' ? '/default-male.png' : '/default-female.png';
         // When the profile has no photo, show a random blurred same-gender
@@ -323,8 +336,8 @@ export default function Home() {
           {p.religion && <span style={{ fontSize:9, fontWeight:600, padding:'1px 6px', borderRadius:8, background:'#fff7ed', color:'#c2410c' }}>{p.religion}</span>}
           {p.star && <span style={{ fontSize:9, fontWeight:600, padding:'1px 6px', borderRadius:8, background:'#f0fdf4', color:'#166534' }}>{p.star}</span>}
         </div>
-        {/* Contact + Report buttons */}
-        <div style={{ display:'flex', gap:4, marginTop:4, minWidth:0, width:'100%' }}>
+        {/* Contact button (report is now an absolute-positioned icon in the card's top-right corner) */}
+        <div style={{ display:'flex', marginTop:4, minWidth:0, width:'100%' }}>
           {revealedContactId === p.id ? (() => {
             const num = revealedPhones[p.id] || p.phone || '';
             return (
@@ -337,17 +350,6 @@ export default function Home() {
               View Free Contact
             </button>
           )}
-          <button
-            title="Report profile"
-            aria-label="Report profile"
-            onClick={e=>{e.stopPropagation();setReportProfileId(p.cpId);setReportReason('');setShowReportModal(true);}}
-            style={{ flex:'0 0 32px', flexShrink:0, width:32, minWidth:32, height:28, padding:0, background:'#fff', color:'#8B0000', border:'1.5px solid #8B0000', borderRadius:6, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B0000" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-              <line x1="12" y1="9" x2="12" y2="13"/>
-              <line x1="12" y1="17" x2="12.01" y2="17"/>
-            </svg>
-          </button>
         </div>
       </div>
     </div>
