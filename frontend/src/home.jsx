@@ -315,12 +315,13 @@ export default function Home() {
         <div style={{ display:'flex', alignItems:'center', gap:5 }}>
           <span style={{ fontSize:10, color:'#8B0000', fontWeight:600, background:'#fef2f2', padding:'1px 6px', borderRadius:3 }}>{p.cpId}</span>
           <span style={{ fontSize:10, color:'#8B0000', fontWeight:600, cursor:'pointer' }} onClick={e=>{e.stopPropagation();navigate(`/detail/${p.id}`,{state:{profile:p}});}}>View →</span>
+          <span style={{ fontSize:10, color:'#ccc' }}>·</span>
           <span
             role="button"
             tabIndex={0}
             onClick={e=>{e.stopPropagation();setReportProfileId(p.cpId);setReportReason('');setShowReportModal(true);}}
-            style={{ marginLeft:'auto', fontSize:10, fontWeight:600, color:'#666', cursor:'pointer', textDecoration:'underline', textDecorationColor:'#ccc' }}>
-            Flag profile
+            style={{ fontSize:10, fontWeight:600, color:'#888', cursor:'pointer' }}>
+            Flag
           </span>
         </div>
         <div style={{ fontSize:11, color:'#777' }}>{[p.age?p.age+' yrs':'',p.height,getLocation(p)].filter(Boolean).join(' · ')}</div>
