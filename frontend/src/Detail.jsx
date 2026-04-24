@@ -266,7 +266,10 @@ export default function Detail() {
           .map(ph => {
             const raw = ph.replace(UPLOADS_PREFIX, '').replace(PHOTO_BASE, '');
             let orig;
-            if (ph.startsWith('http') || ph.startsWith('/matrimony')) orig = ph;
+            // Absolute paths (http(s):// or any /-prefixed path like
+            // /backend/api/uploads/... or /matrimony/...) are used as-is;
+            // only bare "uploads/..." or file-only paths get a prefix.
+            if (ph.startsWith('http') || ph.startsWith('/')) orig = ph;
             else if (ph.startsWith('uploads/')) orig = UPLOADS_PREFIX + ph;
             else orig = PHOTO_BASE + ph;
             const urls = getPhotoUrls(raw);
