@@ -354,21 +354,25 @@ export default function Home() {
 
   const buildFeed = () => {
     const feed = [];
-    const addSection = (title, icon, profiles, limit) => {
+    const addSection = (title, icon, profiles, limit, countOverride) => {
       const filtered = getTabProfiles(profiles);
       if (filtered.length === 0) return;
       const shown = limit ? filtered.slice(0, limit) : filtered;
-      feed.push({ type:'header', title, icon, count:filtered.length });
+      feed.push({ type:'header', title, icon, count: countOverride != null ? countOverride : filtered.length });
       shown.forEach(p => feed.push({ type:'card', ...p }));
       if (limit && filtered.length > limit) {
         feed.push({ type:'viewmore', remaining: filtered.length - limit });
       }
     };
+    // For the headline "Profiles with Photos" section, use the server-reported
+    // total for the active gender (maleCount/femaleCount) so the badge reflects
+    // the full pool the user can browse, not just how many are loaded so far.
+    const totalForActiveTab = activeTab === 'groom' ? maleCount : femaleCount;
     addSection('Based on Your Interest', '🔥', sections.interest.filter(p => p.photo));
     addSection('Partner Preference Match', '💝', sections.preference.filter(p => p.photo));
     // Show 200 photo-only profiles first, then View More for rest
     const photoOnly = sections.withPhotos.filter(p => p.photo);
-    addSection('Profiles with Photos', '📸', photoOnly, showMore ? null : 200);
+    addSection('Profiles with Photos', '📸', photoOnly, showMore ? null : 200, totalForActiveTab);
     if (showMore) {
       addSection('New - Not Yet Viewed', '✨', sections.notViewed);
       addSection('Recently Viewed', '👁', sections.viewed);
