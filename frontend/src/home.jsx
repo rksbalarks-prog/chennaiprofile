@@ -56,7 +56,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [visibleCards, setVisibleCards] = useState(20);
   // Server-side pagination state for infinite scroll
-  const PAGE_SIZE = 12;
+  const PAGE_SIZE = 20;
   const [loadingMore, setLoadingMore] = useState(false);
   const [maleOffset, setMaleOffset] = useState(PAGE_SIZE);
   const [femaleOffset, setFemaleOffset] = useState(PAGE_SIZE);
