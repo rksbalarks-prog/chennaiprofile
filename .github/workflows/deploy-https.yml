@@ -1,0 +1,99 @@
+name: Deploy via HTTPS (HMAC-authenticated)
+
+# Fallback deploy path when FTP/SSH is blocked by the host firewall.
+# Builds the frontend, zips the site (frontend dist + backend minus secrets),
+# and POSTs it to backend/deploy.php over HTTPS with an HMAC-SHA256 signature.
+#
+# Activation steps (one-time):
+#   1. On the server: upload backend/deploy.php and create
+#      backend/.deploy-secret (one line, 64-char hex — generate with
+#      `openssl rand -hex 32`).
+#   2. In GitHub → repo Settings → Secrets → Actions, add:
+#        DEPLOY_URL          = https://kumbakonamfreematrimony.com/backend/deploy.php
+#        DEPLOY_HMAC_SECRET  = <same 64-char hex as .deploy-secret>
+#   3. Run this workflow manually (Actions tab → "Run workflow") to verify.
+#   4. When happy, change the trigger to `push: branches: [main]` so every
+#      push auto-deploys.
+
+on:
+  workflow_dispatch:
+  # Uncomment once verified:
+  # push:
+  #   branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+      - name: Assemble deploy payload
+        run: |
+          set -euo pipefail
+          mkdir -p payload/backend
+          # Frontend build output → site root
+          cp -r frontend/dist/. payload/
+          # Backend source, excluding secrets, uploads, and logs
+          rsync -a \
+            --exclude='config.php' \
+            --exclude='config.production.php' \
+            --exclude='sms.php' \
+            --exclude='payu-config.php' \
+            --exclude='.deploy-secret' \
+            --exclude='api/uploads/' \
+            --exclude='logs/' \
+            backend/ payload/backend/
+          # frontend/API (PHP helpers referenced by the app), excluding its db.php
+          if [ -d frontend/API ]; then
+            mkdir -p payload/frontend/API
+            rsync -a --exclude='db.php' frontend/API/ payload/frontend/API/
+          fi
+          (cd payload && zip -qr ../deploy.zip .)
+          ls -lh deploy.zip
+
+      - name: POST signed zip to server
+        env:
+          DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
+          DEPLOY_HMAC_SECRET: ${{ secrets.DEPLOY_HMAC_SECRET }}
+        run: |
+          set -euo pipefail
+          if [ -z "$DEPLOY_URL" ] || [ -z "$DEPLOY_HMAC_SECRET" ]; then
+            echo "::error::DEPLOY_URL and DEPLOY_HMAC_SECRET must be configured."
+            exit 1
+          fi
+          TS=$(date +%s)
+          BODY_HASH=$(sha256sum deploy.zip | awk '{print $1}')
+          SIG=$(printf '%s' "${TS}:${BODY_HASH}" \
+            | openssl dgst -sha256 -hmac "$DEPLOY_HMAC_SECRET" -r \
+            | awk '{print $1}')
+          echo "Uploading $(stat -c%s deploy.zip) bytes, ts=$TS"
+          HTTP=$(curl -sS -o response.json -w '%{http_code}' \
+            -X POST "$DEPLOY_URL" \
+            -H "X-Deploy-Timestamp: $TS" \
+            -H "X-Deploy-Signature: sha256=$SIG" \
+            -H "Content-Type: application/zip" \
+            --data-binary @deploy.zip \
+            --max-time 180)
+          echo "HTTP $HTTP"
+          cat response.json
+          echo
+          if [ "$HTTP" != "200" ]; then
+            exit 1
+          fi

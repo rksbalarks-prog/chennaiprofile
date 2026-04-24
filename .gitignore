@@ -3,6 +3,7 @@ backend/config.php
 backend/config.production.php
 backend/sms.php
 backend/payu-config.php
+backend/.deploy-secret
 frontend/API/db.php
 
 # ── Dependencies / build artifacts ───────────────────────────────────────────
