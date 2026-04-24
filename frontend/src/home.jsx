@@ -99,12 +99,23 @@ export default function Home() {
     if (allProfiles.length === 0) return; // wait for bootstrap
     const targetGender = activeTab === 'groom' ? 'Male' : 'Female';
 
-    // No verified mobile → pure browse: shuffle the bootstrap pool
+    // No verified mobile → pure browse. Shuffle the FIRST batch for variety,
+    // then stably append newly-loaded profiles to the end so Load More grows
+    // the list predictably (no reshuffling cards the user already scrolled past).
     if (!userMobile) {
       const shuffle = (arr) => { const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
-      const wp = shuffle(allProfiles.filter(p => p.photo));
-      const nop = shuffle(allProfiles.filter(p => !p.photo));
-      setSections({ interest:[], preference:[], withPhotos:wp, notViewed:[], viewed:[], others:nop });
+      setSections(prev => {
+        const isFirstLoad = prev.withPhotos.length === 0 && prev.others.length === 0;
+        const seenPhoto = new Set(prev.withPhotos.map(p => p.id));
+        const seenOther = new Set(prev.others.map(p => p.id));
+        const newPhoto  = allProfiles.filter(p => p.photo && !seenPhoto.has(p.id));
+        const newOther  = allProfiles.filter(p => !p.photo && !seenOther.has(p.id));
+        return {
+          interest: [], preference: [], notViewed: [], viewed: [],
+          withPhotos: isFirstLoad ? shuffle(newPhoto) : [...prev.withPhotos, ...newPhoto],
+          others:     isFirstLoad ? shuffle(newOther) : [...prev.others,     ...newOther],
+        };
+      });
       return;
     }
 
