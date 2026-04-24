@@ -77,22 +77,34 @@ jobs:
             echo "::error::DEPLOY_URL and DEPLOY_HMAC_SECRET must be configured."
             exit 1
           fi
-          TS=$(date +%s)
           BODY_HASH=$(sha256sum deploy.zip | awk '{print $1}')
-          SIG=$(printf '%s' "${TS}:${BODY_HASH}" \
-            | openssl dgst -sha256 -hmac "$DEPLOY_HMAC_SECRET" -r \
-            | awk '{print $1}')
-          echo "Uploading $(stat -c%s deploy.zip) bytes, ts=$TS"
-          HTTP=$(curl -sS -o response.json -w '%{http_code}' \
-            -X POST "$DEPLOY_URL" \
-            -H "X-Deploy-Timestamp: $TS" \
-            -H "X-Deploy-Signature: sha256=$SIG" \
-            -H "Content-Type: application/zip" \
-            --data-binary @deploy.zip \
-            --max-time 180)
-          echo "HTTP $HTTP"
-          cat response.json
-          echo
-          if [ "$HTTP" != "200" ]; then
-            exit 1
-          fi
+          echo "Uploading $(stat -c%s deploy.zip) bytes"
+
+          # Retry up to 5 times — HostEasy's openresty WAF intermittently 415s
+          # binary POSTs. Each attempt recomputes the timestamp + signature so
+          # the ±300s replay window stays valid even across long waits.
+          MAX=5
+          for i in $(seq 1 $MAX); do
+            TS=$(date +%s)
+            SIG=$(printf '%s' "${TS}:${BODY_HASH}" \
+              | openssl dgst -sha256 -hmac "$DEPLOY_HMAC_SECRET" -r \
+              | awk '{print $1}')
+            HTTP=$(curl -sS -o response.json -w '%{http_code}' \
+              -X POST "$DEPLOY_URL" \
+              -H "X-Deploy-Timestamp: $TS" \
+              -H "X-Deploy-Signature: sha256=$SIG" \
+              -H "Content-Type: application/zip" \
+              --data-binary @deploy.zip \
+              --max-time 180 || echo "000")
+            echo "Attempt $i/$MAX → HTTP $HTTP"
+            cat response.json 2>/dev/null || true
+            echo
+            if [ "$HTTP" = "200" ]; then
+              exit 0
+            fi
+            if [ "$i" -lt "$MAX" ]; then
+              sleep $((i * 5))
+            fi
+          done
+          echo "::error::deploy failed after $MAX attempts (last HTTP $HTTP)"
+          exit 1
