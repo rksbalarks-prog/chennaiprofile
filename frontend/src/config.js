@@ -6,9 +6,13 @@ const PREFIX = isLocal ? '/matrimony' : '';
 
 export const API_BASE = `${PREFIX}/backend/api/public.php`;
 export const CONTACT_API = `${PREFIX}/backend/api/contact.php`;
-export const PHOTO_BASE = `${PREFIX}/backend/api/uploads/`;
-export const PHOTO_BASE_OLD = `${PREFIX}/uploads/`;
-export const UPLOADS_PREFIX = `${PREFIX}/backend/api/`;
+// Photos live at <root>/uploads/ on production AND under /matrimony/uploads/
+// for local XAMPP (both mirror the same files). The legacy /backend/api/uploads/
+// path is no longer used but still resolves locally as a fallback via the
+// onError handlers in ProfileCard.
+export const PHOTO_BASE = `${PREFIX}/uploads/`;
+export const PHOTO_BASE_OLD = `${PREFIX}/backend/api/uploads/`;
+export const UPLOADS_PREFIX = `${PREFIX}/`;
 export const USER_PANEL_URL = `${PREFIX}/backend/user-panel.php`;
 
 // Resolve variants of a photo path coming from the DB (e.g. "uploads/abc.jpg").
