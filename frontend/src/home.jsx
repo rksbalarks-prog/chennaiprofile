@@ -315,12 +315,16 @@ export default function Home() {
         <div style={{ display:'flex', alignItems:'center', gap:5 }}>
           <span style={{ fontSize:10, color:'#8B0000', fontWeight:600, background:'#fef2f2', padding:'1px 6px', borderRadius:3 }}>{p.cpId}</span>
           <span style={{ fontSize:10, color:'#8B0000', fontWeight:600, cursor:'pointer' }} onClick={e=>{e.stopPropagation();navigate(`/detail/${p.id}`,{state:{profile:p}});}}>View →</span>
-          <span style={{ fontSize:10, color:'#ccc' }}>·</span>
           <span
             role="button"
             tabIndex={0}
             onClick={e=>{e.stopPropagation();setReportProfileId(p.cpId);setReportReason('');setShowReportModal(true);}}
-            style={{ fontSize:10, fontWeight:600, color:'#888', cursor:'pointer' }}>
+            style={{ fontSize:10, fontWeight:700, color:'#b91c1c', background:'#fef2f2', border:'1px solid #fecaca', padding:'1px 7px', borderRadius:10, cursor:'pointer', display:'inline-flex', alignItems:'center', gap:3, lineHeight:1 }}>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#b91c1c" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
             Flag
           </span>
         </div>
