@@ -40,6 +40,7 @@ export default function Home() {
   // Display helper: cap any profile count at "999+" so the badges stay compact.
   const fmtCount = (n) => (n > 999 ? '999+' : n);
   const [activeTab, setActiveTab] = useState('bride');
+  const [feedFilter, setFeedFilter] = useState('recent'); // 'recent' | 'random' | 'photos' | 'notViewed'
   const [contactVerified, setContactVerified] = useState(false);
   const [userMobile, setUserMobile] = useState('');
   const [hasUserProfile, setHasUserProfile] = useState(false);
@@ -369,20 +370,31 @@ export default function Home() {
         feed.push({ type:'viewmore', remaining: filtered.length - limit });
       }
     };
-    // For the headline "Profiles with Photos" section, use the server-reported
-    // total for the active gender (maleCount/femaleCount) so the badge reflects
-    // the full pool the user can browse, not just how many are loaded so far.
-    const totalForActiveTab = activeTab === 'groom' ? maleCount : femaleCount;
     addSection('Based on Your Interest', '🔥', sections.interest.filter(p => p.photo));
     addSection('Partner Preference Match', '💝', sections.preference.filter(p => p.photo));
-    // Show 200 photo-only profiles first, then View More for rest
-    const photoOnly = sections.withPhotos.filter(p => p.photo);
-    addSection('Profiles with Photos', '📸', photoOnly, showMore ? null : 200, totalForActiveTab);
-    if (showMore) {
-      addSection('New - Not Yet Viewed', '✨', sections.notViewed);
-      addSection('Recently Viewed', '👁', sections.viewed);
-      addSection('More Profiles', '👥', sections.others);
+
+    // Primary list — driven by the Recent / Random / Photos / Not Viewed
+    // filter buttons. All four filter options operate on the withPhotos pool
+    // (which is the full loaded set of profiles, photo-first ordering).
+    const pool = sections.withPhotos;
+    let primary = pool;
+    if (feedFilter === 'random') {
+      const arr = [...pool];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      primary = arr;
+    } else if (feedFilter === 'photos') {
+      primary = pool.filter(p => p.photo);
+    } else if (feedFilter === 'notViewed') {
+      const viewedIds = new Set(sections.viewed.map(p => p.id));
+      primary = pool.filter(p => !viewedIds.has(p.id));
+    } else {
+      // 'recent' — pool is already in server DESC (newest first) order.
+      primary = pool;
     }
+    primary.forEach(p => feed.push({ type:'card', ...p }));
     return feed;
   };
   const feed = buildFeed();
@@ -414,8 +426,8 @@ export default function Home() {
     if (!exhausted && shownCards >= totalCards - 10) loadMoreFromServer();
   };
 
-  // Reset pagination on tab change
-  useEffect(() => { setVisibleCards(20); setShowMore(false); }, [activeTab]);
+  // Reset pagination on tab or filter change
+  useEffect(() => { setVisibleCards(20); setShowMore(false); }, [activeTab, feedFilter]);
 
   // Infinite-scroll sentinel: when the bottom marker enters view, trigger
   // the same logic the Load More button used to run. Ref wraps the latest
@@ -481,6 +493,28 @@ export default function Home() {
             ×
           </button>
         )}
+      </div>
+
+      {/* Filter buttons — pick which slice of profiles to show below */}
+      <div style={{ display:'flex', gap:6, padding:'8px 12px 10px', background:'#fff', borderBottom:'1px solid #f0f0f0', overflowX:'auto' }}>
+        {[
+          { key:'recent',    label:'🆕 Recent' },
+          { key:'random',    label:'🎲 Random' },
+          { key:'photos',    label:'📸 Photos' },
+          { key:'notViewed', label:'✨ Not Viewed' },
+        ].map(f => {
+          const active = feedFilter === f.key;
+          return (
+            <button key={f.key} onClick={() => setFeedFilter(f.key)}
+              style={{ flexShrink:0, padding:'6px 14px', borderRadius:18, fontSize:12, fontWeight:600, cursor:'pointer', whiteSpace:'nowrap',
+                background: active ? '#8B0000' : '#f5f5f5',
+                color: active ? '#fff' : '#555',
+                border: active ? '1.5px solid #8B0000' : '1.5px solid #e8e8e8',
+                transition: 'all 0.15s' }}>
+              {f.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Feed */}
