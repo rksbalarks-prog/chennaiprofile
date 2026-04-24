@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ->execute([':oid' => $orderId, ':m' => $mobile, ':n' => 'File: ' . $proofFile]);
 
         json_ok(['message' => 'Proof uploaded']);
-    }
+    }                                                                                           
 
     // ── Contact OTP (must be before registration) ───────────────────────
     $act = trim($input['action'] ?? '');

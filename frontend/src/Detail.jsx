@@ -271,6 +271,18 @@ export default function Detail() {
   return (
     <div style={{ background:'#f5f5f5', minHeight:'100vh', paddingBottom:70 }}>
 
+      {/* Back button — always visible (desktop + mobile) */}
+      <div style={{ padding:'10px 12px', background:'#fff', borderBottom:'1px solid #f0f0f0' }}>
+        <button
+          onClick={() => { if (window.history.length > 1) navigate(-1); else navigate('/'); }}
+          style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'6px 12px', background:'#fff', color:'#8B0000', border:'1.5px solid #8B0000', borderRadius:20, fontSize:13, fontWeight:600, cursor:'pointer' }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+          Back
+        </button>
+      </div>
+
       {/* Profile Header with Photos */}
       {(() => {
         const allPhotos = [p.photo, p.photo2, p.photo3]
