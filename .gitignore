@@ -31,6 +31,7 @@ Thumbs.db
 *.log
 *.tmp
 ,
+backend/logs/cache/
 
 # ── PHP / Composer (if used later) ───────────────────────────────────────────
 vendor/
