@@ -315,17 +315,13 @@ export default function Home() {
         <div style={{ display:'flex', alignItems:'center', gap:5 }}>
           <span style={{ fontSize:10, color:'#8B0000', fontWeight:600, background:'#fef2f2', padding:'1px 6px', borderRadius:3 }}>{p.cpId}</span>
           <span style={{ fontSize:10, color:'#8B0000', fontWeight:600, cursor:'pointer' }} onClick={e=>{e.stopPropagation();navigate(`/detail/${p.id}`,{state:{profile:p}});}}>View →</span>
-          <button
-            title="Report profile"
-            aria-label="Report profile"
+          <span
+            role="button"
+            tabIndex={0}
             onClick={e=>{e.stopPropagation();setReportProfileId(p.cpId);setReportReason('');setShowReportModal(true);}}
-            style={{ marginLeft:'auto', flexShrink:0, width:22, height:22, padding:0, background:'#fff', color:'#8B0000', border:'1.5px solid #8B0000', borderRadius:'50%', cursor:'pointer', display:'inline-flex', alignItems:'center', justifyContent:'center', lineHeight:1 }}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8B0000" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-              <line x1="12" y1="9" x2="12" y2="13"/>
-              <line x1="12" y1="17" x2="12.01" y2="17"/>
-            </svg>
-          </button>
+            style={{ marginLeft:'auto', fontSize:10, fontWeight:600, color:'#666', cursor:'pointer', textDecoration:'underline', textDecorationColor:'#ccc' }}>
+            Flag profile
+          </span>
         </div>
         <div style={{ fontSize:11, color:'#777' }}>{[p.age?p.age+' yrs':'',p.height,getLocation(p)].filter(Boolean).join(' · ')}</div>
         <div style={{ fontSize:11, color:'#777' }}>{[p.qualification,p.job].filter(Boolean).join(' · ')}</div>
