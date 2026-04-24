@@ -319,13 +319,12 @@ export default function Home() {
             title="Report profile"
             aria-label="Report profile"
             onClick={e=>{e.stopPropagation();setReportProfileId(p.cpId);setReportReason('');setShowReportModal(true);}}
-            style={{ marginLeft:'auto', display:'inline-flex', alignItems:'center', gap:3, padding:'2px 7px', background:'#fff', color:'#8B0000', border:'1.5px solid #8B0000', borderRadius:10, fontSize:10, fontWeight:700, cursor:'pointer', lineHeight:1 }}>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8B0000" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            style={{ marginLeft:'auto', flexShrink:0, width:22, height:22, padding:0, background:'#fff', color:'#8B0000', border:'1.5px solid #8B0000', borderRadius:'50%', cursor:'pointer', display:'inline-flex', alignItems:'center', justifyContent:'center', lineHeight:1 }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8B0000" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
               <line x1="12" y1="9" x2="12" y2="13"/>
               <line x1="12" y1="17" x2="12.01" y2="17"/>
             </svg>
-            Report
           </button>
         </div>
         <div style={{ fontSize:11, color:'#777' }}>{[p.age?p.age+' yrs':'',p.height,getLocation(p)].filter(Boolean).join(' · ')}</div>
