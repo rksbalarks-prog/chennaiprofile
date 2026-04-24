@@ -37,6 +37,8 @@ export default function Home() {
   const [allProfiles, setAllProfiles] = useState([]);
   const [maleCount, setMaleCount] = useState(0);
   const [femaleCount, setFemaleCount] = useState(0);
+  // Display helper: cap any profile count at "999+" so the badges stay compact.
+  const fmtCount = (n) => (n > 999 ? '999+' : n);
   const [activeTab, setActiveTab] = useState('bride');
   const [contactVerified, setContactVerified] = useState(false);
   const [userMobile, setUserMobile] = useState('');
@@ -434,12 +436,12 @@ export default function Home() {
           <button onClick={()=>setActiveTab('bride')} style={{ flex:1, padding:'8px 0', borderRadius:20, fontSize:12, fontWeight:600, cursor:'pointer', border:'1.5px solid', display:'flex', alignItems:'center', justifyContent:'center', gap:4,
             background:activeTab==='bride'?'#8B0000':'#f5f5f5', color:activeTab==='bride'?'#fff':'#666', borderColor:activeTab==='bride'?'#8B0000':'#e8e8e8' }}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>
-            Female <span style={{ fontSize:10, fontWeight:700, background:activeTab==='bride'?'rgba(255,255,255,0.25)':'rgba(0,0,0,0.06)', padding:'0 5px', borderRadius:8 }}>{femaleCount}</span>
+            Female <span style={{ fontSize:10, fontWeight:700, background:activeTab==='bride'?'rgba(255,255,255,0.25)':'rgba(0,0,0,0.06)', padding:'0 5px', borderRadius:8 }}>{fmtCount(femaleCount)}</span>
           </button>
           <button onClick={()=>setActiveTab('groom')} style={{ flex:1, padding:'8px 0', borderRadius:20, fontSize:12, fontWeight:600, cursor:'pointer', border:'1.5px solid', display:'flex', alignItems:'center', justifyContent:'center', gap:4,
             background:activeTab==='groom'?'#8B0000':'#f5f5f5', color:activeTab==='groom'?'#fff':'#666', borderColor:activeTab==='groom'?'#8B0000':'#e8e8e8' }}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>
-            Male <span style={{ fontSize:10, fontWeight:700, background:activeTab==='groom'?'rgba(255,255,255,0.25)':'rgba(0,0,0,0.06)', padding:'0 5px', borderRadius:8 }}>{maleCount}</span>
+            Male <span style={{ fontSize:10, fontWeight:700, background:activeTab==='groom'?'rgba(255,255,255,0.25)':'rgba(0,0,0,0.06)', padding:'0 5px', borderRadius:8 }}>{fmtCount(maleCount)}</span>
           </button>
           <button style={{ padding:'8px 14px', borderRadius:20, fontSize:12, fontWeight:600, cursor:'pointer', background:'#fff7ed', color:'#c2410c', border:'1.5px solid #fed7aa', whiteSpace:'nowrap' }}
             onClick={()=>{setOtpIntent('register');contactVerified?(window.location.href=`${USER_PANEL_URL}?create=1`):setShowOtpModal(true);}}>
@@ -506,7 +508,7 @@ export default function Home() {
                 <div key={`h-${i}`} style={{ display:'flex', alignItems:'center', gap:6, padding:'14px 0 6px' }}>
                   <span style={{ fontSize:16 }}>{item.icon}</span>
                   <span style={{ fontSize:14, fontWeight:700, color:'#222' }}>{item.title}</span>
-                  <span style={{ fontSize:10, color:'#999', background:'#f0f0f0', padding:'1px 7px', borderRadius:10 }}>{item.count}</span>
+                  <span style={{ fontSize:10, color:'#999', background:'#f0f0f0', padding:'1px 7px', borderRadius:10 }}>{fmtCount(item.count)}</span>
                   <div style={{ flex:1, height:1, background:'#e8e8e8', marginLeft:6 }} />
                 </div>
               );
