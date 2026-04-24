@@ -98,6 +98,18 @@ export default function Detail() {
   const [otpTimer, setOtpTimer] = useState(0);
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState('');
+  const [showMarriedConfirm, setShowMarriedConfirm] = useState(false);
+  const [marriedSubmitting, setMarriedSubmitting] = useState(false);
+
+  const submitReport = async (reason) => {
+    try {
+      const chk = contactVerified
+        ? await fetch(API_BASE, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'contact_check' }), credentials:'include' }).then(r=>r.json())
+        : {};
+      await fetch(API_BASE, { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ action:'report_profile', cp_id: p.regId, reason, reporter_mobile: chk.mobile || '' }), credentials:'include' });
+    } catch(e) {}
+  };
   const [limitMsg, setLimitMsg] = useState(null);
   const [lightboxImg, setLightboxImg] = useState(null);
   const [activePhoto, setActivePhoto] = useState(0);
@@ -539,7 +551,7 @@ export default function Detail() {
             style={{ padding:'8px 20px', background:'#fff', border:'1px solid #fecaca', borderRadius:8, fontSize:12, fontWeight:600, color:'#dc2626', cursor:'pointer' }}>
             Report Profile
           </button>
-          <button onClick={() => { setReportReason('already_married'); setShowReportModal(true); }}
+          <button onClick={() => setShowMarriedConfirm(true)}
             style={{ padding:'8px 20px', background:'#fff', border:'1px solid #fed7aa', borderRadius:8, fontSize:12, fontWeight:600, color:'#ea580c', cursor:'pointer' }}>
             Already Married
           </button>
@@ -620,6 +632,40 @@ export default function Detail() {
                   } catch(e) { alert('Report submitted.'); }
                   setShowReportModal(false); setReportReason('');
                 }} style={{ flex:1, padding:10, background: reportReason ? 'linear-gradient(135deg,#8B0000,#C41E3A)' : '#ddd', color:'#fff', border:'none', borderRadius:8, fontSize:13, fontWeight:700, cursor: reportReason ? 'pointer' : 'not-allowed' }}>Submit Report</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Already Married — simple Yes/No confirmation (no reason picker) */}
+      {showMarriedConfirm && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:3000, backdropFilter:'blur(4px)' }}
+          onClick={() => !marriedSubmitting && setShowMarriedConfirm(false)}>
+          <div style={{ background:'#fff', borderRadius:16, overflow:'hidden', maxWidth:340, width:'90%', boxShadow:'0 20px 60px rgba(0,0,0,0.25)' }}
+            onClick={e => e.stopPropagation()}>
+            <div style={{ background:'linear-gradient(135deg,#ea580c,#c2410c)', padding:'18px 20px' }}>
+              <span style={{ color:'#fff', fontSize:15, fontWeight:700 }}>Already Married?</span>
+            </div>
+            <div style={{ padding:20 }}>
+              <p style={{ fontSize:13, color:'#333', marginBottom:16, lineHeight:1.5 }}>
+                Do you confirm that <b>{p.name || 'this person'}</b> ({p.regId}) is already married and this profile should be reported?
+              </p>
+              <div style={{ display:'flex', gap:8 }}>
+                <button disabled={marriedSubmitting} onClick={() => setShowMarriedConfirm(false)}
+                  style={{ flex:1, padding:10, background:'#f5f5f5', border:'1px solid #e8e8e8', borderRadius:8, fontSize:13, fontWeight:600, color:'#666', cursor: marriedSubmitting ? 'not-allowed' : 'pointer' }}>
+                  No
+                </button>
+                <button disabled={marriedSubmitting} onClick={async () => {
+                  setMarriedSubmitting(true);
+                  await submitReport('already_married');
+                  setMarriedSubmitting(false);
+                  setShowMarriedConfirm(false);
+                  alert('Report submitted. Thank you!');
+                }}
+                  style={{ flex:1, padding:10, background: marriedSubmitting ? '#ddd' : 'linear-gradient(135deg,#ea580c,#c2410c)', color:'#fff', border:'none', borderRadius:8, fontSize:13, fontWeight:700, cursor: marriedSubmitting ? 'wait' : 'pointer' }}>
+                  {marriedSubmitting ? 'Submitting…' : 'Yes, Report'}
+                </button>
               </div>
             </div>
           </div>
