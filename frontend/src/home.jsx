@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE, PHOTO_BASE, PHOTO_BASE_OLD, UPLOADS_PREFIX, USER_PANEL_URL, getPhotoUrls } from './config';
@@ -395,8 +395,8 @@ export default function Home() {
   const exhausted = activeTab === 'groom' ? maleExhausted : femaleExhausted;
   const hasMore = shownCards < totalCards || !exhausted;
 
-  // Load More: advance by 20 cards; unlock hidden sections on first click; fetch from
-  // server when the cached feed is nearly exhausted.
+  // Load More: advance by 20 cards; unlock hidden sections on first trigger;
+  // fetch from the server when the cached feed is nearly exhausted.
   const handleLoadMore = () => {
     setShowMore(true);
     setVisibleCards(v => v + 20);
@@ -405,6 +405,24 @@ export default function Home() {
 
   // Reset pagination on tab change
   useEffect(() => { setVisibleCards(20); setShowMore(false); }, [activeTab]);
+
+  // Infinite-scroll sentinel: when the bottom marker enters view, trigger
+  // the same logic the Load More button used to run. Ref wraps the latest
+  // handler so the observer callback always sees current state.
+  const sentinelRef = useRef(null);
+  const loadMoreRef = useRef(handleLoadMore);
+  loadMoreRef.current = handleLoadMore;
+
+  useEffect(() => {
+    if (!hasMore || loadingMore) return;
+    const el = sentinelRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) loadMoreRef.current();
+    }, { rootMargin: '400px 0px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [hasMore, loadingMore, visibleCards, totalCards]);
 
   return (
     <div style={{ background:'#f5f5f5', minHeight:'100vh', paddingBottom:80 }}>
@@ -501,17 +519,16 @@ export default function Home() {
           flushCards();
           return elements;
         })()}
-        {/* Load More button */}
-        {hasMore && visibleFeed.length > 0 && (
-          <div style={{ textAlign:'center', padding:'24px 0 32px' }}>
-            <button
-              onClick={handleLoadMore}
-              disabled={loadingMore}
-              style={{ padding:'12px 40px', background: loadingMore ? '#ccc' : 'linear-gradient(135deg,#8B0000,#C41E3A)', color:'#fff', border:'none', borderRadius:10, fontSize:14, fontWeight:700, cursor: loadingMore ? 'wait' : 'pointer', boxShadow:'0 4px 12px rgba(139,0,0,0.3)', display:'inline-flex', alignItems:'center', gap:8 }}>
-              {loadingMore && <span style={{ width:14, height:14, border:'2px solid rgba(255,255,255,0.4)', borderTopColor:'#fff', borderRadius:'50%', animation:'spin 0.8s linear infinite' }} />}
-              {loadingMore ? 'Loading…' : 'Load More'}
-            </button>
+        {/* Infinite-scroll sentinel — the IntersectionObserver in the effect
+            above triggers handleLoadMore whenever this element enters view. */}
+        {visibleFeed.length > 0 && hasMore && (
+          <div ref={sentinelRef} style={{ textAlign:'center', padding:'20px 0 28px', color:'#888', fontSize:13, fontWeight:500, display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
+            <span style={{ width:14, height:14, border:'2px solid rgba(139,0,0,0.25)', borderTopColor:'#8B0000', borderRadius:'50%', animation:'spin 0.8s linear infinite' }} />
+            Loading more profiles…
           </div>
+        )}
+        {visibleFeed.length > 0 && !hasMore && (
+          <div style={{ textAlign:'center', padding:'20px 0 28px', color:'#aaa', fontSize:12 }}>You've reached the end</div>
         )}
       </div>
 
