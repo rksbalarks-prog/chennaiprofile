@@ -17,9 +17,8 @@ name: Deploy via HTTPS (HMAC-authenticated)
 
 on:
   workflow_dispatch:
-  # Uncomment once verified:
-  # push:
-  #   branches: [main]
+  push:
+    branches: [main]
 
 jobs:
   build-and-deploy:

@@ -1,14 +1,12 @@
-name: Deploy to kumbakonamfreematrimony.com
+name: Deploy to kumbakonamfreematrimony.com (FTPS, disabled)
 
-# Auto-deploys on every push to main.
-# Deploys frontend build output and backend PHP to shared hosting via FTPS.
-# Secrets (config.php, sms.php, payu-config.php, frontend/API/db.php, uploads/)
-# are NOT in the repo and are NEVER overwritten on the server.
+# HostEasy shared hosting blocks ports 21/22/990 at the firewall, so FTPS can
+# never connect (ticket #5679516 confirmed SSH is also unavailable on this
+# plan). Kept for reference only — all deploys now go through
+# deploy-https.yml which uses the HMAC-signed HTTPS endpoint.
 
 on:
-  push:
-    branches: [main]
-  workflow_dispatch:  # manual trigger from the Actions tab
+  workflow_dispatch:  # manual-only, will fail — kept so history is readable
 
 jobs:
   build-and-deploy:
