@@ -278,13 +278,14 @@ export default function Home() {
     <div style={{ position:'relative', display:'flex', background:'#fff', borderRadius:12, overflow:'hidden', boxShadow:'0 1px 6px rgba(0,0,0,0.06)', border:'1px solid #f0f0f0', cursor:'pointer' }}
       onClick={() => navigate(`/detail/${p.id}`, { state: { profile: p } })}>
       {/* Floating report button — always visible, top-right of card, outside
-          the flex layout so it can never be squeezed out by the bottom row. */}
+          the flex layout so it can never be squeezed out by the bottom row.
+          Solid red fill + white icon to stay obvious at small zoom levels. */}
       <button
         title="Report profile"
         aria-label="Report profile"
         onClick={e=>{e.stopPropagation();setReportProfileId(p.cpId);setReportReason('');setShowReportModal(true);}}
-        style={{ position:'absolute', top:6, right:6, zIndex:2, width:26, height:26, padding:0, background:'#fff', color:'#8B0000', border:'1.5px solid #8B0000', borderRadius:6, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 1px 3px rgba(0,0,0,0.08)' }}>
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8B0000" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        style={{ position:'absolute', top:8, right:8, zIndex:2, width:32, height:32, padding:0, background:'#8B0000', color:'#fff', border:'2px solid #fff', borderRadius:'50%', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 6px rgba(0,0,0,0.25)' }}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
           <line x1="12" y1="9" x2="12" y2="13"/>
           <line x1="12" y1="17" x2="12.01" y2="17"/>
