@@ -111,6 +111,85 @@ git push
 
 Or manually re-run an older successful workflow: Actions → pick a run → "Re-run jobs".
 
+## Fallback: HTTPS deploy (when FTP/SSH is firewalled)
+
+HostEasy's shared-hosting firewall blocks ports 21, 22, and 990 globally, so
+the FTPS workflow above can't reach the server. The branch `feat/https-deploy`
+contains a working alternative that uploads a signed zip over port 443 (HTTPS),
+which is always open because the site is reachable from browsers.
+
+### How it works
+
+- `backend/deploy.php` — lives on the server. Receives a POST with a zip body,
+  authenticates it via HMAC-SHA256 + timestamp (rejects >5 min old), and
+  extracts files into the site. Protected paths (`config.php`, `sms.php`,
+  `payu-config.php`, `frontend/API/db.php`, `uploads/`) are never overwritten.
+- `.github/workflows/deploy-https.yml` — builds the frontend, zips payload,
+  signs it, curls it to `deploy.php`.
+
+### Activation (one-time)
+
+1. **Generate a shared HMAC secret** on your local machine:
+   ```bash
+   openssl rand -hex 32
+   ```
+   Copy the 64-char hex output.
+
+2. **On the server** (via DirectAdmin File Manager, since FTP is blocked):
+   - Upload `backend/deploy.php` from this branch into the site's
+     `public_html/backend/` folder.
+   - Create a new file `public_html/backend/.deploy-secret` containing only
+     the 64-char hex value from step 1 (no quotes, no newline at end if your
+     editor lets you avoid it — but trailing whitespace is stripped anyway).
+   - Make sure `.deploy-secret` is NOT web-accessible. `backend/.htaccess`
+     already blocks dotfiles in most setups; if in doubt, add a line:
+     ```
+     <Files ".deploy-secret">
+         Require all denied
+     </Files>
+     ```
+
+3. **In GitHub → repo Settings → Secrets and variables → Actions**, add:
+   | Name | Value |
+   |---|---|
+   | `DEPLOY_URL` | `https://kumbakonamfreematrimony.com/backend/deploy.php` |
+   | `DEPLOY_HMAC_SECRET` | the same 64-char hex from step 1 |
+
+4. **Merge `feat/https-deploy` to `main`** (or cherry-pick its three files):
+   ```bash
+   git checkout main
+   git merge feat/https-deploy
+   git push
+   ```
+
+5. **First run** — manually trigger from Actions tab:
+   - Go to https://github.com/rksbalarks-prog/matrimony/actions
+   - Select "Deploy via HTTPS (HMAC-authenticated)"
+   - Click "Run workflow" → Run
+   - Watch the logs. A successful run ends with `{"ok":true,"written":N,...}`.
+
+6. **Once verified**, uncomment the `push: branches: [main]` trigger in
+   `deploy-https.yml` to get full auto-deploy on every push, and either
+   disable or delete the FTPS `deploy.yml` workflow so it stops failing.
+
+### Troubleshooting HTTPS deploy
+
+- **`signature mismatch`** → `DEPLOY_HMAC_SECRET` in GitHub and
+  `.deploy-secret` on the server must be byte-identical. Re-create both from
+  the same `openssl rand -hex 32` output.
+- **`timestamp outside ±300s window`** → server clock skew. Either fix NTP on
+  the server or widen the window in `deploy.php` (not recommended).
+- **`HTTP 413` or `HTTP 500 deploy-secret missing`** → shared hosting's
+  default `upload_max_filesize` / `post_max_size` (often 2–8 MB) is too
+  small. Add to `backend/.htaccess`:
+  ```
+  php_value upload_max_filesize 32M
+  php_value post_max_size 32M
+  php_value max_execution_time 120
+  ```
+- **`ZipArchive unavailable on server`** → rare; ask HostEasy to enable the
+  PHP `zip` extension.
+
 ## Troubleshooting
 
 **Workflow fails with "FTP connection timeout"** → hosting may block FTPS from
