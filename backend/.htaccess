@@ -1,0 +1,91 @@
+# matrimony/.htaccess
+
+# ── Enable mod_rewrite ────────────────────────────────────────────────────────
+Options -Indexes
+Options +FollowSymLinks
+RewriteEngine On
+
+# ── Block direct browser access to config.php ─────────────────────────────────
+<Files "admin-config.php">
+    Order Allow,Deny
+    Deny from all
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+</Files>
+<Files "sms.php">
+    Order Allow,Deny
+    Deny from all
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+</Files>
+<Files "config.php">
+    Order Allow,Deny
+    Deny from all
+
+    # Apache 2.4 syntax (preferred)
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+</Files>
+
+# ── Block direct browser access to the db directory ──────────────────────────
+<IfModule mod_rewrite.c>
+    RewriteRule ^db/.*$ - [F,L]
+</IfModule>
+
+# ── PHP session cookie hardening via php_value ───────────────────────────────
+<IfModule mod_php.c>
+    php_value session.cookie_httponly  1
+    php_value session.cookie_samesite  Lax
+    php_value session.use_strict_mode  1
+    # session.cookie_secure is set dynamically in secureSession() so localhost
+    # (HTTP) still works while production (HTTPS) keeps the cookie secure.
+</IfModule>
+<IfModule mod_php8.c>
+    php_value session.cookie_httponly  1
+    php_value session.cookie_samesite  Lax
+    php_value session.use_strict_mode  1
+    # session.cookie_secure is set dynamically in secureSession() so localhost
+    # (HTTP) still works while production (HTTPS) keeps the cookie secure.
+</IfModule>
+<IfModule mod_php7.c>
+    php_value session.cookie_httponly  1
+    php_value session.cookie_samesite  Lax
+    php_value session.use_strict_mode  1
+    # session.cookie_secure is set dynamically in secureSession() so localhost
+    # (HTTP) still works while production (HTTPS) keeps the cookie secure.
+</IfModule>
+
+# ── Security headers ─────────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# ── Allow .php files in api/ to be accessed normally ─────────────────────────
+<FilesMatch "\.php$">
+    <IfModule mod_authz_core.c>
+        Require all granted
+    </IfModule>
+</FilesMatch>
+
+# ── Deny access to .htaccess itself ──────────────────────────────────────────
+<Files ".htaccess">
+    Order Allow,Deny
+    Deny from all
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+</Files>
+
+# ── UTF-8 default charset ─────────────────────────────────────────────────────
+AddDefaultCharset UTF-8
+
+# ── Prevent directory listing in all subdirectories ──────────────────────────
+<IfModule mod_autoindex.c>
+    Options -Indexes
+</IfModule>

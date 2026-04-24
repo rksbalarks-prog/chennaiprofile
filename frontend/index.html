@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#8B0000">
+    <meta name="description" content="Kumbakonam Free Matrimony - Find your perfect life partner. Thousands of verified profiles, free contact info.">
+    <meta name="format-detection" content="telephone=no">
+
+    <title>Kumbakonam Free Matrimony - Find Your Perfect Life Partner</title>
+    <link rel="icon" type="image/svg+xml" href="/assets/kumbakonam_logo.svg">
+
+    <!-- DNS/connection setup: warms the TLS handshake in parallel with HTML parsing.
+         Saves 100-300ms on first fetch for mobile users on 3G/4G. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch"  href="//fonts.googleapis.com">
+
+    <!-- Preload the homepage API call. Browser fires the request in parallel with
+         the JS download, so data arrives roughly at the same time React mounts. -->
+    <link rel="preload" as="fetch" href="/backend/api/public.php?action=bootstrap&limit=12"
+          crossorigin="use-credentials">
+
+    <!-- Fonts load async with display=swap → text paints in system font immediately. -->
+    <link rel="preload" as="style"
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+          media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"></noscript>
+
+    <!-- Inline critical CSS: splash screen that paints BEFORE any JS runs.
+         User sees the brand within ~100ms of DNS lookup, even on Instagram
+         webview on 3G. Replaced by React UI as soon as hydration happens. -->
+    <style>
+      html, body {
+        margin: 0; padding: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #f5f5f5; color: #222;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;   /* removes iOS 300ms tap delay */
+        text-size-adjust: 100%; -webkit-text-size-adjust: 100%;
+      }
+      body { min-height: 100vh; }
+      #root:empty::before {
+        content: ''; display: block; height: 100vh; width: 100%;
+        background:
+          radial-gradient(circle at center top, #8B0000 0%, transparent 250px) no-repeat,
+          #f5f5f5;
+      }
+      #splash {
+        position: fixed; inset: 0; display: flex; flex-direction: column;
+        align-items: center; justify-content: center; background: #f5f5f5;
+        z-index: 9999; transition: opacity 0.3s ease-out;
+      }
+      #splash.hide { opacity: 0; pointer-events: none; }
+      .splash-logo {
+        width: 72px; height: 72px; border-radius: 50%;
+        border: 3px solid #8B0000; display: flex;
+        align-items: center; justify-content: center;
+        font-size: 22px; font-weight: 900; color: #8B0000;
+        background: #fff; margin-bottom: 18px;
+      }
+      .splash-title { font-size: 18px; font-weight: 800; color: #8B0000; letter-spacing: -0.3px; }
+      .splash-sub { font-size: 12px; color: #999; margin-top: 4px; letter-spacing: 0.4px; }
+      .splash-spin {
+        margin-top: 28px; width: 28px; height: 28px;
+        border: 3px solid #f0e0e0; border-top-color: #8B0000;
+        border-radius: 50%; animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+
+      /* Mobile tap/scroll polish — applied globally via inline CSS so it's
+         effective during the splash → hydration transition, not just post-mount. */
+      a, button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+      img { display: block; max-width: 100%; height: auto; }
+    </style>
+</head>
+<body>
+    <div id="root">
+      <!-- Shown until React mounts. Removed by main.jsx. -->
+      <div id="splash">
+        <div class="splash-logo">KM</div>
+        <div class="splash-title">Kumbakonam Matrimony</div>
+        <div class="splash-sub">FREE · TRUSTED · VERIFIED</div>
+        <div class="splash-spin"></div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.jsx"></script>
+    <script>
+      // Remove splash as soon as React has replaced #root content.
+      // MutationObserver fires within ~1ms of the first React render.
+      (function () {
+        var splash = document.getElementById('splash');
+        if (!splash) return;
+        var obs = new MutationObserver(function () {
+          // If React has rendered something, start fading out the splash.
+          if (document.getElementById('root').children.length > 1 ||
+              (document.getElementById('root').firstElementChild &&
+               document.getElementById('root').firstElementChild.id !== 'splash')) {
+            splash.classList.add('hide');
+            setTimeout(function () { splash.remove(); obs.disconnect(); }, 300);
+          }
+        });
+        obs.observe(document.getElementById('root'), { childList: true, subtree: false });
+        // Safety: always remove after 8s even if something goes wrong.
+        setTimeout(function () { splash && splash.remove(); }, 8000);
+      })();
+    </script>
+</body>
+</html>

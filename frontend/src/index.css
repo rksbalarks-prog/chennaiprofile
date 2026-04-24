@@ -1,0 +1,135 @@
+/* Global CSS with i18n Support */
+
+/* ─────────────────────────────────────────────────────────────────── */
+/* TAILWIND AND BASE STYLES */
+/* ─────────────────────────────────────────────────────────────────── */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────────────────────────── */
+/* LANGUAGE-SPECIFIC FONT CONFIGURATION */
+/* ─────────────────────────────────────────────────────────────────── */
+
+/* English Language - Default */
+html[lang="en"],
+html:not([lang]) {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+  letter-spacing: 0.2px;
+}
+
+/* Tamil Language - Specialized Font */
+html[lang="ta"] {
+  font-family: 'Noto Sans Tamil', 'Tamil MN', 'Noto Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.7;
+  letter-spacing: 0.3px;
+  text-rendering: optimizeLegibility;
+  word-spacing: 0.1em;
+}
+
+/* Ensure inputs and form elements use appropriate fonts */
+html[lang="ta"] input,
+html[lang="ta"] textarea,
+html[lang="ta"] select,
+html[lang="ta"] button {
+  font-family: 'Noto Sans Tamil', 'Tamil MN', 'Noto Sans', sans-serif;
+  line-height: 1.7;
+}
+
+html[lang="en"] input,
+html[lang="en"] textarea,
+html[lang="en"] select,
+html[lang="en"] button {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  line-height: 1.5;
+}
+
+/* ─────────────────────────────────────────────────────────────────── */
+/* BODY AND ROOT STYLES */
+/* ─────────────────────────────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  -webkit-font-feature-settings: "kern" 1;
+  -moz-font-feature-settings: "kern" 1;
+  font-feature-settings: "kern" 1;
+  background-color: #f5f5f5;
+  color: #222;
+}
+
+/* ─────────────────────────────────────────────────────────────────── */
+/* LANGUAGE TRANSITION EFFECTS */
+/* ─────────────────────────────────────────────────────────────────── */
+* {
+  transition: font-family 0.3s ease;
+}
+
+/* Smooth transition for text when language changes */
+html[lang="ta"] * {
+  transition: font-family 0.3s ease, line-height 0.2s ease;
+}
+
+/* ─────────────────────────────────────────────────────────────────── */
+/* ENSURE NO CHARACTER CORRUPTION IN TAMIL */
+/* ─────────────────────────────────────────────────────────────────── */
+html[lang="ta"] {
+  unicode-bidi: embed;
+}
+
+/* Prevent Tamil text from breaking incorrectly */
+html[lang="ta"] p,
+html[lang="ta"] div,
+html[lang="ta"] span,
+html[lang="ta"] h1,
+html[lang="ta"] h2,
+html[lang="ta"] h3,
+html[lang="ta"] h4,
+html[lang="ta"] h5,
+html[lang="ta"] h6 {
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+/* ─────────────────────────────────────────────────────────────────── */
+/* SCROLLBAR STYLING */
+/* ─────────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+/* ─────────────────────────────────────────────────────────────────── */
+/* GLOBAL APP STYLES */
+/* ─────────────────────────────────────────────────────────────────── */
+html, body {
+  overflow-x: hidden;
+}
+
+a { text-decoration: none; }
+
+img { max-width: 100%; }
+
+/* Prevent pull-to-refresh on mobile */
+html { overscroll-behavior: none; }

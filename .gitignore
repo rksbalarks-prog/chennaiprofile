@@ -1,0 +1,37 @@
+# ── Secrets (never commit) ───────────────────────────────────────────────────
+backend/config.php
+backend/config.production.php
+backend/sms.php
+backend/payu-config.php
+frontend/API/db.php
+
+# ── Dependencies / build artifacts ───────────────────────────────────────────
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/dist.zip
+frontend/.vite/
+backend.zip
+
+# ── User-generated content (huge, lives only on server) ──────────────────────
+uploads/
+backend/api/uploads/
+
+# ── SQL dumps (production data) ──────────────────────────────────────────────
+*.sql
+
+# ── Local tooling / editor ───────────────────────────────────────────────────
+.claude/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ── Logs / temp ──────────────────────────────────────────────────────────────
+*.log
+*.tmp
+,
+
+# ── PHP / Composer (if used later) ───────────────────────────────────────────
+vendor/
+composer.lock
