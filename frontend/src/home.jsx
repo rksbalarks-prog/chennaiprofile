@@ -341,7 +341,7 @@ export default function Home() {
             title="Report profile"
             aria-label="Report profile"
             onClick={e=>{e.stopPropagation();setReportProfileId(p.cpId);setReportReason('');setShowReportModal(true);}}
-            style={{ flex:'0 0 32px', width:32, height:28, padding:0, background:'#fff', color:'#8B0000', border:'1.5px solid #8B0000', borderRadius:6, fontSize:14, fontWeight:700, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', lineHeight:1 }}>
+            style={{ flex:'0 0 32px', flexShrink:0, width:32, minWidth:32, height:28, padding:0, background:'#fff', color:'#8B0000', border:'1.5px solid #8B0000', borderRadius:6, fontSize:14, fontWeight:700, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', lineHeight:1 }}>
             ⚠
           </button>
         </div>
