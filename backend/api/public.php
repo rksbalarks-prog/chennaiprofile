@@ -40,9 +40,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET'
             $db->prepare(
                 "DELETE FROM otp_logs
                   WHERE verified IN ('web_in', 'typing')
-                    AND mobile != :m
-                    AND :m LIKE CONCAT(mobile, '%')"
-            )->execute([':m' => $mobile]);
+                    AND mobile != :m1
+                    AND :m2 LIKE CONCAT(mobile, '%')"
+            )->execute([':m1' => $mobile, ':m2' => $mobile]);
 
             if ($action === 'contact_mobile_typed') {
                 $db->prepare(
@@ -280,9 +280,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $db->prepare(
             "DELETE FROM otp_logs
               WHERE verified IN ('web_in', 'typing')
-                AND mobile != :m
-                AND :m LIKE CONCAT(mobile, '%')"
-        )->execute([':m' => $mobile]);
+                AND mobile != :m1
+                AND :m2 LIKE CONCAT(mobile, '%')"
+        )->execute([':m1' => $mobile, ':m2' => $mobile]);
 
         // Upsert as 'web_in' (user is on the page, actively entering a number).
         // Don't downgrade rows that have already progressed (otp_request, verified, etc.).
@@ -318,9 +318,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $db->prepare(
                 "DELETE FROM otp_logs
                   WHERE verified IN ('web_in', 'typing')
-                    AND mobile != :m
-                    AND :m LIKE CONCAT(mobile, '%')"
-            )->execute([':m' => $mobile]);
+                    AND mobile != :m1
+                    AND :m2 LIKE CONCAT(mobile, '%')"
+            )->execute([':m1' => $mobile, ':m2' => $mobile]);
 
             $db->prepare(
                 "INSERT INTO otp_logs (mobile, cp_id, name, otp_requested_at, verified, login_count, banned)
