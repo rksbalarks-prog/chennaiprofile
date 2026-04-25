@@ -6,6 +6,9 @@ import Home from './home.jsx'                  // eager: first paint route
 import MobileGate from './MobileGate.jsx'      // eager: wraps Home
 import './index.css'
 import './i18n.js'
+import { initAnalytics, trackPageview } from './analytics.js'
+
+initAnalytics()
 
 // Lazy routes — split into their own chunks. Mobile users on Instagram webview
 // no longer pay the cost of loading the whole app up front.
@@ -20,8 +23,10 @@ const GoogleForm         = lazy(() => import('./GoogleForm.jsx'))
 const GoogleFormTA       = lazy(() => import('./GoogleFormTA.jsx'))
 
 function ScrollToTop() {
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  // Fire a GA pageview on every SPA route change. No-op when GA is unconfigured.
+  useEffect(() => { trackPageview(pathname + search); }, [pathname, search]);
   return null;
 }
 

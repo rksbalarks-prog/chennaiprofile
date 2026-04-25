@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { API_BASE } from './config';
+import { trackEvent } from './analytics.js';
 
 const C = {
   maroon: '#7f1d1d',
@@ -149,10 +150,12 @@ export default function MobileGate({ children }) {
       if (r.ok) {
         if (r.auto_verified) {
           setVerified(true);
+          trackEvent('mobile_verified', { method: 'auto' });
           try { sessionStorage.setItem('cc_v1', JSON.stringify({ v:true, m:mobile, t:Date.now() })); } catch(e){}
           return;
         }
         setStage('otp'); setTimer(120);
+        trackEvent('otp_sent');
         show(r.otp ? `Dev OTP: ${r.otp}` : `OTP sent to +91 ${mobile}`, 'success');
         setTimeout(() => otpRefs.current[0]?.focus(), 50);
       } else show(r.error || 'Failed to send OTP', 'error');
@@ -172,9 +175,10 @@ export default function MobileGate({ children }) {
       }).then(r => r.json());
       if (r.ok && r.verified) {
         setVerified(true);
+        trackEvent('mobile_verified', { method: 'otp' });
         try { sessionStorage.setItem('cc_v1', JSON.stringify({ v:true, m:mobile, t:Date.now() })); } catch(e){}
       }
-      else show(r.error || 'Invalid OTP', 'error');
+      else { trackEvent('otp_failed'); show(r.error || 'Invalid OTP', 'error'); }
     } catch { show('Network error. Please try again.', 'error'); }
     setLoading(false);
   };
