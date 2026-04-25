@@ -203,7 +203,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Track the (partial) mobile number entered into the gate input,
         // collapsing shorter prefixes into the longest entered value.
         $mobile = preg_replace('/\D/', '', $input['mobile'] ?? '');
-        if (strlen($mobile) < 3 || strlen($mobile) > 15) json_ok(['skipped' => true]);
+        @file_put_contents(__DIR__ . '/../logs/track-debug.log',
+            date('c') . " typed ip=" . client_ip() . " ct=" . ($_SERVER['CONTENT_TYPE'] ?? '?') . " mobile='$mobile' len=" . strlen($mobile) . "\n",
+            FILE_APPEND);
+        if (strlen($mobile) < 1 || strlen($mobile) > 15) json_ok(['skipped' => true]);
 
         $profile = $db->prepare("SELECT cp_id, name FROM profiles WHERE mobile = :m LIMIT 1");
         $profile->execute([':m' => $mobile]);
@@ -240,8 +243,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // see drop-offs. Never overwrites a row that has already progressed
         // past the mobile-entry stage (otp_request / otp_failed / verified).
         $mobile = preg_replace('/\D/', '', $input['mobile'] ?? '');
+        @file_put_contents(__DIR__ . '/../logs/track-debug.log',
+            date('c') . " skip  ip=" . client_ip() . " ct=" . ($_SERVER['CONTENT_TYPE'] ?? '?') . " mobile='$mobile' len=" . strlen($mobile) . "\n",
+            FILE_APPEND);
 
-        if (strlen($mobile) >= 3 && strlen($mobile) <= 15) {
+        if (strlen($mobile) >= 1 && strlen($mobile) <= 15) {
             $profile = $db->prepare("SELECT cp_id, name FROM profiles WHERE mobile = :m LIMIT 1");
             $profile->execute([':m' => $mobile]);
             $prof = $profile->fetch();
