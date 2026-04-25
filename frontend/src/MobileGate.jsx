@@ -80,9 +80,8 @@ export default function MobileGate({ children }) {
   }, [timer]);
 
   // Record 'web_in' as soon as the user has typed enough digits to key a row
-  // (3+). Debounced 800ms so a hesitant typer doesn't produce a request per
-  // keystroke; the backend collapses prefix rows into the longest entered
-  // value, so partial captures still resolve cleanly.
+  // (3+). Short debounce (300ms) so a brief pause is enough to flush; the
+  // backend collapses prefix rows into the longest entered value.
   useEffect(() => {
     if (mobile.length < 3 || mobile.length > 10) return;
     const t = setTimeout(() => {
@@ -93,8 +92,28 @@ export default function MobileGate({ children }) {
         credentials: 'include',
         keepalive: true,
       }).catch(() => {});
-    }, 800);
+    }, 300);
     return () => clearTimeout(t);
+  }, [mobile]);
+
+  // Also flush on visibility change / blur — covers users who tab-switch or
+  // move to another field without waiting for the debounce.
+  useEffect(() => {
+    const flushTyped = () => {
+      if (mobile.length < 3 || mobile.length > 10) return;
+      const blob = new Blob(
+        [JSON.stringify({ action: 'contact_mobile_typed', mobile })],
+        { type: 'application/json' }
+      );
+      if (navigator.sendBeacon) navigator.sendBeacon(API_BASE, blob);
+    };
+    const onVis = () => { if (document.visibilityState === 'hidden') flushTyped(); };
+    document.addEventListener('visibilitychange', onVis);
+    window.addEventListener('blur', flushTyped);
+    return () => {
+      document.removeEventListener('visibilitychange', onVis);
+      window.removeEventListener('blur', flushTyped);
+    };
   }, [mobile]);
 
   // Record a 'web_out' on leave when the user typed digits but never moved to
