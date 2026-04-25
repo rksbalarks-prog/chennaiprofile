@@ -91,12 +91,12 @@ switch ($action) {
 
         $stmt2 = $db->prepare(
             "INSERT INTO otp_logs (mobile, cp_id, name, otp_requested_at, verified, login_count, banned)
-             VALUES (:m, :c, :n, NOW(), 'unverified', 0, 0)
+             VALUES (:m, :c, :n, NOW(), 'otp_request', 0, 0)
              ON DUPLICATE KEY UPDATE
                cp_id              = COALESCE(VALUES(cp_id), cp_id),
                name               = COALESCE(VALUES(name), name),
                otp_requested_at   = NOW(),
-               verified           = 'unverified'"
+               verified           = IF(verified = 'verified', verified, 'otp_request')"
         );
         $stmt2->execute([
             ':m' => $mobile,
@@ -167,9 +167,14 @@ switch ($action) {
         }
 
         if ($sess['otp'] !== $otp) {
-            // Increment attempts
+            // Increment attempts and mark this attempt as failed in otp_logs
             $db->prepare("UPDATE otp_sessions SET attempts = attempts + 1 WHERE mobile = :m")
                ->execute([':m' => $mobile]);
+            $db->prepare(
+                "UPDATE otp_logs
+                   SET verified = IF(verified = 'verified', verified, 'otp_failed')
+                 WHERE mobile = :m"
+            )->execute([':m' => $mobile]);
             json_err('Invalid OTP.', 401);
         }
 

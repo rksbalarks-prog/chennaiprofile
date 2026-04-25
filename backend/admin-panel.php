@@ -2952,10 +2952,11 @@ input[type="date"].filter-select { padding:8px 10px; cursor:pointer; }
       <input class="search-input" id="otpSearch" placeholder="Search by mobile, CP ID or name…" oninput="renderOtp()">
       <select class="filter-select" id="otpStatusFilter" onchange="renderOtp()">
         <option value="">All Status</option>
-        <option value="verified">Verified</option>
-        <option value="unverified">Not Verified</option>
-        <option value="typing">Typing</option>
-        <option value="skip">Skipped</option>
+        <option value="web_in">Web In</option>
+        <option value="web_out">Web Out</option>
+        <option value="otp_request">OTP Request</option>
+        <option value="verified">OTP Verified</option>
+        <option value="otp_failed">OTP Failed</option>
       </select>
       <select class="filter-select" id="otpBanFilter" onchange="renderOtp()">
         <option value="">All Users</option>
@@ -7391,6 +7392,10 @@ function exportCSV(type) {
     downloadCSV('custom-plans.csv', csv);
     toast('Plans exported as CSV');
   } else if (type === 'otp') {
+    const stLabel = v => {
+      const n = v==='typing'?'web_in':v==='skip'?'web_out':v==='unverified'?'otp_request':v;
+      return ({verified:'OTP Verified',otp_failed:'OTP Failed',otp_request:'OTP Request',web_in:'Web In',web_out:'Web Out'}[n]) || (v || '—');
+    };
     const csv = toCSV(
       ['Sl.No','Mobile','CP ID','Name','OTP Requested At','Live OTP','Verification Status','Last Login','Login Count','User Status'],
       otpLogs.map((o, i) => {
@@ -7400,7 +7405,7 @@ function exportCSV(type) {
         return [
           i + 1, o.mobile, o.cpId || '—', o.name || 'Not registered',
           o.otpRequestedAt, (lr && !expired) ? lr : '—',
-          o.verified === 'verified' ? 'Verified' : 'Not Verified',
+          stLabel(o.verified),
           o.lastLogin, o.loginCount, o.banned ? 'Banned' : 'Active'
         ];
       })
@@ -10369,10 +10374,12 @@ function renderOtp() {
   const dateFrom=  document.getElementById('otpDateFrom')?.value     || '';
   const dateTo  =  document.getElementById('otpDateTo')?.value       || '';
   const sorted  = [...otpLogs].sort((a,b)=>(b.otpRequestedAt||'').localeCompare(a.otpRequestedAt||''));
+  // Normalize legacy status values to the current taxonomy
+  const normStatus = v => v==='typing'?'web_in':v==='skip'?'web_out':v==='unverified'?'otp_request':(v||'');
   const filtered= sorted.filter(o=>{
     const txt=(o.mobile+o.cpId+o.name).toLowerCase();
     const d=(o.otpRequestedAt||'').split(' ')[0];
-    return(!q||txt.includes(q))&&(!stFilt||o.verified===stFilt)&&
+    return(!q||txt.includes(q))&&(!stFilt||normStatus(o.verified)===stFilt)&&
            (!banFilt||(banFilt==='banned'&&o.banned)||(banFilt==='active'&&!o.banned))&&
            (!dateFrom||d>=dateFrom)&&(!dateTo||d<=dateTo);
   });
@@ -10381,13 +10388,18 @@ function renderOtp() {
     const otpPIdx=profiles.findIndex(p=>p.mobile===o.mobile);
     const cpCell=o.cpId?`<code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${o.cpId}</code>`:`<span style="color:#d1d5db;font-size:12px">—</span>`;
     const nameCell=o.name?`<div class="name-cell"><div class="avatar" style="width:26px;height:26px;font-size:10px">${initials(o.name)}</div>${o.name}</div>`:`<span style="color:#d1d5db;font-size:12px">Not registered</span>`;
-    const vBadge = o.verified === 'verified'
-      ? `<span class="badge otp-verified">✅ Verified</span>`
-      : o.verified === 'typing'
-        ? `<span class="badge otp-typing" style="background:#fff7ed;color:#c2410c;border:1px solid #fed7aa">⌨️ Typing</span>`
-        : o.verified === 'skip'
-          ? `<span class="badge otp-skip" style="background:#eef2ff;color:#4338ca;border:1px solid #c7d2fe">⤼ Skipped</span>`
-          : `<span class="badge otp-unverified">⏳ Not Verified</span>`;
+    const st = normStatus(o.verified);
+    const vBadge = st === 'verified'
+      ? `<span class="badge otp-verified">✅ OTP Verified</span>`
+      : st === 'otp_failed'
+        ? `<span class="badge otp-failed" style="background:#fef2f2;color:#b91c1c;border:1px solid #fecaca">❌ OTP Failed</span>`
+        : st === 'otp_request'
+          ? `<span class="badge otp-request" style="background:#fef9c3;color:#854d0e;border:1px solid #fde68a">⏳ OTP Request</span>`
+          : st === 'web_in'
+            ? `<span class="badge otp-webin" style="background:#fff7ed;color:#c2410c;border:1px solid #fed7aa">⌨️ Web In</span>`
+            : st === 'web_out'
+              ? `<span class="badge otp-webout" style="background:#eef2ff;color:#4338ca;border:1px solid #c7d2fe">⤼ Web Out</span>`
+              : `<span class="badge otp-unverified">— ${o.verified || 'Unknown'}</span>`;
     const sBadge=o.banned?`<span class="badge otp-banned">🚫 Banned</span>`:`<span class="badge otp-active">✓ Active</span>`;
     const cc=o.loginCount>=15?'#dc2626':o.loginCount>=8?'#d97706':'var(--text-primary)';
     const banBtn=o.banned?`<button class="btn unban-btn btn-sm" onclick="toggleBan(${realIdx})">↩ Unban</button>`:`<button class="btn ban-btn btn-sm" onclick="toggleBan(${realIdx})">🚫 Ban</button>`;

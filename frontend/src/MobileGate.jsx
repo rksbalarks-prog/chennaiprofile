@@ -97,19 +97,21 @@ export default function MobileGate({ children }) {
     return () => clearTimeout(t);
   }, [mobile]);
 
-  // Send the last typed value when the user leaves the page mid-entry.
+  // Record a 'web_out' on leave when the user typed digits but never moved to
+  // the OTP-entry stage. Once stage advances to 'otp', the row is already
+  // 'otp_request' and the backend won't downgrade it.
   useEffect(() => {
     const flush = () => {
-      if (mobile.length < 3) return;
+      if (stage !== 'mobile' || mobile.length < 3) return;
       const blob = new Blob(
-        [JSON.stringify({ action: 'contact_mobile_typed', mobile })],
+        [JSON.stringify({ action: 'contact_skip_gate', mobile })],
         { type: 'application/json' }
       );
       if (navigator.sendBeacon) navigator.sendBeacon(API_BASE, blob);
     };
     window.addEventListener('pagehide', flush);
     return () => window.removeEventListener('pagehide', flush);
-  }, [mobile]);
+  }, [mobile, stage]);
 
   const show = (text, kind = 'info') => { setMsg(text); setMsgKind(kind); };
 

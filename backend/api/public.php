@@ -128,14 +128,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $profile = $db->prepare("SELECT cp_id, name FROM profiles WHERE mobile = :m LIMIT 1");
         $profile->execute([':m' => $mobile]);
         $prof = $profile->fetch();
+        // Promote to 'otp_request' (user is now on the OTP entry page).
+        // Don't downgrade an already-'verified' row.
         $db->prepare(
             "INSERT INTO otp_logs (mobile, cp_id, name, otp_requested_at, verified, login_count, banned)
-             VALUES (:m, :c, :n, NOW(), 'unverified', 0, 0)
+             VALUES (:m, :c, :n, NOW(), 'otp_request', 0, 0)
              ON DUPLICATE KEY UPDATE
                cp_id            = COALESCE(VALUES(cp_id), cp_id),
                name             = COALESCE(VALUES(name), name),
                otp_requested_at = NOW(),
-               verified         = 'unverified'"
+               verified         = IF(verified = 'verified', verified, 'otp_request')"
         )->execute([':m' => $mobile, ':c' => $prof['cp_id'] ?? null, ':n' => $prof['name'] ?? null]);
 
         require_once __DIR__ . '/../sms.php';
@@ -160,7 +162,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ((int)$row['attempts'] >= 5) json_err('Too many attempts. Please request again.');
 
         $db->prepare("UPDATE otp_sessions SET attempts = attempts + 1 WHERE mobile = :m")->execute([':m' => $mobile]);
-        if ($row['otp'] !== $otp) json_err('Invalid OTP');
+        if ($row['otp'] !== $otp) {
+            // Mark this attempt as failed in otp_logs so admins can see wrong-OTP entries.
+            $db->prepare(
+                "UPDATE otp_logs
+                   SET verified = IF(verified = 'verified', verified, 'otp_failed')
+                 WHERE mobile = :m"
+            )->execute([':m' => $mobile]);
+            json_err('Invalid OTP');
+        }
 
         $db->prepare("UPDATE otp_sessions SET verified = 1 WHERE mobile = :m")->execute([':m' => $mobile]);
 
@@ -190,32 +200,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $profile->execute([':m' => $mobile]);
         $prof = $profile->fetch();
 
-        // Drop any shorter prefix rows still in 'typing' state — e.g. when user
-        // typed 99 → 994 → 994455, only keep 994455. Never touches 'verified' rows.
+        // Drop any shorter prefix rows still in an 'in-progress' (web_in/typing)
+        // state — e.g. when user typed 99 → 994 → 994455, only keep 994455.
+        // Never touches rows that have already progressed past entry.
         $db->prepare(
             "DELETE FROM otp_logs
-              WHERE verified = 'typing'
+              WHERE verified IN ('web_in', 'typing')
                 AND mobile != :m
                 AND :m LIKE CONCAT(mobile, '%')"
         )->execute([':m' => $mobile]);
 
-        // Upsert current value — never downgrade a 'verified' row back to typing.
+        // Upsert as 'web_in' (user is on the page, actively entering a number).
+        // Don't downgrade rows that have already progressed (otp_request, verified, etc.).
         $db->prepare(
             "INSERT INTO otp_logs (mobile, cp_id, name, otp_requested_at, verified, login_count, banned)
-             VALUES (:m, :c, :n, NOW(), 'typing', 0, 0)
+             VALUES (:m, :c, :n, NOW(), 'web_in', 0, 0)
              ON DUPLICATE KEY UPDATE
                cp_id            = COALESCE(VALUES(cp_id), cp_id),
                name             = COALESCE(VALUES(name), name),
                otp_requested_at = NOW(),
-               verified         = IF(verified = 'verified', verified, 'typing')"
+               verified         = IF(verified IN ('verified','otp_request','otp_failed','web_out'), verified, 'web_in')"
         )->execute([':m' => $mobile, ':c' => $prof['cp_id'] ?? null, ':n' => $prof['name'] ?? null]);
 
         json_ok(['tracked' => true]);
     }
 
     if ($act === 'contact_skip_gate') {
-        // User dismissed the mobile-verification gate without verifying.
-        // Record as 'skip' in otp_logs so admins can see drop-offs.
+        // User left the mobile-verification gate after typing 1–10 digits but
+        // never requested an OTP. Record as 'web_out' in otp_logs so admins can
+        // see drop-offs. Never overwrites a row that has already progressed
+        // past the mobile-entry stage (otp_request / otp_failed / verified).
         $mobile = preg_replace('/\D/', '', $input['mobile'] ?? '');
 
         if (strlen($mobile) >= 3 && strlen($mobile) <= 15) {
@@ -223,22 +237,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $profile->execute([':m' => $mobile]);
             $prof = $profile->fetch();
 
-            // Collapse earlier 'typing' prefixes into this final skipped value.
+            // Collapse earlier in-progress prefixes into this final web_out value.
             $db->prepare(
                 "DELETE FROM otp_logs
-                  WHERE verified = 'typing'
+                  WHERE verified IN ('web_in', 'typing')
                     AND mobile != :m
                     AND :m LIKE CONCAT(mobile, '%')"
             )->execute([':m' => $mobile]);
 
             $db->prepare(
                 "INSERT INTO otp_logs (mobile, cp_id, name, otp_requested_at, verified, login_count, banned)
-                 VALUES (:m, :c, :n, NOW(), 'skip', 0, 0)
+                 VALUES (:m, :c, :n, NOW(), 'web_out', 0, 0)
                  ON DUPLICATE KEY UPDATE
                    cp_id            = COALESCE(VALUES(cp_id), cp_id),
                    name             = COALESCE(VALUES(name), name),
                    otp_requested_at = NOW(),
-                   verified         = IF(verified = 'verified', verified, 'skip')"
+                   verified         = IF(verified IN ('verified','otp_request','otp_failed'), verified, 'web_out')"
             )->execute([':m' => $mobile, ':c' => $prof['cp_id'] ?? null, ':n' => $prof['name'] ?? null]);
         }
 

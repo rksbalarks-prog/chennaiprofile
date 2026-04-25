@@ -2751,7 +2751,7 @@ async function renderLoginHistory() {
       ? '<tr><td colspan="6" style="text-align:center;padding:22px;color:var(--ink3)">No login records</td></tr>'
       : '<tr><td style="color:var(--ink4)">1</td>'
         + '<td style="font-size:11.5px">' + esc(log.otp_requested_at || '-') + '</td>'
-        + '<td><span class="badge ' + (log.verified === 'verified' ? 'badge-green' : 'badge-amber') + '">' + (log.verified === 'verified' ? 'Verified' : 'Pending') + '</span></td>'
+        + '<td><span class="badge ' + (log.verified === 'verified' ? 'badge-green' : 'badge-amber') + '">' + ({verified:'OTP Verified',otp_failed:'OTP Failed',otp_request:'OTP Request',unverified:'OTP Request',web_in:'Web In',typing:'Web In',web_out:'Web Out',skip:'Web Out'}[log.verified] || 'Pending') + '</span></td>'
         + '<td style="font-size:11.5px">' + (log.last_login ? esc(log.last_login) : '-') + '</td>'
         + '<td style="font-weight:700;font-family:var(--mono)">' + (log.login_count || 0) + '</td>'
         + '<td><span class="badge ' + (log.banned ? 'badge-amber' : 'badge-green') + '">' + (log.banned ? 'Banned' : 'Active') + '</span></td></tr>';
