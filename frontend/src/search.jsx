@@ -256,52 +256,92 @@ export default function MatrimonySearch() {
           <div style={{ fontSize:12, color:'#ccc', marginTop:4 }}>Try adjusting your filters</div>
         </div>
       ) : (
-        <div style={{ padding:12, display:'flex', flexDirection:'column', gap:10, maxWidth:900, margin:'0 auto' }}>
-          {paged.map(p => (
-            <div key={p.id} style={{ display:'flex', background:'#fff', borderRadius:12, overflow:'hidden', boxShadow:'0 1px 6px rgba(0,0,0,0.06)', border:'1px solid #f0f0f0', cursor:'pointer' }}
-              onClick={() => navigate(`/detail/${p.id}`, { state: { profile: p } })}>
-              {(() => {
-                const genderFallback = p.gender === 'Male' ? '/default-male.png' : '/default-female.png';
-                if (!p.photo) {
-                  return (
+        <div style={{ padding:12, display:'flex', flexDirection:'column', gap:14, maxWidth:560, margin:'0 auto' }}>
+          {paged.map(p => {
+            const goDetail = () => navigate(`/detail/${p.id}`, { state: { profile: p } });
+            const genderFallback = p.gender === 'Male' ? '/default-male.png' : '/default-female.png';
+            const urls = p.photo ? getPhotoUrls(p.photoRaw) : null;
+            const locationStr = [p.city, p.district, p.state].filter(Boolean).join(', ');
+            return (
+              <div key={p.id} style={{ background:'#fff', borderRadius:14, overflow:'hidden', boxShadow:'0 2px 10px rgba(0,0,0,0.06)', border:'1px solid #efeaf3', cursor:'pointer' }}
+                onClick={goDetail}>
+
+                {/* Photo banner */}
+                <div style={{ position:'relative', width:'100%', aspectRatio:'4 / 3', background:'#f5f5f5' }}>
+                  {p.photo ? (
+                    <picture>
+                      {urls && <source type="image/webp" srcSet={urls.thumb} />}
+                      <img src={urls ? urls.orig : p.photo} alt={p.name}
+                        loading="lazy" decoding="async"
+                        style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}
+                        onError={e => { e.target.onerror=null; e.target.src = genderFallback; }} />
+                    </picture>
+                  ) : (
                     <img src={genderFallback} alt={p.name}
                       loading="lazy" decoding="async"
-                      width="110" height="130"
-                      style={{ width:110, height:130, objectFit:'cover', flexShrink:0, background:'#f5f5f5' }} />
-                  );
-                }
-                const urls = getPhotoUrls(p.photoRaw);
-                return (
-                  <picture>
-                    {urls && <source type="image/webp" srcSet={urls.thumb} />}
-                    <img src={urls ? urls.orig : p.photo} alt={p.name}
-                      loading="lazy" decoding="async"
-                      width="110" height="130"
-                      style={{ width:110, height:130, objectFit:'cover', flexShrink:0, background:'#f5f5f5' }}
-                      onError={e => { e.target.onerror=null; e.target.src = genderFallback; }} />
-                  </picture>
-                );
-              })()}
-              <div style={{ flex:1, padding:'10px 12px', display:'flex', flexDirection:'column', gap:3, minWidth:0 }}>
-                <div style={{ fontSize:14, fontWeight:700, color:'#222', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.name}</div>
-                <span style={{ fontSize:11, color:'#8B0000', fontWeight:600, background:'#fef2f2', padding:'1px 8px', borderRadius:4, width:'fit-content' }}>{p.regId}</span>
-                <div style={{ fontSize:12, color:'#777' }}>
-                  {[p.age ? p.age+' yrs' : '', p.height, [p.city,p.district,p.state].filter(Boolean).join(', ')].filter(Boolean).join(' · ')}
+                      style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} />
+                  )}
+                  <span style={{ position:'absolute', top:10, right:10, background:'rgba(139,0,0,0.85)', color:'#fff', fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:14, backdropFilter:'blur(4px)' }}>1 / 1</span>
                 </div>
-                <div style={{ fontSize:12, color:'#777' }}>
-                  {[p.qualification, p.job].filter(Boolean).join(' · ')}
+
+                {/* Header row: ID + religion + Call Now */}
+                <div style={{ padding:'10px 14px 6px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:8 }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap', minWidth:0 }}>
+                    <span style={{ fontSize:12, color:'#8B0000', fontWeight:700, letterSpacing:0.3 }}>{p.regId}</span>
+                    {p.religion && <span style={{ fontSize:11, fontWeight:600, padding:'2px 9px', borderRadius:12, background:'#ecfdf5', color:'#047857', border:'1px solid #a7f3d0' }}>{p.religion}</span>}
+                  </div>
+                  <button onClick={e => { e.stopPropagation(); goDetail(); }}
+                    style={{ display:'flex', alignItems:'center', gap:5, background:'linear-gradient(135deg,#dc2626,#b91c1c)', color:'#fff', border:'none', borderRadius:18, padding:'6px 12px', fontSize:11, fontWeight:700, cursor:'pointer', boxShadow:'0 1px 4px rgba(220,38,38,0.3)', whiteSpace:'nowrap' }}>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57a1 1 0 0 0-1.02.24l-2.2 2.2a15.07 15.07 0 0 1-6.59-6.58l2.2-2.21a.96.96 0 0 0 .25-1A11.36 11.36 0 0 1 8.5 4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1c0 9.39 7.61 17 17 17a1 1 0 0 0 1-1v-3.5a1 1 0 0 0-1-1z"/></svg>
+                    Call Now
+                  </button>
                 </div>
-                <div style={{ fontSize:12, color:'#777' }}>
-                  {[p.star, p.raasi].filter(Boolean).join(' · ')}
+
+                {/* Name + location pin */}
+                <div style={{ padding:'2px 14px 4px' }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                    <span style={{ color:'#dc2626', fontSize:14 }}>📍</span>
+                    <span style={{ fontSize:16, fontWeight:700, color:'#1a1a2e', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.name}</span>
+                  </div>
                 </div>
-                <div style={{ display:'flex', gap:4, flexWrap:'wrap', marginTop:'auto' }}>
-                  {p.caste && <span style={{ fontSize:10, fontWeight:600, padding:'2px 7px', borderRadius:10, background:'#f5f0ff', color:'#6d28d9' }}>{p.caste}</span>}
-                  {p.religion && <span style={{ fontSize:10, fontWeight:600, padding:'2px 7px', borderRadius:10, background:'#fff7ed', color:'#c2410c' }}>{p.religion}</span>}
-                  {p.marital && <span style={{ fontSize:10, fontWeight:600, padding:'2px 7px', borderRadius:10, background:'#f0fdf4', color:'#166534' }}>{p.marital}</span>}
+
+                {/* Tag pills */}
+                <div style={{ padding:'2px 14px 6px', display:'flex', gap:6, flexWrap:'wrap' }}>
+                  {p.caste && <span style={{ fontSize:11, fontWeight:600, padding:'3px 9px', borderRadius:6, background:'#f3f4f6', color:'#374151' }}>Caste: {p.caste}</span>}
+                  {p.marital && <span style={{ fontSize:11, fontWeight:600, padding:'3px 9px', borderRadius:6, background:'#f3f4f6', color:'#374151' }}>Status: {p.marital}</span>}
+                </div>
+
+                {/* Info row */}
+                <div style={{ padding:'4px 14px 10px', display:'flex', gap:14, flexWrap:'wrap', fontSize:12, color:'#4b5563' }}>
+                  {p.gender && <span>👤 {p.gender}</span>}
+                  {p.age && <span>🎂 {p.age} yrs</span>}
+                  {p.height && <span>📏 {p.height}</span>}
+                </div>
+
+                {/* Highlight bar — Education | Occupation */}
+                <div style={{ background:'linear-gradient(135deg,#fdf2f8,#fef2f2)', borderTop:'1px solid #fce7f3', borderBottom:'1px solid #fce7f3', display:'flex' }}>
+                  <div style={{ flex:1, padding:'10px 14px', borderLeft:'3px solid #8B0000' }}>
+                    <div style={{ fontSize:9, fontWeight:700, color:'#9ca3af', letterSpacing:0.5, textTransform:'uppercase' }}>Education</div>
+                    <div style={{ fontSize:13, fontWeight:700, color:'#8B0000', marginTop:2, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.qualification || '—'}</div>
+                  </div>
+                  <div style={{ flex:1, padding:'10px 14px', textAlign:'right' }}>
+                    <div style={{ fontSize:9, fontWeight:700, color:'#9ca3af', letterSpacing:0.5, textTransform:'uppercase' }}>Occupation</div>
+                    <div style={{ fontSize:13, fontWeight:700, color:'#1a1a2e', marginTop:2, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.job || '—'}</div>
+                  </div>
+                </div>
+
+                {/* Footer: location + view hint */}
+                <div style={{ padding:'8px 14px', display:'flex', alignItems:'center', justifyContent:'space-between', fontSize:11, color:'#6b7280', background:'#fafafa' }}>
+                  <span style={{ display:'flex', alignItems:'center', gap:4, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', minWidth:0 }}>
+                    📅 {locationStr || 'Location not set'}
+                  </span>
+                  <span style={{ display:'flex', alignItems:'center', gap:4, color:'#8B0000', fontWeight:600, whiteSpace:'nowrap' }}>
+                    📞 View Contact
+                  </span>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
 
           {/* Pagination */}
           {totalPages > 1 && (
