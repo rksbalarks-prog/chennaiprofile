@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $RATE_LIMITS = [
         'contact_otp_send'     => [3,   60],   // 3 OTPs/min (SMS costs money!)
         'contact_otp_verify'   => [6,   60],   // 6 verify attempts/min
-        'contact_mobile_typed' => [10,  60],   // 10 log hits/min per IP
+        'contact_mobile_typed' => [120, 60],   // 120 log hits/min per IP — purely tracking, no SMS cost
         'contact_check'        => [30,  60],
         'report_profile'       => [5,   60],
         'track_view'           => [60,  60],

@@ -202,6 +202,15 @@ for ($i = 0; $i < $zip->numFiles; $i++) {
 $zip->close();
 @unlink($tmpZip);
 
+// Invalidate PHP opcache so newly-written files are picked up immediately.
+// Without this, opcache serves the previous compiled bytecode for up to
+// opcache.revalidate_freq (60s default) and small fixes appear "deployed
+// but not live."
+$opcacheReset = false;
+if (function_exists('opcache_reset')) {
+    $opcacheReset = (bool) @opcache_reset();
+}
+
 if (!empty($errors)) {
     deploy_fail(500, 'deploy completed with errors', [
         'written' => $written,
@@ -215,4 +224,5 @@ deploy_ok([
     'skipped'       => $skipped,
     'skipped_paths' => $skippedPaths,
     'body_bytes'    => $bodyLen,
+    'opcache_reset' => $opcacheReset,
 ]);
