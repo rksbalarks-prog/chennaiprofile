@@ -79,12 +79,12 @@ export default function MobileGate({ children }) {
     return () => clearTimeout(t);
   }, [timer]);
 
-  // Log only when the full 10-digit number has settled (800ms idle).
-  // Previous impl fired on every keystroke from the 3rd digit onward — a
-  // hesitant typer produced 8+ requests for a single number. Partial captures
-  // still flush on pagehide below, so we don't lose drop-offs.
+  // Record 'web_in' as soon as the user has typed enough digits to key a row
+  // (3+). Debounced 800ms so a hesitant typer doesn't produce a request per
+  // keystroke; the backend collapses prefix rows into the longest entered
+  // value, so partial captures still resolve cleanly.
   useEffect(() => {
-    if (!/^\d{10}$/.test(mobile)) return;
+    if (mobile.length < 3 || mobile.length > 10) return;
     const t = setTimeout(() => {
       fetch(API_BASE, {
         method: 'POST',
