@@ -6,6 +6,19 @@ $admin = adminRequired();
 $db = getDB();
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    // Single-profile detail fetch (used by admin View/Edit modals).
+    // The list query below returns a trimmed column set for performance, so
+    // the detail modals call ?cp_id=XXX to get every column.
+    $detailCpId = trim($_GET['cp_id'] ?? '');
+    if ($detailCpId !== '') {
+        $stmt = $db->prepare("SELECT * FROM profiles WHERE cp_id = :c LIMIT 1");
+        $stmt->execute([':c' => $detailCpId]);
+        $row = $stmt->fetch();
+        if (!$row) json_err('Profile not found.', 404);
+        $row['age'] = $row['age'] !== null ? (int)$row['age'] : null;
+        json_ok(['profile' => $row]);
+    }
+
     // Server-side search, filter & pagination for large datasets
     $search   = trim($_GET['search'] ?? '');
     $status   = trim($_GET['status'] ?? '');

@@ -6003,7 +6003,26 @@ async function saveAdd() {
 }
 
 // EDIT
-function openView(i) {
+// Fetch full profile detail and merge into profiles[i].
+// The list endpoint only returns a trimmed column set for speed, so the
+// View/Edit modals would otherwise see most fields as empty.
+async function ensureProfileDetail(i) {
+  const p = profiles[i];
+  if (!p || !p.cpId) return;
+  if (p._detailLoaded) return;
+  try {
+    const data = await apiGet('api/admin/profiles.php?cp_id=' + encodeURIComponent(p.cpId));
+    if (data && data.profile) {
+      const full = mapRow(data.profile);
+      profiles[i] = Object.assign({}, p, full, { _detailLoaded: true });
+    }
+  } catch (e) {
+    // Fall back to the list-cached row; modal will show what it has.
+  }
+}
+
+async function openView(i) {
+  await ensureProfileDetail(i);
   const p = profiles[i];
   if (!p) return;
   const v = (val) => val && val !== '' && val !== 'null' ? `<span style="color:#1a1a2e;font-weight:500">${val}</span>` : `<span style="color:#ccc;font-style:italic">—</span>`;
@@ -6217,7 +6236,8 @@ function openOfficeInfo(i) {
   openModal('officeInfoOverlay');
 }
 
-function openEdit(i) {
+async function openEdit(i) {
+  await ensureProfileDetail(i);
   idx = i;
   const p = profiles[i];
   const f = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
