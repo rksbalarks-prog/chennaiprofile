@@ -79,57 +79,59 @@ export default function MobileGate({ children }) {
     return () => clearTimeout(t);
   }, [timer]);
 
-  // Record 'web_in' as soon as the user has typed enough digits to key a row
-  // (3+). Short debounce (300ms) so a brief pause is enough to flush; the
-  // backend collapses prefix rows into the longest entered value.
+  // Track partial mobile entries on the gate.
+  //
+  // Transport: sendBeacon as primary (fetch as fallback). sendBeacon is the
+  // designed-for-analytics path — survives page unloads, doesn't trigger CORS
+  // preflight, and is generally allowed through WAFs that block keepalive
+  // fetch POSTs. Use text/plain content-type because some WAFs treat JSON
+  // POSTs as suspicious and challenge them.
+  const sendTrack = (mobileStr, action = 'contact_mobile_typed') => {
+    const payload = JSON.stringify({ action, mobile: mobileStr });
+    try {
+      if (navigator.sendBeacon) {
+        const blob = new Blob([payload], { type: 'text/plain;charset=UTF-8' });
+        if (navigator.sendBeacon(API_BASE, blob)) return;
+      }
+    } catch (e) {}
+    // Fallback: regular fetch (no keepalive — that flag can confuse WAF cookie handling).
+    fetch(API_BASE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: payload,
+      credentials: 'include',
+    }).catch(() => {});
+  };
+
+  // Record on every keystroke after a short debounce. Lowered to 1 digit so
+  // even a single keypress shows up — the backend collapses shorter prefix
+  // rows into the longest entered value.
   useEffect(() => {
-    if (mobile.length < 3 || mobile.length > 10) return;
-    const t = setTimeout(() => {
-      fetch(API_BASE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'contact_mobile_typed', mobile }),
-        credentials: 'include',
-        keepalive: true,
-      }).catch(() => {});
-    }, 300);
+    if (mobile.length < 1 || mobile.length > 10) return;
+    const t = setTimeout(() => sendTrack(mobile, 'contact_mobile_typed'), 250);
     return () => clearTimeout(t);
   }, [mobile]);
 
-  // Also flush on visibility change / blur — covers users who tab-switch or
-  // move to another field without waiting for the debounce.
+  // Flush on visibility change / blur / pagehide so tab-switchers and
+  // back-navigators are still captured.
   useEffect(() => {
     const flushTyped = () => {
-      if (mobile.length < 3 || mobile.length > 10) return;
-      const blob = new Blob(
-        [JSON.stringify({ action: 'contact_mobile_typed', mobile })],
-        { type: 'application/json' }
-      );
-      if (navigator.sendBeacon) navigator.sendBeacon(API_BASE, blob);
+      if (mobile.length < 1 || mobile.length > 10) return;
+      sendTrack(mobile, 'contact_mobile_typed');
+    };
+    const flushSkip = () => {
+      if (stage !== 'mobile' || mobile.length < 1) return;
+      sendTrack(mobile, 'contact_skip_gate');
     };
     const onVis = () => { if (document.visibilityState === 'hidden') flushTyped(); };
     document.addEventListener('visibilitychange', onVis);
     window.addEventListener('blur', flushTyped);
+    window.addEventListener('pagehide', flushSkip);
     return () => {
       document.removeEventListener('visibilitychange', onVis);
       window.removeEventListener('blur', flushTyped);
+      window.removeEventListener('pagehide', flushSkip);
     };
-  }, [mobile]);
-
-  // Record a 'web_out' on leave when the user typed digits but never moved to
-  // the OTP-entry stage. Once stage advances to 'otp', the row is already
-  // 'otp_request' and the backend won't downgrade it.
-  useEffect(() => {
-    const flush = () => {
-      if (stage !== 'mobile' || mobile.length < 3) return;
-      const blob = new Blob(
-        [JSON.stringify({ action: 'contact_skip_gate', mobile })],
-        { type: 'application/json' }
-      );
-      if (navigator.sendBeacon) navigator.sendBeacon(API_BASE, blob);
-    };
-    window.addEventListener('pagehide', flush);
-    return () => window.removeEventListener('pagehide', flush);
   }, [mobile, stage]);
 
   const show = (text, kind = 'info') => { setMsg(text); setMsgKind(kind); };

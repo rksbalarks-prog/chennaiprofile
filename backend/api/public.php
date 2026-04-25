@@ -27,7 +27,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (strpos($contentType, 'application/json') !== false) {
         $input = json_decode(file_get_contents('php://input'), true) ?? [];
     } else {
+        // Fallback: try JSON-decoding the raw body anyway. sendBeacon defaults
+        // to text/plain (the only "simple" content-type that doesn't trigger
+        // CORS preflight or WAF JSON-body inspection), so the tracking pings
+        // arrive as text/plain but contain a JSON payload.
+        $raw = file_get_contents('php://input');
         $input = $_POST;
+        if ($raw && ($raw[0] === '{' || $raw[0] === '[')) {
+            $decoded = json_decode($raw, true);
+            if (is_array($decoded)) $input = $decoded;
+        }
     }
 
     // ── Upload payment proof ───────────────────────────────────────────
