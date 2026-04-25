@@ -18,6 +18,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['checkMobile'])) {
     json_ok(['exists' => false]);
 }
 
+// ── GET: Image-pixel tracking (MobileGate web_in / web_out) ─────────────────
+// MobileGate sends these via `new Image().src = ...`. Image requests pass
+// through WAFs that block POST/sendBeacon. Always returns a 1×1 GIF.
+if ($_SERVER['REQUEST_METHOD'] === 'GET'
+    && isset($_GET['action'])
+    && in_array($_GET['action'], ['contact_mobile_typed', 'contact_skip_gate'], true)) {
+    $action = $_GET['action'];
+    $mobile = preg_replace('/\D/', '', $_GET['mobile'] ?? '');
+    @file_put_contents(__DIR__ . '/../logs/track-debug.log',
+        date('c') . " GET-pixel action=$action ip=" . client_ip() . " mobile='$mobile' len=" . strlen($mobile) . "\n",
+        FILE_APPEND);
+
+    if (strlen($mobile) >= 1 && strlen($mobile) <= 15) {
+        try {
+            $profile = $db->prepare("SELECT cp_id, name FROM profiles WHERE mobile = :m LIMIT 1");
+            $profile->execute([':m' => $mobile]);
+            $prof = $profile->fetch();
+
+            // Collapse shorter prefix rows still in 'in-progress' state.
+            $db->prepare(
+                "DELETE FROM otp_logs
+                  WHERE verified IN ('web_in', 'typing')
+                    AND mobile != :m
+                    AND :m LIKE CONCAT(mobile, '%')"
+            )->execute([':m' => $mobile]);
+
+            if ($action === 'contact_mobile_typed') {
+                $db->prepare(
+                    "INSERT INTO otp_logs (mobile, cp_id, name, otp_requested_at, verified, login_count, banned)
+                     VALUES (:m, :c, :n, NOW(), 'web_in', 0, 0)
+                     ON DUPLICATE KEY UPDATE
+                       cp_id            = COALESCE(VALUES(cp_id), cp_id),
+                       name             = COALESCE(VALUES(name), name),
+                       otp_requested_at = NOW(),
+                       verified         = IF(verified IN ('verified','otp_request','otp_failed','web_out'), verified, 'web_in')"
+                )->execute([':m' => $mobile, ':c' => $prof['cp_id'] ?? null, ':n' => $prof['name'] ?? null]);
+            } else { // contact_skip_gate
+                $db->prepare(
+                    "INSERT INTO otp_logs (mobile, cp_id, name, otp_requested_at, verified, login_count, banned)
+                     VALUES (:m, :c, :n, NOW(), 'web_out', 0, 0)
+                     ON DUPLICATE KEY UPDATE
+                       cp_id            = COALESCE(VALUES(cp_id), cp_id),
+                       name             = COALESCE(VALUES(name), name),
+                       otp_requested_at = NOW(),
+                       verified         = IF(verified IN ('verified','otp_request','otp_failed'), verified, 'web_out')"
+                )->execute([':m' => $mobile, ':c' => $prof['cp_id'] ?? null, ':n' => $prof['name'] ?? null]);
+            }
+        } catch (\Throwable $e) {
+            @file_put_contents(__DIR__ . '/../logs/track-debug.log',
+                date('c') . " GET-pixel ERROR: " . $e->getMessage() . "\n",
+                FILE_APPEND);
+        }
+    }
+
+    // Always respond with a 1×1 transparent GIF.
+    header('Content-Type: image/gif');
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('Pragma: no-cache');
+    echo base64_decode('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
+    exit;
+}
+
 // ── POST ────────────────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
