@@ -39,7 +39,7 @@ export default function Home() {
   const [femaleCount, setFemaleCount] = useState(0);
   // Display helper: cap any profile count at "999+" so the badges stay compact.
   const fmtCount = (n) => (n > 999 ? '999+' : n);
-  const [activeTab, setActiveTab] = useState('bride');
+  const [activeTab, setActiveTab] = useState('all'); // 'all' | 'bride' | 'groom'
   const [feedFilter, setFeedFilter] = useState('recent'); // 'recent' | 'random' | 'photos' | 'notViewed'
   const [contactVerified, setContactVerified] = useState(false);
   const [userMobile, setUserMobile] = useState('');
@@ -196,22 +196,32 @@ export default function Home() {
   useEffect(() => { if(otpTimer<=0)return; const t=setTimeout(()=>setOtpTimer(otpTimer-1),1000); return()=>clearTimeout(t); }, [otpTimer]);
 
   // Server-side pagination: fetch next page for the active tab's gender.
+  // For 'all' tab, alternate to whichever side is less loaded so the
+  // chronological feed stays balanced. Falls through to the other gender
+  // if one side is exhausted.
   const loadMoreFromServer = async () => {
     if (loadingMore) return;
-    const isGroom = activeTab === 'groom';
-    const gender = isGroom ? 'Male' : 'Female';
-    const offset = isGroom ? maleOffset : femaleOffset;
-    const exhausted = isGroom ? maleExhausted : femaleExhausted;
-    if (exhausted) return;
+    let pickGroom;
+    if (activeTab === 'all') {
+      if (maleExhausted && femaleExhausted) return;
+      if (maleExhausted) pickGroom = false;
+      else if (femaleExhausted) pickGroom = true;
+      else pickGroom = maleOffset <= femaleOffset; // load the side that has fewer rows yet
+    } else {
+      pickGroom = activeTab === 'groom';
+      if (pickGroom ? maleExhausted : femaleExhausted) return;
+    }
+    const gender = pickGroom ? 'Male' : 'Female';
+    const offset = pickGroom ? maleOffset : femaleOffset;
     setLoadingMore(true);
     try {
       const r = await fetch(`${API_BASE}?action=search&gender=${gender}&limit=${PAGE_SIZE}&offset=${offset}&sortId=desc&photo=with`).then(r=>r.json());
       const batch = (r.ok ? r.profiles : []).map(mapP);
       if (batch.length > 0) setAllProfiles(prev => [...prev, ...batch]);
       if (batch.length < PAGE_SIZE) {
-        if (isGroom) setMaleExhausted(true); else setFemaleExhausted(true);
+        if (pickGroom) setMaleExhausted(true); else setFemaleExhausted(true);
       } else {
-        if (isGroom) setMaleOffset(o => o + PAGE_SIZE); else setFemaleOffset(o => o + PAGE_SIZE);
+        if (pickGroom) setMaleOffset(o => o + PAGE_SIZE); else setFemaleOffset(o => o + PAGE_SIZE);
       }
     } catch (e) { console.error('loadMore error:', e); }
     setLoadingMore(false);
@@ -304,6 +314,7 @@ export default function Home() {
       if (!hasUserProfile) {
         if (activeTab === 'groom' && p.gender !== 'Male') return false;
         if (activeTab === 'bride' && p.gender !== 'Female') return false;
+        // 'all' → no gender filter
       }
       if (q) {
         const name = (p.name || '').toLowerCase();
@@ -431,9 +442,19 @@ export default function Home() {
     addSection('Partner Preference Match', '💝', sections.preference.filter(p => p.photo));
 
     // Primary list — driven by the Recent / Random / Photos / Not Viewed
-    // filter buttons. All four filter options operate on the withPhotos pool
-    // (which is the full loaded set of profiles, photo-first ordering).
-    const pool = sections.withPhotos;
+    // filter buttons.
+    //
+    // Pool choice is tab-driven:
+    //   - 'all'           → allProfiles (server DESC, both genders) so
+    //                        Recent shows truly chronological entries.
+    //   - 'bride'/'groom' → sections.withPhotos, which Effect B shuffles
+    //                        once on first load and then appends to. That
+    //                        gives a fresh randomised feed per page visit
+    //                        (the user's "every new session" requirement)
+    //                        without cards jumping around on Load More.
+    const pool = activeTab === 'all'
+      ? allProfiles.filter(p => p.photo)
+      : sections.withPhotos;
     let primary = pool;
     if (feedFilter === 'random') {
       const arr = [...pool];
@@ -472,7 +493,9 @@ export default function Home() {
     while (sliced.length && sliced[sliced.length - 1].type !== 'card') sliced.pop();
     return { visibleFeed: sliced, shownCards: count, totalCards: total };
   })();
-  const exhausted = activeTab === 'groom' ? maleExhausted : femaleExhausted;
+  const exhausted = activeTab === 'all'
+    ? (maleExhausted && femaleExhausted)
+    : (activeTab === 'groom' ? maleExhausted : femaleExhausted);
   const hasMore = shownCards < totalCards || !exhausted;
 
   // Load More: advance by 20 cards; unlock hidden sections on first trigger;
@@ -511,6 +534,11 @@ export default function Home() {
           locks gender to the opposite of their own (tabs would be confusing). */}
       {!hasUserProfile && (
         <div style={{ display:'flex', gap:6, padding:'8px 12px 6px', background:'#fff' }}>
+          <button onClick={()=>setActiveTab('all')} style={{ flex:1, padding:'8px 0', borderRadius:20, fontSize:12, fontWeight:600, cursor:'pointer', border:'1.5px solid', display:'flex', alignItems:'center', justifyContent:'center', gap:4,
+            background:activeTab==='all'?'#8B0000':'#f5f5f5', color:activeTab==='all'?'#fff':'#666', borderColor:activeTab==='all'?'#8B0000':'#e8e8e8' }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="7" r="4"/><circle cx="17" cy="7" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M14 21a7 7 0 0 1 8-6.7"/></svg>
+            All <span style={{ fontSize:10, fontWeight:700, background:activeTab==='all'?'rgba(255,255,255,0.25)':'rgba(0,0,0,0.06)', padding:'0 5px', borderRadius:8 }}>{fmtCount(maleCount + femaleCount)}</span>
+          </button>
           <button onClick={()=>setActiveTab('bride')} style={{ flex:1, padding:'8px 0', borderRadius:20, fontSize:12, fontWeight:600, cursor:'pointer', border:'1.5px solid', display:'flex', alignItems:'center', justifyContent:'center', gap:4,
             background:activeTab==='bride'?'#8B0000':'#f5f5f5', color:activeTab==='bride'?'#fff':'#666', borderColor:activeTab==='bride'?'#8B0000':'#e8e8e8' }}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>
