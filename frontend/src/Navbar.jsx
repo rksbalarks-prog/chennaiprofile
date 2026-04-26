@@ -133,6 +133,18 @@ export default function Navbar() {
           background: #8B0000; color: #fff;
         }
 
+        /* Single-button toggle: shows the OTHER language as its label
+           (English → "தமிழ்", Tamil → "EN"). Click swaps. */
+        .lang-toggle-single {
+          padding: 6px 12px; font-size: 12px; font-weight: 700;
+          background: #8B0000; color: #fff;
+          border: none; border-radius: 20px;
+          cursor: pointer; transition: background 0.15s, transform 0.05s;
+          line-height: 1; min-width: 48px; text-align: center;
+        }
+        .lang-toggle-single:hover { background: #6f0000; }
+        .lang-toggle-single:active { transform: scale(0.97); }
+
         .hamburger-btn {
           width: 36px; height: 36px; border-radius: 50%;
           background: #f5f5f5; border: none; cursor: pointer;
@@ -335,19 +347,18 @@ export default function Navbar() {
           ) : (
             <a href={USER_PANEL_URL} className="desktop-login">User Login</a>
           )}
-
-          <div className="lang-toggle">
-            <button className={`lang-btn ${i18n.language === 'en' ? 'active' : ''}`} onClick={() => handleLanguageChange('en')}>EN</button>
-            <button className={`lang-btn ${i18n.language === 'ta' ? 'active' : ''}`} onClick={() => handleLanguageChange('ta')}>த</button>
-          </div>
         </div>
 
-        {/* Mobile actions */}
+        {/* Top-bar actions (visible on both mobile and desktop) */}
         <div className="top-bar-actions">
-          <div className="lang-toggle">
-            <button className={`lang-btn ${i18n.language === 'en' ? 'active' : ''}`} onClick={() => handleLanguageChange('en')}>EN</button>
-            <button className={`lang-btn ${i18n.language === 'ta' ? 'active' : ''}`} onClick={() => handleLanguageChange('ta')}>த</button>
-          </div>
+          <button
+            className="lang-toggle-single"
+            onClick={() => handleLanguageChange(i18n.language === 'en' ? 'ta' : 'en')}
+            aria-label={i18n.language === 'en' ? 'Switch to Tamil' : 'Switch to English'}
+            title={i18n.language === 'en' ? 'Switch to Tamil' : 'Switch to English'}
+          >
+            {i18n.language === 'en' ? 'தமிழ்' : 'EN'}
+          </button>
 
           <button className="hamburger-btn" onClick={() => setMenuOpen(true)}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
