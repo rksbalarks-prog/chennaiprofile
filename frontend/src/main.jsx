@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import Navbar from './Navbar.jsx'
 import Home from './home.jsx'                  // eager: first paint route
-import MobileGate from './MobileGate.jsx'      // eager: wraps Home
 import './index.css'
 import './i18n.js'
 import { initAnalytics, trackPageview } from './analytics.js'
@@ -51,7 +50,7 @@ function App() {
       <Navbar />
       <Suspense fallback={<RouteFallback />}>
         <Routes>
-          <Route path="/" element={<MobileGate><Home /></MobileGate>} />
+          <Route path="/" element={<Home />} />
           <Route path="/registration" element={<Registration />} />
           <Route path="/google-form" element={<GoogleForm />} />
           <Route path="/google-form-ta" element={<GoogleFormTA />} />

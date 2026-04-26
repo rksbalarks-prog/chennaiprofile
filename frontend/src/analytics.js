@@ -24,12 +24,10 @@ export function initAnalytics() {
   window.dataLayer = window.dataLayer || [];
   window.gtag = function () { window.dataLayer.push(arguments); };
   window.gtag('js', new Date());
-  // send_page_view: false — we fire pageviews manually from the router so
-  // SPA navigations are tracked, not just the initial load.
+  // send_page_view: false — the router's useEffect in main.jsx fires a
+  // pageview on mount AND on every SPA navigation, so it covers the first
+  // load too. Letting gtag auto-send would double-count the initial hit.
   window.gtag('config', GA_ID, { send_page_view: false });
-
-  // Fire the first pageview now that gtag is up.
-  trackPageview(window.location.pathname + window.location.search);
 }
 
 export function trackPageview(path) {
