@@ -452,26 +452,28 @@ export default function Home() {
     //                        gives a fresh randomised feed per page visit
     //                        (the user's "every new session" requirement)
     //                        without cards jumping around on Load More.
-    const pool = activeTab === 'all'
+    const rawPool = activeTab === 'all'
       ? allProfiles.filter(p => p.photo)
       : sections.withPhotos;
-    let primary = pool;
+    // Apply the tab gender + search filter FIRST so subsequent sort/shuffle
+    // operates only on the visible-to-this-tab subset. Without this, the
+    // mixed-gender pool used for the bride/groom tabs would leak the wrong
+    // gender into the feed.
+    let primary = getTabProfiles(rawPool);
     if (feedFilter === 'random') {
-      const arr = [...pool];
+      const arr = [...primary];
       for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [arr[i], arr[j]] = [arr[j], arr[i]];
       }
       primary = arr;
     } else if (feedFilter === 'photos') {
-      primary = pool.filter(p => p.photo);
+      primary = primary.filter(p => p.photo);
     } else if (feedFilter === 'notViewed') {
       const viewedIds = new Set(sections.viewed.map(p => p.id));
-      primary = pool.filter(p => !viewedIds.has(p.id));
-    } else {
-      // 'recent' — pool is already in server DESC (newest first) order.
-      primary = pool;
+      primary = primary.filter(p => !viewedIds.has(p.id));
     }
+    // 'recent' falls through — primary is already in pool order.
     primary.forEach(p => feed.push({ type:'card', ...p }));
     return feed;
   };
