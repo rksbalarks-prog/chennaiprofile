@@ -370,7 +370,7 @@ export default function Detail() {
         {/* Main Photo */}
         <div style={{ position:'relative', background:'#f0f0f0' }}>
           {allPhotos.length > 0 ? (
-            <picture onClick={() => setLightboxImg(active.orig)} style={{ cursor:'pointer', display:'block' }}>
+            <picture onClick={() => setLightboxImg({ orig: active.orig, full: active.full })} style={{ cursor:'pointer', display:'block' }}>
               <source type="image/webp" srcSet={active.full} />
               <img src={active.orig} alt={p.name}
                 loading="eager" decoding="async" fetchpriority="high"
@@ -616,17 +616,27 @@ export default function Detail() {
       </div>
 
       {/* Image Lightbox */}
-      {lightboxImg && (
+      {lightboxImg && (() => {
+        // lightboxImg may be a string (rasi/amsam charts) OR a {orig, full}
+        // object (profile photos). Newer profile uploads only have WebP
+        // variants on disk, so a plain <img src={orig}> would 404 — use
+        // <picture> with the full-size WebP first and orig as fallback.
+        const lb = typeof lightboxImg === 'string' ? { orig: lightboxImg, full: null } : lightboxImg;
+        return (
         <div onClick={() => setLightboxImg(null)}
           style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.9)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:3000, cursor:'pointer' }}>
           <button onClick={() => setLightboxImg(null)}
             style={{ position:'absolute', top:16, right:16, width:36, height:36, borderRadius:'50%', background:'rgba(255,255,255,0.2)', border:'none', color:'#fff', fontSize:20, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1 }}>
             x
           </button>
-          <img src={lightboxImg} alt="Full size" onClick={e => e.stopPropagation()}
-            style={{ maxWidth:'95%', maxHeight:'90vh', objectFit:'contain', borderRadius:4, cursor:'default' }} />
+          <picture onClick={e => e.stopPropagation()}>
+            {lb.full && <source type="image/webp" srcSet={lb.full} />}
+            <img src={lb.orig} alt="Full size"
+              style={{ maxWidth:'95%', maxHeight:'90vh', objectFit:'contain', borderRadius:4, cursor:'default', display:'block' }} />
+          </picture>
         </div>
-      )}
+        );
+      })()}
 
       {/* Limit Reached Popup */}
       {limitMsg && (
