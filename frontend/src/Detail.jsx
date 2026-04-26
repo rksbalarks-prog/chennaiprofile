@@ -746,7 +746,10 @@ export default function Detail() {
               )}
               {!otpSent ? (
                 <>
-                  <label style={{ fontSize:11, fontWeight:700, color:'#8B0000', textTransform:'uppercase', letterSpacing:0.8, display:'block', marginBottom:6 }}>Mobile Number</label>
+                  <div style={{ display:'flex', alignItems:'baseline', justifyContent:'space-between', gap:8, marginBottom:6, flexWrap:'wrap' }}>
+                    <label style={{ fontSize:11, fontWeight:700, color:'#8B0000', textTransform:'uppercase', letterSpacing:0.8 }}>Mobile Number</label>
+                    <span style={{ fontSize:11, fontWeight:700, color:'#16a34a', letterSpacing:0.2 }}>Verify &amp; get unlimited free contacts</span>
+                  </div>
                   <input type="tel" maxLength={10} value={otpMobile} onChange={e => setOtpMobile(e.target.value.replace(/\D/g,''))}
                     placeholder="Enter 10-digit mobile" style={{ width:'100%', padding:'12px 14px', border:'1.5px solid #e0e0e0', borderRadius:10, fontSize:16, fontFamily:'monospace', letterSpacing:2, outline:'none', boxSizing:'border-box' }} />
                   <button onClick={sendOtp} disabled={otpLoading}
