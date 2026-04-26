@@ -100,6 +100,10 @@ export default function Detail() {
   const [reportReason, setReportReason] = useState('');
   const [showMarriedConfirm, setShowMarriedConfirm] = useState(false);
   const [marriedSubmitting, setMarriedSubmitting] = useState(false);
+  // Anonymous-visitor gate state — same shape as home.jsx. Server is the
+  // source of truth; these mirror the snapshot it returns.
+  const [gateState, setGateState] = useState({ returning:false, anonViewsUsed:0, anonViewsLimit:5, gateRequired:false });
+  const [gatePromptMsg, setGatePromptMsg] = useState('');
 
   const submitReport = async (reason) => {
     try {
@@ -117,7 +121,15 @@ export default function Detail() {
   useEffect(() => {
     fetch(API_BASE, { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ action:'contact_check' }), credentials:'include' })
-      .then(r => r.json()).then(d => { if (d.ok && d.verified) setContactVerified(true); })
+      .then(r => r.json()).then(d => {
+        if (d.ok && d.verified) setContactVerified(true);
+        if (d.ok) setGateState({
+          returning:       !!d.returning,
+          anonViewsUsed:   d.anon_views_used  ?? 0,
+          anonViewsLimit:  d.anon_views_limit ?? 5,
+          gateRequired:    !!d.gate_required,
+        });
+      })
       .catch(() => {});
   }, []);
 
@@ -127,6 +139,56 @@ export default function Detail() {
     return () => clearTimeout(tm);
   }, [otpTimer]);
 
+  // Open the OTP modal because the server-side gate blocked a contact view.
+  const openGateModal = (reason, limit) => {
+    setOtpMobile(''); setOtpValue(['','','','']); setOtpSent(false); setOtpMsg('');
+    setGatePromptMsg(reason === 'returning_user'
+      ? 'Welcome back. Please verify your mobile to continue viewing contacts.'
+      : `You've used your ${limit || 5} free contact views. Verify your mobile to keep viewing contacts.`);
+    setShowOtpModal(true);
+  };
+
+  // Single source of truth for revealing the contact panel. Hits track_view
+  // on the server; the server enforces the 5-free / returning-user gate and
+  // returns 403 + gate_required when blocked.
+  const revealContact = async () => {
+    // Verified users: enforce plan limits first (independent of the anon gate).
+    if (contactVerified) {
+      try {
+        const chk = await fetch(API_BASE, { method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ action:'contact_check' }), credentials:'include' }).then(r=>r.json());
+        const mobile = chk.mobile || '';
+        if (mobile) {
+          const limResp = await fetch(API_BASE, { method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ action:'user_limits', mobile }), credentials:'include' }).then(r=>r.json());
+          if (limResp.ok) {
+            const { limits, used } = limResp;
+            if (limits.day > 0 && used.day >= limits.day) { setLimitMsg({ title:'Daily Limit Reached', desc:`You have used all ${limits.day} contact views for today.`, sub:'Try again tomorrow.' }); return; }
+            if (limits.month > 0 && used.month >= limits.month) { setLimitMsg({ title:'Monthly Limit Reached', desc:`You have used all ${limits.month} contact views this month.`, sub:'Limit resets next month.' }); return; }
+            if (limits.total > 0 && used.total >= limits.total) { setLimitMsg({ title:'Total Limit Reached', desc:`You have used all ${limits.total} lifetime contact views.`, sub:'Upgrade your plan for more.' }); return; }
+          }
+        }
+      } catch(e) {}
+    }
+    try {
+      const res = await fetch(API_BASE, { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ action:'track_view', target_cp_id: id, type:'contact_view' }), credentials:'include' });
+      const tv = await res.json().catch(()=>({}));
+      if (tv && tv.anon_views_used != null) setGateState(g => ({
+        ...g,
+        returning:      !!tv.returning,
+        anonViewsUsed:  tv.anon_views_used,
+        anonViewsLimit: tv.anon_views_limit ?? g.anonViewsLimit,
+        gateRequired:   !!tv.gate_required,
+      }));
+      if (!res.ok && tv && tv.gate_required) {
+        openGateModal(tv.gate_reason, tv.anon_views_limit);
+        return;
+      }
+    } catch(e) {}
+    setShowContact(true);
+  };
+
   const sendOtp = async () => {
     if (!/^\d{10}$/.test(otpMobile)) { setOtpMsg('Enter valid 10-digit mobile'); return; }
     setOtpLoading(true); setOtpMsg('');
@@ -135,7 +197,11 @@ export default function Detail() {
         body: JSON.stringify({ action:'contact_otp_send', mobile: otpMobile }), credentials:'include' });
       const data = await resp.json();
       if (data.ok) {
-        if (data.auto_verified) { setContactVerified(true); setShowOtpModal(false); setShowContact(true); return; }
+        if (data.auto_verified) {
+          setContactVerified(true); setShowOtpModal(false); setGatePromptMsg('');
+          revealContact();
+          return;
+        }
         setOtpSent(true); setOtpTimer(120);
         setOtpMsg(data.otp ? `OTP: ${data.otp}` : 'OTP sent');
       } else setOtpMsg(data.error || 'Failed');
@@ -152,9 +218,8 @@ export default function Detail() {
         body: JSON.stringify({ action:'contact_otp_verify', mobile: otpMobile, otp }), credentials:'include' });
       const data = await resp.json();
       if (data.ok && data.verified) {
-        setContactVerified(true); setShowOtpModal(false); setShowContact(true);
-        fetch(API_BASE, { method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ action:'track_view', target_cp_id: id, type:'contact_view' }), credentials:'include' }).catch(()=>{});
+        setContactVerified(true); setShowOtpModal(false); setGatePromptMsg('');
+        revealContact();
       } else setOtpMsg(data.error || 'Invalid OTP');
     } catch (e) { setOtpMsg('Network error'); }
     setOtpLoading(false);
@@ -372,7 +437,7 @@ export default function Detail() {
 
         {/* Contact Button */}
         <div style={{ background:'#fff', borderRadius:12, padding:'14px 18px', marginBottom:10, boxShadow:'0 1px 4px rgba(0,0,0,0.04)', border:'1px solid #f0f0f0' }}>
-          {showContact && contactVerified ? (
+          {showContact ? (
             <div>
               <div style={{ fontSize:12, fontWeight:600, color:'#999', textTransform:'uppercase', marginBottom:8 }}>Contact Details</div>
               <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
@@ -394,28 +459,7 @@ export default function Detail() {
               <button onClick={() => setShowContact(false)} style={{ marginTop:10, width:'100%', padding:'8px', background:'#f5f5f5', border:'1px solid #e8e8e8', borderRadius:8, fontSize:12, fontWeight:600, color:'#888', cursor:'pointer' }}>Hide Contact</button>
             </div>
           ) : (
-            <button onClick={async () => {
-              if (!contactVerified) { setShowOtpModal(true); return; }
-              // Check limits
-              try {
-                const chk = await fetch(API_BASE, { method:'POST', headers:{'Content-Type':'application/json'},
-                  body: JSON.stringify({ action:'contact_check' }), credentials:'include' }).then(r=>r.json());
-                const mobile = chk.mobile || '';
-                if (mobile) {
-                  const limResp = await fetch(API_BASE, { method:'POST', headers:{'Content-Type':'application/json'},
-                    body: JSON.stringify({ action:'user_limits', mobile }), credentials:'include' }).then(r=>r.json());
-                  if (limResp.ok) {
-                    const { limits, used } = limResp;
-                    if (limits.day > 0 && used.day >= limits.day) { setLimitMsg({ title:'Daily Limit Reached', desc:`You have used all ${limits.day} contact views for today.`, sub:'Try again tomorrow.' }); return; }
-                    if (limits.month > 0 && used.month >= limits.month) { setLimitMsg({ title:'Monthly Limit Reached', desc:`You have used all ${limits.month} contact views this month.`, sub:'Limit resets next month.' }); return; }
-                    if (limits.total > 0 && used.total >= limits.total) { setLimitMsg({ title:'Total Limit Reached', desc:`You have used all ${limits.total} lifetime contact views.`, sub:'Upgrade your plan for more.' }); return; }
-                  }
-                  await fetch(API_BASE, { method:'POST', headers:{'Content-Type':'application/json'},
-                    body: JSON.stringify({ action:'track_view', target_cp_id: p.regId, type:'contact_view' }), credentials:'include' });
-                }
-              } catch(e) { console.error('Limit check error:', e); }
-              setShowContact(true);
-            }}
+            <button onClick={revealContact}
               style={{ width:'100%', padding:'12px', background:'linear-gradient(135deg,#16a34a,#15803d)', color:'#fff', border:'none', borderRadius:10, fontSize:14, fontWeight:700, cursor:'pointer', letterSpacing:0.3 }}>
               View Free Contact
             </button>
@@ -687,7 +731,7 @@ export default function Detail() {
       {/* OTP Modal */}
       {showOtpModal && (
         <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:3000, backdropFilter:'blur(4px)' }}
-          onClick={() => setShowOtpModal(false)}>
+          onClick={() => { setShowOtpModal(false); setGatePromptMsg(''); }}>
           <div style={{ background:'#fff', borderRadius:20, overflow:'hidden', maxWidth:380, width:'90%', boxShadow:'0 20px 60px rgba(0,0,0,0.25)' }}
             onClick={e => e.stopPropagation()}>
             <div style={{ background:'linear-gradient(135deg,#8B0000,#C41E3A)', padding:22, textAlign:'center' }}>
@@ -695,6 +739,11 @@ export default function Detail() {
               <div style={{ fontSize:11, color:'rgba(255,255,255,0.7)', marginTop:4 }}>Enter your number to view contact details</div>
             </div>
             <div style={{ padding:20 }}>
+              {gatePromptMsg && (
+                <div style={{ background:'#fef9e7', border:'1px solid #fde68a', color:'#92400e', padding:'10px 12px', borderRadius:8, fontSize:12.5, lineHeight:1.45, marginBottom:14 }}>
+                  {gatePromptMsg}
+                </div>
+              )}
               {!otpSent ? (
                 <>
                   <label style={{ fontSize:11, fontWeight:700, color:'#8B0000', textTransform:'uppercase', letterSpacing:0.8, display:'block', marginBottom:6 }}>Mobile Number</label>

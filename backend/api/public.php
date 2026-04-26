@@ -7,6 +7,66 @@ cors();
 
 $db = getDB();
 
+// ── Contact-view gating ─────────────────────────────────────────────────────
+// Anonymous visitors get N free contact reveals per session. After that —
+// and on every subsequent session for users who have ever verified — they
+// must pass OTP again. The "ever verified" flag is held in a long-lived
+// cookie (the user's session itself only lives 12h).
+const KFM_FREE_VIEWS       = 5;
+const KFM_RETURNING_COOKIE = 'kfm_returning';
+
+function kfm_set_returning_cookie(): void {
+    // setcookie must run before any echo. All callers do so via json_ok/json_err.
+    setcookie(KFM_RETURNING_COOKIE, '1', [
+        'expires'  => time() + 365 * 24 * 3600,
+        'path'     => '/',
+        'secure'   => !empty($_SERVER['HTTPS']),
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+    $_COOKIE[KFM_RETURNING_COOKIE] = '1'; // make it visible in this same request
+}
+
+function kfm_is_returning(): bool {
+    return !empty($_COOKIE[KFM_RETURNING_COOKIE]);
+}
+
+function kfm_anon_views_used(): int {
+    $arr = $_SESSION['anon_view_cpids'] ?? [];
+    return is_array($arr) ? count($arr) : 0;
+}
+
+function kfm_anon_record(string $cpId): void {
+    $arr = $_SESSION['anon_view_cpids'] ?? [];
+    if (!is_array($arr)) $arr = [];
+    if ($cpId !== '' && !in_array($cpId, $arr, true)) $arr[] = $cpId;
+    $_SESSION['anon_view_cpids'] = $arr;
+}
+
+// True when a contact_view request must be blocked behind OTP.
+function kfm_gate_required(string $targetCpId): bool {
+    // Already OTP-verified this session OR logged in via user-panel → no gate.
+    if (!empty($_SESSION['contact_verified']) || !empty($_SESSION['mobile'])) return false;
+    // Returning device but no current-session verification → must OTP.
+    if (kfm_is_returning()) return true;
+    // Anonymous: re-revealing the same profile is free; new profile only if under quota.
+    $arr = $_SESSION['anon_view_cpids'] ?? [];
+    if (is_array($arr) && in_array($targetCpId, $arr, true)) return false;
+    return kfm_anon_views_used() >= KFM_FREE_VIEWS;
+}
+
+// Snapshot for clients to drive UI without a separate request.
+function kfm_gate_snapshot(): array {
+    $verified = !empty($_SESSION['contact_verified']) || !empty($_SESSION['mobile']);
+    return [
+        'returning'        => kfm_is_returning(),
+        'anon_views_used'  => kfm_anon_views_used(),
+        'anon_views_limit' => KFM_FREE_VIEWS,
+        // Will the *next* contact_view on a brand-new profile be gated?
+        'gate_required'    => !$verified && (kfm_is_returning() || kfm_anon_views_used() >= KFM_FREE_VIEWS),
+    ];
+}
+
 // ── GET: Check mobile duplicate ─────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['checkMobile'])) {
     $m = preg_replace('/\D/', '', $_GET['checkMobile']);
@@ -258,6 +318,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['contact_mobile'] = $mobile;
         $_SESSION['contact_verified_at'] = time();
 
+        // Mark this device as "ever verified" so future sessions must OTP again
+        // (the session cookie itself only lives 12h; this one is 1 year).
+        kfm_set_returning_cookie();
+
         json_ok(['message' => 'OTP verified successfully', 'verified' => true]);
     }
 
@@ -343,7 +407,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($act === 'contact_check') {
         secureSession();
         // A user logged in via user-panel (auth.php sets $_SESSION['mobile']) is already
-        // OTP-authenticated — treat them as verified so the MobileGate doesn't re-prompt.
+        // OTP-authenticated — treat them as verified.
         $loggedIn = !empty($_SESSION['mobile']);
         $verified = $loggedIn
             || (!empty($_SESSION['contact_verified']) && (time() - ($_SESSION['contact_verified_at'] ?? 0)) < 86400);
@@ -358,7 +422,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pRow = $pStmt->fetch();
             if ($pRow) { $name = $pRow['name']; $cpId = $pRow['cp_id']; }
         }
-        json_ok(['verified' => $verified, 'skipped' => $skipped, 'mobile' => $mobile, 'name' => $name, 'cp_id' => $cpId]);
+        // Promote any verified visitor to "returning" so future sessions re-prompt.
+        // Covers the user-panel login path too, which never went through SPA OTP.
+        if ($verified && !kfm_is_returning()) kfm_set_returning_cookie();
+
+        json_ok([
+            'verified' => $verified,
+            'skipped'  => $skipped,
+            'mobile'   => $mobile,
+            'name'     => $name,
+            'cp_id'    => $cpId,
+        ] + kfm_gate_snapshot());
     }
 
     if ($act === 'contact_otp_get') {
@@ -405,6 +479,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $type = trim($input['type'] ?? 'profile_view'); // profile_view or contact_view
         if (!$targetCpId) json_ok(['tracked' => false]);
 
+        // Gate contact reveals BEFORE inserting anything — we don't want
+        // analytics rows for blocked attempts.
+        if ($type === 'contact_view' && kfm_gate_required($targetCpId)) {
+            // Mirror json_err's shape but include gate context the SPA needs
+            // to open the OTP modal with the right messaging.
+            http_response_code(403);
+            echo json_encode([
+                'ok'            => false,
+                'error'         => 'OTP verification required',
+                'gate_required' => true,
+                'gate_reason'   => kfm_is_returning() ? 'returning_user' : 'free_limit_reached',
+            ] + kfm_gate_snapshot());
+            exit;
+        }
+
         // Get viewer profile info
         $viewerProfile = null;
         if ($viewerMobile) {
@@ -438,16 +527,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':sd' => $scrollDepth,
             ]);
 
-        // For a contact reveal, return the target's mobile — but only to an OTP-verified session.
-        // Bulk listings (bootstrap/suggestions) deliberately omit mobile; this is the single
-        // gated point where a caller can fetch it, so the reveal button on Home has a number to show.
-        // Accept either session key: contact_mobile (SPA OTP flow) or mobile (user-panel login),
-        // matching contact_check/bootstrap so user-panel-logged-in users don't see "Number unavailable".
-        if ($type === 'contact_view' && (!empty($_SESSION['contact_mobile']) || !empty($_SESSION['mobile']))) {
+        // For a contact reveal, return the target's mobile.
+        // - Verified sessions (SPA OTP or user-panel login): always.
+        // - Anonymous within free quota: also yes (record toward quota).
+        if ($type === 'contact_view') {
+            $verified = !empty($_SESSION['contact_mobile']) || !empty($_SESSION['mobile']);
+            if (!$verified) kfm_anon_record($targetCpId); // count this reveal toward the 5
             $tgt = $db->prepare("SELECT mobile FROM profiles WHERE cp_id = :c AND status = 'Approved' LIMIT 1");
             $tgt->execute([':c' => $targetCpId]);
             $row = $tgt->fetch();
-            json_ok(['tracked' => true, 'mobile' => $row['mobile'] ?? '']);
+            json_ok([
+                'tracked' => true,
+                'mobile'  => $row['mobile'] ?? '',
+            ] + kfm_gate_snapshot());
         }
         json_ok(['tracked' => true]);
     }
@@ -1040,6 +1132,7 @@ switch ($action) {
         secureSession();
         $verified = !empty($_SESSION['contact_mobile']) || !empty($_SESSION['mobile']);
         $mobile = (string)($_SESSION['contact_mobile'] ?? $_SESSION['mobile'] ?? '');
+        if ($verified && !kfm_is_returning()) kfm_set_returning_cookie();
 
         // Helper: paged list for one gender, with photo, newest first. Results cached 60s.
         $byGender = function($gender) use ($db, $limit) {
@@ -1066,7 +1159,7 @@ switch ($action) {
 
         header('Cache-Control: private, max-age=30');
         json_ok([
-            'contact' => ['verified' => $verified, 'mobile' => $mobile],
+            'contact' => ['verified' => $verified, 'mobile' => $mobile] + kfm_gate_snapshot(),
             'male'    => $byGender('Male'),
             'female'  => $byGender('Female'),
             'limit'   => $limit,
