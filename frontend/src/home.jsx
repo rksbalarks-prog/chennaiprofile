@@ -78,6 +78,10 @@ export default function Home() {
   const [visibleCards, setVisibleCards] = useState(20);
   // Server-side pagination state for infinite scroll
   const PAGE_SIZE = 20;
+  // Fresh per-visit shuffle seed. The server uses this to return profiles in a
+  // deterministic pseudo-random order across the FULL approved-with-photo set,
+  // consistent across paginated requests so Load More walks the same global shuffle.
+  const [shuffleSeed] = useState(() => Math.random().toString(36).slice(2, 12));
   const [loadingMore, setLoadingMore] = useState(false);
   const [maleOffset, setMaleOffset] = useState(PAGE_SIZE);
   const [femaleOffset, setFemaleOffset] = useState(PAGE_SIZE);
@@ -92,7 +96,7 @@ export default function Home() {
     const init = async () => {
       let boot;
       try {
-        boot = await fetch(`${API_BASE}?action=bootstrap&limit=${PAGE_SIZE}`, { credentials:'include' }).then(r=>r.json());
+        boot = await fetch(`${API_BASE}?action=bootstrap&limit=${PAGE_SIZE}&seed=${shuffleSeed}`, { credentials:'include' }).then(r=>r.json());
       } catch (e) { boot = { ok:false }; }
 
       if (boot?.ok && boot.contact?.verified) {
@@ -171,14 +175,13 @@ export default function Home() {
   }, [userMobile, activeTab]);
 
   // Effect B — append new profiles into the feed on every Load More.
-  // For incognito: shuffle first batch, stably append afterward.
+  // For incognito: server returns rows already in global random order (seeded
+  // shuffle across the FULL approved-with-photo DB), so we just append stably.
   // For logged-in: append into `others` (suggestion sections stay server-sourced).
   useEffect(() => {
     if (allProfiles.length === 0) return;
     if (!userMobile) {
-      const shuffle = (arr) => { const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
       setSections(prev => {
-        const isFirstLoad = prev.withPhotos.length === 0 && prev.others.length === 0;
         const seenPhoto = new Set(prev.withPhotos.map(p => p.id));
         const seenOther = new Set(prev.others.map(p => p.id));
         const newPhoto  = allProfiles.filter(p => p.photo && !seenPhoto.has(p.id));
@@ -186,8 +189,8 @@ export default function Home() {
         if (newPhoto.length === 0 && newOther.length === 0) return prev;
         return {
           interest: [], preference: [], notViewed: [], viewed: [],
-          withPhotos: isFirstLoad ? shuffle(newPhoto) : [...prev.withPhotos, ...newPhoto],
-          others:     isFirstLoad ? shuffle(newOther) : [...prev.others,     ...newOther],
+          withPhotos: [...prev.withPhotos, ...newPhoto],
+          others:     [...prev.others,     ...newOther],
         };
       });
       return;
@@ -235,7 +238,7 @@ export default function Home() {
     const offset = pickGroom ? maleOffset : femaleOffset;
     setLoadingMore(true);
     try {
-      const r = await fetch(`${API_BASE}?action=search&gender=${gender}&limit=${PAGE_SIZE}&offset=${offset}&sortId=desc&photo=with`).then(r=>r.json());
+      const r = await fetch(`${API_BASE}?action=search&gender=${gender}&limit=${PAGE_SIZE}&offset=${offset}&seed=${shuffleSeed}&photo=with`).then(r=>r.json());
       const batch = (r.ok ? r.profiles : []).map(mapP);
       if (batch.length > 0) setAllProfiles(prev => [...prev, ...batch]);
       if (batch.length < PAGE_SIZE) {

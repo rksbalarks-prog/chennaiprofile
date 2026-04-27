@@ -1183,27 +1183,41 @@ switch ($action) {
         $mobile = (string)($_SESSION['contact_mobile'] ?? $_SESSION['mobile'] ?? '');
         if ($verified && !kfm_is_returning()) kfm_set_returning_cookie();
 
-        // Helper: paged list for one gender, with photo, newest first. Results cached 60s.
-        $byGender = function($gender) use ($db, $limit) {
-            $key = "bootstrap:g=$gender:l=$limit";
-            return cache_remember($key, 60, function() use ($db, $gender, $limit) {
+        // Optional shuffle seed: when set, profiles are returned in a deterministic
+        // pseudo-random order across the FULL approved-with-photo set (not just the
+        // newest N). The same seed produces the same global ordering, so the client
+        // can paginate consistently via subsequent `search` calls with the same seed.
+        $seed = trim((string)($_GET['seed'] ?? ''));
+        $useRandom = $seed !== '';
+
+        // Helper: paged list for one gender, with photo. Newest-first by default;
+        // pseudo-random across the full set when a seed is supplied. Cached 60s only
+        // on the deterministic newest-first path — seeded responses are per-visitor.
+        $byGender = function($gender) use ($db, $limit, $seed, $useRandom) {
+            $runQuery = function() use ($db, $gender, $limit, $seed, $useRandom) {
                 $w = "p.status = 'Approved' AND p.gender = :g
                       AND p.photo1 IS NOT NULL AND p.photo1 != '' AND p.photo1 NOT LIKE 'default_%'";
                 $c = $db->prepare("SELECT COUNT(*) FROM profiles p WHERE $w");
                 $c->execute([':g' => $gender]);
                 $total = (int)$c->fetchColumn();
 
+                $orderBy = $useRandom ? "MD5(CONCAT(p.id, :seed))" : "p.id DESC";
                 $s = $db->prepare("SELECT p.cp_id, p.name, p.age, p.gender, p.caste, p.mother_tongue,
                                           p.marital, p.height, p.qualification, p.job, p.star, p.raasi,
                                           p.religion, p.photo1,
                                           p.present_area, p.present_city, p.present_district, p.present_state
                                    FROM profiles p
                                    WHERE $w
-                                   ORDER BY p.id DESC
+                                   ORDER BY $orderBy
                                    LIMIT $limit");
-                $s->execute([':g' => $gender]);
+                $params = [':g' => $gender];
+                if ($useRandom) $params[':seed'] = $seed;
+                $s->execute($params);
                 return ['profiles' => $s->fetchAll(), 'total' => $total];
-            });
+            };
+            if ($useRandom) return $runQuery();
+            $key = "bootstrap:g=$gender:l=$limit";
+            return cache_remember($key, 60, $runQuery);
         };
 
         header('Cache-Control: private, max-age=30');
@@ -1281,14 +1295,29 @@ switch ($action) {
         $offset = max((int)($_GET['offset'] ?? 0), 0);
         $whereStr = implode(' AND ', $where);
 
+        // Optional shuffle seed: when set, results are returned in a deterministic
+        // pseudo-random order across the FULL filtered set, consistent across pages
+        // for the same seed — so paginated calls with the same seed walk the
+        // whole DB in one stable random ordering.
+        $seed = trim((string)($_GET['seed'] ?? ''));
+        $useRandom = $seed !== '';
+        if ($useRandom) {
+            $params[':seed'] = $seed;
+            $orderClause = "MD5(CONCAT(p.id, :seed))";
+        } else {
+            $orderClause = "p.id $sort";
+        }
+
         // Count only on first page — saves a COUNT(*) on every scroll.
         // Cached 60s per unique filter signature (most traffic hits the same few filter combos).
         $total = null;
         if ($offset === 0 || !empty($_GET['withTotal'])) {
-            $countKey = 'cnt:' . md5($whereStr . '|' . serialize($params));
-            $total = cache_remember($countKey, 60, function() use ($db, $whereStr, $params) {
+            $countParams = $params;
+            unset($countParams[':seed']); // count doesn't depend on order
+            $countKey = 'cnt:' . md5($whereStr . '|' . serialize($countParams));
+            $total = cache_remember($countKey, 60, function() use ($db, $whereStr, $countParams) {
                 $s = $db->prepare("SELECT COUNT(*) FROM profiles p WHERE $whereStr");
-                $s->execute($params);
+                $s->execute($countParams);
                 return (int)$s->fetchColumn();
             });
         }
@@ -1301,14 +1330,18 @@ switch ($action) {
                        p.present_area, p.present_city, p.present_district, p.present_state
                 FROM profiles p
                 WHERE $whereStr
-                ORDER BY p.id $sort
+                ORDER BY $orderClause
                 LIMIT $limit OFFSET $offset";
 
         $stmt = $db->prepare($sql);
         $stmt->execute($params);
 
-        // Browser + edge cache — safe because results change slowly and user-agnostic
-        header('Cache-Control: public, max-age=60, stale-while-revalidate=120');
+        // Cache: deterministic ordering is shareable; seeded ordering is per-visitor.
+        if ($useRandom) {
+            header('Cache-Control: private, max-age=60');
+        } else {
+            header('Cache-Control: public, max-age=60, stale-while-revalidate=120');
+        }
 
         $resp = ['profiles' => $stmt->fetchAll(), 'limit' => $limit, 'offset' => $offset];
         if ($total !== null) $resp['total'] = $total;
