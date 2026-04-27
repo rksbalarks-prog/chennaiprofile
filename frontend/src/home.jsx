@@ -64,6 +64,13 @@ export default function Home() {
   // of the gate (free-limit reached or returning user). Keeps the styling
   // separate from otpMsg, which is wired to the success/error indicator.
   const [gatePromptMsg, setGatePromptMsg] = useState('');
+  // 4-hour "Verify or Reset" defer. When set, the gate modal is suppressed
+  // until the timestamp passes. Also drives the live countdown shown on the
+  // skip button inside the modal. Persisted in localStorage so it survives
+  // page reloads.
+  const GATE_SKIP_KEY = 'gate_skip_until';
+  const GATE_SKIP_MS  = 4 * 60 * 60 * 1000;
+  const [nowTick, setNowTick] = useState(Date.now());
   const [searchQuery, setSearchQuery] = useState('');
   const [visibleCards, setVisibleCards] = useState(20);
   // Server-side pagination state for infinite scroll
@@ -195,6 +202,14 @@ export default function Home() {
 
   useEffect(() => { if(otpTimer<=0)return; const t=setTimeout(()=>setOtpTimer(otpTimer-1),1000); return()=>clearTimeout(t); }, [otpTimer]);
 
+  // 1Hz tick that drives the "Verify or Reset in HH:MM:SS" countdown while
+  // the gate modal is visible. No-op when the modal is closed.
+  useEffect(() => {
+    if (!showOtpModal) return;
+    const id = setInterval(() => setNowTick(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [showOtpModal]);
+
   // Server-side pagination: fetch next page for the active tab's gender.
   // For 'all' tab, alternate to whichever side is less loaded so the
   // chronological feed stays balanced. Falls through to the other gender
@@ -245,6 +260,10 @@ export default function Home() {
   // Open the OTP modal because the server-side gate blocked a contact view.
   // gate_reason is either 'returning_user' or 'free_limit_reached'.
   const openGateModal = (profileId, reason, limit) => {
+    // Honour the user's "Verify or Reset in 4 Hrs" defer — don't re-pop the
+    // modal until the window expires.
+    const skipUntil = parseInt(localStorage.getItem(GATE_SKIP_KEY) || '0', 10);
+    if (skipUntil && Date.now() < skipUntil) return;
     setPendingContactId(profileId);
     setOtpIntent('view');
     setOtpMobile(''); setOtpValue(['','','','']); setOtpSent(false); setOtpMsg('');
@@ -252,6 +271,14 @@ export default function Home() {
       ? 'Welcome back. Please verify your mobile to continue viewing contacts.'
       : `You've used your ${limit || 5} free contact views. Verify your mobile to keep viewing contacts.`);
     setShowOtpModal(true);
+  };
+  // Close the modal and remember the user wants to defer verification for the
+  // next 4 hours. Used by both the top-right skip "x" and the secondary
+  // "Verify or Reset in 4 Hrs" button below Send OTP.
+  const skipGateFor4h = () => {
+    localStorage.setItem(GATE_SKIP_KEY, String(Date.now() + GATE_SKIP_MS));
+    setShowOtpModal(false);
+    setGatePromptMsg('');
   };
 
   const handleViewContact = async (profileId) => {
@@ -687,7 +714,11 @@ export default function Home() {
       {showOtpModal && (
         <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:3000, backdropFilter:'blur(4px)' }} onClick={()=>{setShowOtpModal(false);setGatePromptMsg('');}}>
           <div style={{ background:'#fff', borderRadius:20, overflow:'hidden', maxWidth:380, width:'90%', boxShadow:'0 20px 60px rgba(0,0,0,0.25)' }} onClick={e=>e.stopPropagation()}>
-            <div style={{ background:'linear-gradient(135deg,#8B0000,#C41E3A)', padding:22, textAlign:'center' }}>
+            <div style={{ background:'linear-gradient(135deg,#8B0000,#C41E3A)', padding:22, textAlign:'center', position:'relative' }}>
+              <button onClick={skipGateFor4h} title="Skip for 4 hours"
+                style={{ position:'absolute', top:10, right:10, background:'rgba(255,255,255,0.18)', border:'none', color:'#fff', padding:'4px 10px', borderRadius:14, fontSize:11, fontWeight:700, cursor:'pointer', letterSpacing:0.4 }}>
+                Skip ✕
+              </button>
               <div style={{ fontSize:14, fontWeight:700, color:'#fff' }}>Verify Your Mobile</div>
               <div style={{ fontSize:11, color:'rgba(255,255,255,0.7)', marginTop:4 }}>Enter your number to continue</div>
             </div>
@@ -709,6 +740,21 @@ export default function Home() {
                     style={{ width:'100%', marginTop:14, padding:12, background:'linear-gradient(135deg,#8B0000,#C41E3A)', color:'#fff', border:'none', borderRadius:10, fontSize:15, fontWeight:700, cursor:'pointer' }}>
                     {otpLoading ? 'Sending...' : 'Send OTP'}
                   </button>
+                  {(() => {
+                    const skipUntil = parseInt(localStorage.getItem(GATE_SKIP_KEY) || '0', 10);
+                    const remain = Math.max(0, (skipUntil || (nowTick + GATE_SKIP_MS)) - nowTick);
+                    const hh = String(Math.floor(remain/3600000)).padStart(2,'0');
+                    const mm = String(Math.floor((remain%3600000)/60000)).padStart(2,'0');
+                    const ss = String(Math.floor((remain%60000)/1000)).padStart(2,'0');
+                    return (
+                      <button onClick={skipGateFor4h}
+                        style={{ width:'100%', marginTop:8, padding:10, background:'transparent', color:'#8B0000', border:'1.5px solid #8B0000', borderRadius:10, fontSize:13, fontWeight:700, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
+                        <span>⏱</span>
+                        <span>Verify or Reset in 4 Hrs</span>
+                        <span style={{ fontFamily:'monospace', background:'#fef2f2', padding:'2px 8px', borderRadius:6, fontSize:12 }}>{hh}:{mm}:{ss}</span>
+                      </button>
+                    );
+                  })()}
                 </>
               ) : (
                 <>
