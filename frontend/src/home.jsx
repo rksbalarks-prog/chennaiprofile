@@ -635,25 +635,31 @@ export default function Home() {
     <div style={{ background:'#f5f5f5', minHeight:'100vh', paddingBottom:80 }}>
 
       {/* Filter Buttons — hidden for registered users since the server already
-          locks gender to the opposite of their own (tabs would be confusing). */}
+          locks gender to the opposite of their own (tabs would be confusing).
+          Pill style mirrors the Recent/Random/Photos/Not Viewed row below for
+          a single visual language across both filter groups. */}
       {!hasUserProfile && (
-        <div style={{ display:'flex', gap:6, padding:'8px 12px 6px', background:'#fff' }}>
-          <button onClick={()=>setActiveTab('all')} style={{ flex:1, padding:'8px 0', borderRadius:20, fontSize:13.2, fontWeight:600, cursor:'pointer', border:'1.5px solid', display:'flex', alignItems:'center', justifyContent:'center', gap:4,
-            background:activeTab==='all'?'#8B0000':'#f5f5f5', color:activeTab==='all'?'#fff':'#666', borderColor:activeTab==='all'?'#8B0000':'#e8e8e8' }}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="7" r="4"/><circle cx="17" cy="7" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M14 21a7 7 0 0 1 8-6.7"/></svg>
-            All <span style={{ fontSize:11, fontWeight:700, background:activeTab==='all'?'rgba(255,255,255,0.25)':'rgba(0,0,0,0.06)', padding:'0 5px', borderRadius:8 }}>{fmtCount(maleCount + femaleCount)}</span>
-          </button>
-          <button onClick={()=>setActiveTab('bride')} style={{ flex:1, padding:'8px 0', borderRadius:20, fontSize:13.2, fontWeight:600, cursor:'pointer', border:'1.5px solid', display:'flex', alignItems:'center', justifyContent:'center', gap:4,
-            background:activeTab==='bride'?'#8B0000':'#f5f5f5', color:activeTab==='bride'?'#fff':'#666', borderColor:activeTab==='bride'?'#8B0000':'#e8e8e8' }}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>
-            Female <span style={{ fontSize:11, fontWeight:700, background:activeTab==='bride'?'rgba(255,255,255,0.25)':'rgba(0,0,0,0.06)', padding:'0 5px', borderRadius:8 }}>{fmtCount(femaleCount)}</span>
-          </button>
-          <button onClick={()=>setActiveTab('groom')} style={{ flex:1, padding:'8px 0', borderRadius:20, fontSize:13.2, fontWeight:600, cursor:'pointer', border:'1.5px solid', display:'flex', alignItems:'center', justifyContent:'center', gap:4,
-            background:activeTab==='groom'?'#8B0000':'#f5f5f5', color:activeTab==='groom'?'#fff':'#666', borderColor:activeTab==='groom'?'#8B0000':'#e8e8e8' }}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>
-            Male <span style={{ fontSize:11, fontWeight:700, background:activeTab==='groom'?'rgba(255,255,255,0.25)':'rgba(0,0,0,0.06)', padding:'0 5px', borderRadius:8 }}>{fmtCount(maleCount)}</span>
-          </button>
-          <button style={{ padding:'8px 14px', borderRadius:20, fontSize:13.2, fontWeight:600, cursor:'pointer', background:'#fff7ed', color:'#c2410c', border:'1.5px solid #fed7aa', whiteSpace:'nowrap' }}
+        <div style={{ display:'flex', gap:6, padding:'8px 12px 6px', background:'#fff', overflowX:'auto', scrollbarWidth:'thin' }}>
+          {[
+            { key:'all',   label:'All',    count:maleCount + femaleCount, icon:(<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="7" r="4"/><circle cx="17" cy="7" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M14 21a7 7 0 0 1 8-6.7"/></svg>) },
+            { key:'bride', label:'Female', count:femaleCount,             icon:(<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>) },
+            { key:'groom', label:'Male',   count:maleCount,               icon:(<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>) },
+          ].map(t => {
+            const active = activeTab === t.key;
+            return (
+              <button key={t.key} onClick={()=>setActiveTab(t.key)}
+                style={{ flexShrink:0, padding:'6px 14px', borderRadius:18, fontSize:13.2, fontWeight:600, cursor:'pointer', whiteSpace:'nowrap', display:'inline-flex', alignItems:'center', gap:6,
+                  background: active ? '#8B0000' : '#f5f5f5',
+                  color: active ? '#fff' : '#555',
+                  border: active ? '1.5px solid #8B0000' : '1.5px solid #e8e8e8',
+                  transition:'all 0.15s' }}>
+                {t.icon}
+                {t.label}
+                <span style={{ fontSize:11, fontWeight:700, background:active?'rgba(255,255,255,0.25)':'rgba(0,0,0,0.06)', padding:'0 6px', borderRadius:8 }}>{fmtCount(t.count)}</span>
+              </button>
+            );
+          })}
+          <button style={{ flexShrink:0, padding:'6px 14px', borderRadius:18, fontSize:13.2, fontWeight:600, cursor:'pointer', background:'#fff7ed', color:'#c2410c', border:'1.5px solid #fed7aa', whiteSpace:'nowrap' }}
             onClick={()=>{setOtpIntent('register');contactVerified?(window.location.href=`${USER_PANEL_URL}?create=1`):setShowOtpModal(true);}}>
             + Add Profile
           </button>
