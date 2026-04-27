@@ -335,7 +335,13 @@ export default function Detail() {
     })();
   }, [id]);
 
-  if (loading) return <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', fontSize:17.6, color:'#999' }}>Loading...</div>;
+  if (loading) return (
+    <div style={{ minHeight:'100vh', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:14, color:'#888' }}>
+      <span style={{ width:34, height:34, border:'3px solid rgba(139,0,0,0.18)', borderTopColor:'#8B0000', borderRadius:'50%', animation:'spin 0.8s linear infinite' }} />
+      <span style={{ fontSize:14, fontWeight:600 }}>Loading profile…</span>
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+    </div>
+  );
   if (!profile) return (
     <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#f5f5f5' }}>
       <div style={{ textAlign:'center', padding:40, background:'#fff', borderRadius:16, boxShadow:'0 2px 12px rgba(0,0,0,0.06)', maxWidth:400 }}>

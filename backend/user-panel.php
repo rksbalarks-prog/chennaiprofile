@@ -168,23 +168,30 @@ input,select,textarea{outline:none}
 .btn-danger{background:#dc2626;color:#fff}.btn-danger:hover{background:#b91c1c}
 .btn-ghost{background:none;color:var(--ink3);border-color:transparent}.btn-ghost:hover{background:var(--bg)}
 .btn-sm{padding:6px 12px;font-size:12px}
-.action-row{display:flex;gap:7px;flex-wrap:wrap}
+/* Topbar actions — single row, horizontally scrollable when wider than the
+   topbar can fit (mobile). nowrap so buttons don't drop under the title;
+   webkit scroll-snap keeps each button aligned at its left edge after a swipe. */
+.action-row{display:flex;gap:7px;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;max-width:100%;scrollbar-width:thin;padding:2px 0;scroll-snap-type:x proximity}
+.action-row > *{flex-shrink:0;scroll-snap-align:start}
+.action-row::-webkit-scrollbar{height:4px}
+.action-row::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
 
-/* Compact dropdown used in the topbar — bundles multiple actions behind one
-   trigger so the topbar stays a single line on mobile (no wrapping under the
-   page title). The panel scrolls vertically if it ever overflows. */
-.topbar-menu{position:relative;display:inline-block}
-.topbar-menu-trigger{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;background:var(--accent);color:#fff;border:1.5px solid var(--accent);font-size:12px;font-weight:600;cursor:pointer;line-height:1.2}
-.topbar-menu-trigger:hover{background:var(--accent2);border-color:var(--accent2)}
-.topbar-menu-trigger .chev{font-size:10px;transition:transform .15s ease}
-.topbar-menu.open .topbar-menu-trigger .chev{transform:rotate(180deg)}
-.topbar-menu-list{display:none;position:absolute;top:calc(100% + 6px);right:0;min-width:200px;max-width:80vw;max-height:60vh;overflow-y:auto;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 12px 36px rgba(0,0,0,0.14);padding:6px;z-index:30;-webkit-overflow-scrolling:touch}
-.topbar-menu.open .topbar-menu-list{display:block;animation:fadeUp .15s ease}
-.topbar-menu-list a,.topbar-menu-list button{display:flex;align-items:center;gap:9px;width:100%;padding:10px 12px;border:none;background:none;color:var(--ink2);font-size:13px;font-weight:600;text-align:left;text-decoration:none;border-radius:7px;cursor:pointer;font-family:inherit}
-.topbar-menu-list a:hover,.topbar-menu-list button:hover{background:var(--bg);color:var(--ink)}
-.topbar-menu-list .menu-primary{color:var(--accent)}
-.topbar-menu-list .menu-primary:hover{background:#fef2f2}
-@media(max-width:640px){.topbar{padding:0 14px}.topbar-menu-list{right:-4px;min-width:220px}}
+/* Generic horizontally-scrollable filter chip row — applied via .chip-row
+   wherever a row of chips might overflow on mobile. */
+.chip-row{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;padding-bottom:4px;scrollbar-width:thin;scroll-snap-type:x proximity}
+.chip-row > *{flex-shrink:0;scroll-snap-align:start}
+.chip-row::-webkit-scrollbar{height:4px}
+.chip-row::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+/* Loading animations: spinner ring + soft skeleton block. Applied wherever
+   an async fetch/save is in flight so the UI never sits silent. */
+@keyframes uSpin{to{transform:rotate(360deg)}}
+.u-spinner{display:inline-block;width:14px;height:14px;border:2.5px solid rgba(0,0,0,0.12);border-top-color:var(--accent);border-radius:50%;animation:uSpin .7s linear infinite;vertical-align:-3px}
+.u-spinner.lg{width:28px;height:28px;border-width:3px}
+.u-spinner.on-dark{border-color:rgba(255,255,255,0.35);border-top-color:#fff}
+.u-loading-overlay{position:absolute;inset:0;background:rgba(255,255,255,0.72);display:flex;align-items:center;justify-content:center;gap:10px;font-size:13px;font-weight:600;color:var(--ink2);z-index:5;border-radius:inherit;backdrop-filter:blur(2px)}
+@keyframes uShimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.u-skeleton{background:linear-gradient(90deg,#f0f0f0 0%,#fafafa 50%,#f0f0f0 100%);background-size:200% 100%;animation:uShimmer 1.4s ease-in-out infinite;border-radius:6px;color:transparent!important;display:inline-block}
 
 .no-profile-wrap{max-width:500px;margin:0 auto;text-align:center;padding:50px 24px;background:var(--card);border-radius:var(--radius2);box-shadow:var(--shadow);border:2px dashed var(--border2);animation:fadeUp .3s ease}
 .no-profile-icon{font-size:48px;opacity:.45;margin-bottom:14px}
@@ -535,13 +542,13 @@ input,select,textarea{outline:none}
     <div class="content">
       <div class="u-section active" id="myProfileSection"></div>
       <div class="u-section" id="suggestionsSection">
-        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+        <div class="chip-row" style="margin-bottom:14px;align-items:center">
           <button class="btn btn-sm" onclick="filterSuggestions('all')" id="sgFiltAll" style="background:var(--accent);color:#fff;border:none;padding:6px 14px;border-radius:16px;font-size:12px;font-weight:600">All</button>
           <button class="btn btn-sm" onclick="filterSuggestions('interested')" id="sgFiltInterested" style="background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;padding:6px 14px;border-radius:16px;font-size:12px;font-weight:600">💚 Interested</button>
           <button class="btn btn-sm" onclick="filterSuggestions('later')" id="sgFiltLater" style="background:#fefce8;color:#a16207;border:1px solid #fde68a;padding:6px 14px;border-radius:16px;font-size:12px;font-weight:600">🕐 Later</button>
           <button class="btn btn-sm" onclick="filterSuggestions('not_interested')" id="sgFiltNot" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;padding:6px 14px;border-radius:16px;font-size:12px;font-weight:600">❌ Not Interested</button>
           <button class="btn btn-sm" onclick="filterSuggestions('untagged')" id="sgFiltUntagged" style="background:#f3f4f6;color:#6b7280;border:1px solid #e5e7eb;padding:6px 14px;border-radius:16px;font-size:12px;font-weight:600">🏷 Untagged</button>
-          <span style="margin-left:auto;display:flex;align-items:center;gap:6px">
+          <span style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;flex-shrink:0">
             <span style="font-size:11px;color:var(--ink3)">Sort:</span>
             <select id="sgSort" onchange="renderSuggestionsUI()" style="padding:5px 10px;border:1px solid #e5e7eb;border-radius:8px;font-size:11px;font-weight:600;color:#374151;cursor:pointer">
               <option value="rating_desc">★ Rating High → Low</option>
@@ -1882,20 +1889,15 @@ function setActions(sec) {
     if (canDelete) html += '<button class="btn btn-danger btn-sm" onclick="deleteProf()">Delete</button>';
     acts.innerHTML = html;
   } else if (sec === 'myProfile' && !profile) {
-    // Scroll-menu dropdown — keeps the topbar to a single line on mobile and
-    // scrolls vertically if the option list ever grows beyond the viewport.
-    let items = '';
+    // Inline buttons — the .action-row container scrolls horizontally on
+    // mobile so buttons stay on a single line instead of wrapping under
+    // the page title.
+    let html = '';
     if (upAllowed('feat_create_profile')) {
-      items += '<button type="button" class="menu-primary" onclick="openCreate()">+ Create New Profile</button>';
+      html += '<button class="btn btn-primary btn-sm" onclick="openCreate()">+ Create New Profile</button>';
     }
-    items += '<a href="/"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Go Home</a>';
-    acts.innerHTML = `
-      <div class="topbar-menu" id="myProfileMenu">
-        <button type="button" class="topbar-menu-trigger" onclick="event.stopPropagation();document.getElementById('myProfileMenu').classList.toggle('open')">
-          Menu <span class="chev">▾</span>
-        </button>
-        <div class="topbar-menu-list" onclick="document.getElementById('myProfileMenu').classList.remove('open')">${items}</div>
-      </div>`;
+    html += '<a href="/" class="btn btn-outline btn-sm" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Go Home</a>';
+    acts.innerHTML = html;
   } else {
     acts.innerHTML = '';
   }
@@ -2557,7 +2559,10 @@ let sgFilter = 'all';
 async function renderSuggestions() {
   const container = document.getElementById('suggestionsContent');
   if (!container) return;
-  container.innerHTML = '<div style="text-align:center;padding:30px;color:var(--ink3)">Loading suggestions...</div>';
+  container.innerHTML = '<div style="text-align:center;padding:36px 20px;color:var(--ink3);display:flex;flex-direction:column;align-items:center;gap:12px">'
+    + '<span class="u-spinner lg"></span>'
+    + '<span style="font-size:13px;font-weight:500">Loading suggestions…</span>'
+    + '</div>';
 
   try {
     const resp = await fetch('api/public.php', { method:'POST', headers:{'Content-Type':'application/json'},
