@@ -386,6 +386,8 @@ export default function Home() {
 
     return (
     <div style={{ position:'relative', display:'flex', background:'#fff', borderRadius:12, overflow:'hidden', boxShadow:'0 1px 6px rgba(0,0,0,0.06)', border:'1px solid #f0f0f0', cursor:'pointer' }}
+      onMouseEnter={() => setSlide(1)}
+      onMouseLeave={() => setSlide(0)}
       onClick={() => navigate(`/detail/${p.id}`, { state: { profile: p } })}>
       {(() => {
         const svgFallback = p.gender === 'Male' ? '/default-male.png' : '/default-female.png';
