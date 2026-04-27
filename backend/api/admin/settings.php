@@ -314,10 +314,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $day   = ($b['day']   !== '' && $b['day']   !== null) ? (int)$b['day'] : null;
                 $month = ($b['month'] !== '' && $b['month'] !== null) ? (int)$b['month'] : null;
                 $total = ($b['total'] !== '' && $b['total'] !== null) ? (int)$b['total'] : null;
-                $db->prepare("INSERT INTO restrictions (type,mobile,per_day,per_month,total) VALUES ('global',NULL,:d,:m,:t)
-                    ON DUPLICATE KEY UPDATE per_day=VALUES(per_day),per_month=VALUES(per_month),total=VALUES(total)")
-                   ->execute([':d'=>$day,':m'=>$month,':t'=>$total]);
-                pushAdminLog('Set Global Restriction', 'Day:'.$day.' Month:'.$month.' Total:'.$total, 'setting', $admin);
+                // Unverified-visitor per-session quota + window (hours).
+                // session_views=0/null means unlimited; session_hours=0/null
+                // means the session never auto-resets.
+                $sViews = (isset($b['unverified_session_views']) && $b['unverified_session_views'] !== '') ? (int)$b['unverified_session_views'] : null;
+                $sHours = (isset($b['unverified_session_hours']) && $b['unverified_session_hours'] !== '') ? (int)$b['unverified_session_hours'] : null;
+                // No UNIQUE on type — emulate upsert manually.
+                $existing = $db->query("SELECT id FROM restrictions WHERE type='global' LIMIT 1")->fetch();
+                if ($existing) {
+                    $db->prepare("UPDATE restrictions SET per_day=:d,per_month=:m,total=:t,
+                        unverified_session_views=:sv,unverified_session_hours=:sh WHERE id=:id")
+                       ->execute([':d'=>$day,':m'=>$month,':t'=>$total,':sv'=>$sViews,':sh'=>$sHours,':id'=>$existing['id']]);
+                } else {
+                    $db->prepare("INSERT INTO restrictions (type,mobile,per_day,per_month,total,unverified_session_views,unverified_session_hours)
+                        VALUES ('global',NULL,:d,:m,:t,:sv,:sh)")
+                       ->execute([':d'=>$day,':m'=>$month,':t'=>$total,':sv'=>$sViews,':sh'=>$sHours]);
+                }
+                pushAdminLog('Set Global Restriction',
+                    'Day:'.$day.' Month:'.$month.' Total:'.$total.' Unverif:'.$sViews.'/'.$sHours.'h',
+                    'setting', $admin);
                 json_ok(['msg' => 'Saved.']);
             }
             if ($action === 'saveIndividual') {

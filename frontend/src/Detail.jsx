@@ -102,7 +102,7 @@ export default function Detail() {
   const [marriedSubmitting, setMarriedSubmitting] = useState(false);
   // Anonymous-visitor gate state — same shape as home.jsx. Server is the
   // source of truth; these mirror the snapshot it returns.
-  const [gateState, setGateState] = useState({ returning:false, anonViewsUsed:0, anonViewsLimit:5, gateRequired:false });
+  const [gateState, setGateState] = useState({ returning:false, anonViewsUsed:0, anonViewsLimit:5, gateRequired:false, anonWindowSec:24*3600, anonWindowStart:0 });
   const [gatePromptMsg, setGatePromptMsg] = useState('');
   // 24-hour "to get your 5 free contacts" countdown. The window starts the
   // first time the gate modal opens and persists in localStorage. The user
@@ -133,10 +133,12 @@ export default function Detail() {
       .then(r => r.json()).then(d => {
         if (d.ok && d.verified) setContactVerified(true);
         if (d.ok) setGateState({
-          returning:       !!d.returning,
-          anonViewsUsed:   d.anon_views_used  ?? 0,
-          anonViewsLimit:  d.anon_views_limit ?? 5,
-          gateRequired:    !!d.gate_required,
+          returning:        !!d.returning,
+          anonViewsUsed:    d.anon_views_used   ?? 0,
+          anonViewsLimit:   d.anon_views_limit  ?? 5,
+          gateRequired:     !!d.gate_required,
+          anonWindowSec:    d.anon_window_sec   ?? 24*3600,
+          anonWindowStart:  d.anon_window_start ?? 0,
         });
       })
       .catch(() => {});
@@ -206,10 +208,12 @@ export default function Detail() {
       const tv = await res.json().catch(()=>({}));
       if (tv && tv.anon_views_used != null) setGateState(g => ({
         ...g,
-        returning:      !!tv.returning,
-        anonViewsUsed:  tv.anon_views_used,
-        anonViewsLimit: tv.anon_views_limit ?? g.anonViewsLimit,
-        gateRequired:   !!tv.gate_required,
+        returning:        !!tv.returning,
+        anonViewsUsed:    tv.anon_views_used,
+        anonViewsLimit:   tv.anon_views_limit ?? g.anonViewsLimit,
+        gateRequired:     !!tv.gate_required,
+        anonWindowSec:    tv.anon_window_sec   ?? g.anonWindowSec,
+        anonWindowStart:  tv.anon_window_start ?? g.anonWindowStart,
       }));
       if (!res.ok && tv && tv.gate_required) {
         openGateModal(tv.gate_reason, tv.anon_views_limit);
@@ -801,16 +805,22 @@ export default function Detail() {
                     {otpLoading ? 'Sending...' : 'Send OTP'}
                   </button>
                   {(() => {
-                    const windowUntil = parseInt(localStorage.getItem(GATE_WINDOW_KEY) || '0', 10);
-                    const remain = Math.max(0, (windowUntil || (nowTick + GATE_WINDOW_MS)) - nowTick);
+                    // Prefer the server-published window; fall back to the
+                    // localStorage timestamp the client armed when offline.
+                    const winMs = (gateState.anonWindowSec || GATE_WINDOW_MS/1000) * 1000;
+                    const serverEnd = gateState.anonWindowStart ? gateState.anonWindowStart*1000 + winMs : 0;
+                    const localEnd  = parseInt(localStorage.getItem(GATE_WINDOW_KEY) || '0', 10);
+                    const endAt     = serverEnd || localEnd || (nowTick + winMs);
+                    const remain    = Math.max(0, endAt - nowTick);
                     const hh = String(Math.floor(remain/3600000)).padStart(2,'0');
                     const mm = String(Math.floor((remain%3600000)/60000)).padStart(2,'0');
                     const ss = String(Math.floor((remain%60000)/1000)).padStart(2,'0');
+                    const limit = gateState.anonViewsLimit || 5;
                     return (
                       <button onClick={skipGateModal}
                         style={{ width:'100%', marginTop:8, padding:10, background:'transparent', color:'#8B0000', border:'1.5px solid #8B0000', borderRadius:10, fontSize:13, fontWeight:700, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
                         <span>⏱</span>
-                        <span>To get your 5 free contacts in</span>
+                        <span>To get your {limit} free contacts in</span>
                         <span style={{ fontFamily:'monospace', background:'#fef2f2', padding:'2px 8px', borderRadius:6, fontSize:12 }}>{hh}:{mm}:{ss}</span>
                       </button>
                     );

@@ -12,9 +12,33 @@ $db = getDB();
 // and on every subsequent session for users who have ever verified — they
 // must pass OTP again. The "ever verified" flag is held in a long-lived
 // cookie (the user's session itself only lives 12h).
+// Defaults — overridden by the global row in `restrictions` if set by admin.
 const KFM_FREE_VIEWS       = 5;
-const KFM_FREE_WINDOW_SEC  = 24 * 60 * 60; // rolling 24-hour reset window
+const KFM_FREE_WINDOW_SEC  = 24 * 60 * 60; // rolling reset window
 const KFM_RETURNING_COOKIE = 'kfm_returning';
+
+// Read admin-configurable per-session limits for unverified visitors. Cached
+// per-request via a static so we hit the DB at most once.
+function kfm_unverified_limits(): array {
+    static $cached = null;
+    if ($cached !== null) return $cached;
+    $views = KFM_FREE_VIEWS;
+    $win   = KFM_FREE_WINDOW_SEC;
+    try {
+        $db = getDB();
+        $row = $db->query("SELECT unverified_session_views, unverified_session_hours
+                             FROM restrictions WHERE type='global' LIMIT 1")->fetch();
+        if ($row) {
+            if ($row['unverified_session_views'] !== null && (int)$row['unverified_session_views'] > 0) {
+                $views = (int)$row['unverified_session_views'];
+            }
+            if ($row['unverified_session_hours'] !== null && (int)$row['unverified_session_hours'] > 0) {
+                $win = (int)$row['unverified_session_hours'] * 3600;
+            }
+        }
+    } catch (Throwable $e) { /* fall back to defaults */ }
+    return $cached = ['views' => $views, 'window_sec' => $win];
+}
 
 function kfm_set_returning_cookie(): void {
     // setcookie must run before any echo. All callers do so via json_ok/json_err.
@@ -32,12 +56,14 @@ function kfm_is_returning(): bool {
     return !empty($_COOKIE[KFM_RETURNING_COOKIE]);
 }
 
-// Roll the 24-hour free-view window if it has expired. Clears the recorded
-// cpid list and resets the window-start timestamp so the visitor gets a
-// fresh batch of KFM_FREE_VIEWS contacts.
+// Roll the free-view window if it has expired. Clears the recorded cpid list
+// and resets the window-start timestamp so the visitor gets a fresh batch of
+// the configured per-session views. Window length comes from the admin
+// restriction; falls back to the KFM_FREE_WINDOW_SEC default.
 function kfm_anon_roll_window(): void {
     $start = (int)($_SESSION['anon_window_start'] ?? 0);
-    if ($start > 0 && (time() - $start) >= KFM_FREE_WINDOW_SEC) {
+    $cfg   = kfm_unverified_limits();
+    if ($start > 0 && (time() - $start) >= $cfg['window_sec']) {
         $_SESSION['anon_view_cpids']   = [];
         $_SESSION['anon_window_start'] = 0;
     }
@@ -70,18 +96,23 @@ function kfm_gate_required(string $targetCpId): bool {
     // Anonymous: re-revealing the same profile is free; new profile only if under quota.
     $arr = $_SESSION['anon_view_cpids'] ?? [];
     if (is_array($arr) && in_array($targetCpId, $arr, true)) return false;
-    return kfm_anon_views_used() >= KFM_FREE_VIEWS;
+    $cfg = kfm_unverified_limits();
+    return kfm_anon_views_used() >= $cfg['views'];
 }
 
 // Snapshot for clients to drive UI without a separate request.
 function kfm_gate_snapshot(): array {
     $verified = !empty($_SESSION['contact_verified']) || !empty($_SESSION['mobile']);
+    $cfg      = kfm_unverified_limits();
+    $used     = kfm_anon_views_used();
     return [
-        'returning'        => kfm_is_returning(),
-        'anon_views_used'  => kfm_anon_views_used(),
-        'anon_views_limit' => KFM_FREE_VIEWS,
+        'returning'         => kfm_is_returning(),
+        'anon_views_used'   => $used,
+        'anon_views_limit'  => $cfg['views'],
+        'anon_window_sec'   => $cfg['window_sec'],
+        'anon_window_start' => (int)($_SESSION['anon_window_start'] ?? 0),
         // Will the *next* contact_view on a brand-new profile be gated?
-        'gate_required'    => !$verified && (kfm_is_returning() || kfm_anon_views_used() >= KFM_FREE_VIEWS),
+        'gate_required'     => !$verified && (kfm_is_returning() || $used >= $cfg['views']),
     ];
 }
 

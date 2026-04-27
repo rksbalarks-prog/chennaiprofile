@@ -1892,6 +1892,22 @@ input[type="date"].filter-select { padding:8px 10px; cursor:pointer; }
               <div style="font-size:11px;color:var(--text-secondary);margin-top:8px">Enter 0 or leave blank for unlimited</div>
             </div>
 
+            <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:16px 18px;margin-bottom:16px">
+              <div style="font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#c2410c;margin-bottom:4px">Unverified Visitors — Per Session</div>
+              <div style="font-size:11px;color:var(--text-secondary);margin-bottom:12px">Anonymous (mobile-not-verified) users. Session starts on the first contact viewed.</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div>
+                  <label class="input-label">Max Contacts / Session</label>
+                  <input class="input" id="gl_uv_views" type="number" min="0" placeholder="e.g. 2" style="margin-bottom:0">
+                </div>
+                <div>
+                  <label class="input-label">Session Time Limit (hrs)</label>
+                  <input class="input" id="gl_uv_hours" type="number" min="0" placeholder="e.g. 4" style="margin-bottom:0">
+                </div>
+              </div>
+              <div style="font-size:11px;color:var(--text-secondary);margin-top:8px">Enter 0 or leave blank for unlimited / no auto-reset</div>
+            </div>
+
             <button class="btn btn-primary" style="width:100%" onclick="saveGlobalRestriction()">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
               Save Global Restriction
@@ -4623,7 +4639,7 @@ let planHistory = [];
 let paymentOptions = [];
 let userPanelControl = { global: {}, overrides: [] };
 let upCtrlHistory = [];
-let globalRestriction = { day: '', month: '', total: '' };
+let globalRestriction = { day: '', month: '', total: '', sessionViews: '', sessionHours: '' };
 let casteList = [];
 let subcasteList = [];
 let profileReports = [];
@@ -4783,7 +4799,13 @@ async function loadAll() {
     });
     if (s.restrictions) {
       const g = s.restrictions.global ? mapRow(s.restrictions.global) : null;
-      globalRestriction = g ? { day: g.day ?? g.per_day ?? '', month: g.month ?? g.per_month ?? '', total: g.total ?? '' } : { day:'', month:'', total:'' };
+      globalRestriction = g ? {
+        day:          g.day          ?? g.per_day  ?? '',
+        month:        g.month        ?? g.per_month ?? '',
+        total:        g.total        ?? '',
+        sessionViews: g.sessionViews ?? g.unverified_session_views ?? '',
+        sessionHours: g.sessionHours ?? g.unverified_session_hours ?? '',
+      } : { day:'', month:'', total:'', sessionViews:'', sessionHours:'' };
       individualRestrictions = mapRows(s.restrictions.individual).map(r => ({
         ...r, day: r.day ?? r.per_day ?? '', month: r.month ?? r.per_month ?? '', total: r.total ?? '',
       }));
@@ -10096,7 +10118,7 @@ function togglePlanUserVisible(idx, visible) {
 // ──────────────────────────────────────────────
 // RESTRICTIONS
 // ──────────────────────────────────────────────
-globalRestriction   = { day: '', month: '', total: '' };
+globalRestriction   = { day: '', month: '', total: '', sessionViews: '', sessionHours: '' };
 individualRestrictions = []; // [{mobile, name, day, month, total}]
 
 function renderRestrictions() {
@@ -10104,17 +10126,21 @@ function renderRestrictions() {
   const gd = document.getElementById('globalRestrictionDisplay');
   const gc = document.getElementById('globalRestrictionCard');
   if (!gd || !gc) return;
-  const hasGlobal = globalRestriction.day !== '' || globalRestriction.month !== '' || globalRestriction.total !== '';
+  const hasGlobal = globalRestriction.day !== '' || globalRestriction.month !== '' || globalRestriction.total !== ''
+    || globalRestriction.sessionViews !== '' || globalRestriction.sessionHours !== '';
   gd.style.display = hasGlobal ? '' : 'none';
   // Pre-fill form with current values
   if (hasGlobal) {
-    document.getElementById('gl_day').value = globalRestriction.day || '';
-    document.getElementById('gl_month').value = globalRestriction.month || '';
-    document.getElementById('gl_total').value = globalRestriction.total || '';
+    document.getElementById('gl_day').value      = globalRestriction.day || '';
+    document.getElementById('gl_month').value    = globalRestriction.month || '';
+    document.getElementById('gl_total').value    = globalRestriction.total || '';
+    document.getElementById('gl_uv_views').value = globalRestriction.sessionViews || '';
+    document.getElementById('gl_uv_hours').value = globalRestriction.sessionHours || '';
     gc.innerHTML = restrictionChip(
       'All Users (Global)',
       globalRestriction.day, globalRestriction.month, globalRestriction.total,
-      '#eff6ff', '#2563eb', null
+      '#eff6ff', '#2563eb', null,
+      globalRestriction.sessionViews, globalRestriction.sessionHours
     );
   }
 
@@ -10136,7 +10162,7 @@ function renderRestrictions() {
   }).join('');
 }
 
-function restrictionChip(label, day, month, total, bg, color, idx) {
+function restrictionChip(label, day, month, total, bg, color, idx, sessionViews, sessionHours) {
   const fmt = v => (v === '' || v == null) ? '∞' : (v == 0 ? '∞' : v);
   const isGlobal = idx === null;
   const editBtn = isGlobal
@@ -10145,6 +10171,20 @@ function restrictionChip(label, day, month, total, bg, color, idx) {
         <button onclick="editIndRestriction(${idx})" class="btn btn-outline btn-sm" style="font-size:10px;padding:3px 8px" title="Edit">Edit</button>
         <button onclick="deleteIndRestriction(${idx})" style="background:none;border:1px solid #fecaca;border-radius:5px;cursor:pointer;color:#dc2626;font-size:10px;padding:3px 8px;font-weight:600" title="Remove">Delete</button>
        </div>`;
+  // Optional unverified-session row only renders for the global chip when set.
+  const hasSession = isGlobal && (sessionViews !== '' && sessionViews != null) || (sessionHours !== '' && sessionHours != null);
+  const sessionRow = hasSession ? `
+    <div style="margin-top:8px;padding-top:8px;border-top:1px dashed rgba(0,0,0,.10);display:flex;gap:12px">
+      <div style="text-align:center">
+        <div style="font-size:14px;font-weight:700;color:#c2410c">${fmt(sessionViews)}</div>
+        <div style="font-size:10px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.5px">Unverif / Session</div>
+      </div>
+      <div style="width:1px;background:rgba(0,0,0,.08)"></div>
+      <div style="text-align:center">
+        <div style="font-size:14px;font-weight:700;color:#c2410c">${fmt(sessionHours)}${(sessionHours===''||sessionHours==null||sessionHours==0)?'':'h'}</div>
+        <div style="font-size:10px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.5px">Session Window</div>
+      </div>
+    </div>` : '';
   return `<div style="background:${bg};border-radius:9px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px">
     <div>
       <div style="font-size:12.5px;font-weight:600;color:${color};margin-bottom:6px">${label}</div>
@@ -10164,28 +10204,36 @@ function restrictionChip(label, day, month, total, bg, color, idx) {
           <div style="font-size:10px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.5px">Total</div>
         </div>
       </div>
+      ${sessionRow}
     </div>
     ${editBtn}
   </div>`;
 }
 
 function editGlobalRestriction() {
-  document.getElementById('gl_day').value = globalRestriction.day || '';
-  document.getElementById('gl_month').value = globalRestriction.month || '';
-  document.getElementById('gl_total').value = globalRestriction.total || '';
+  document.getElementById('gl_day').value      = globalRestriction.day || '';
+  document.getElementById('gl_month').value    = globalRestriction.month || '';
+  document.getElementById('gl_total').value    = globalRestriction.total || '';
+  document.getElementById('gl_uv_views').value = globalRestriction.sessionViews || '';
+  document.getElementById('gl_uv_hours').value = globalRestriction.sessionHours || '';
   document.getElementById('gl_day').focus();
   toast('Global restriction loaded for editing');
 }
 
 function saveGlobalRestriction() {
-  const day   = document.getElementById('gl_day').value.trim();
-  const month = document.getElementById('gl_month').value.trim();
-  const total = document.getElementById('gl_total').value.trim();
-  if (day === '' && month === '' && total === '') {
+  const day          = document.getElementById('gl_day').value.trim();
+  const month        = document.getElementById('gl_month').value.trim();
+  const total        = document.getElementById('gl_total').value.trim();
+  const sessionViews = document.getElementById('gl_uv_views').value.trim();
+  const sessionHours = document.getElementById('gl_uv_hours').value.trim();
+  if (day === '' && month === '' && total === '' && sessionViews === '' && sessionHours === '') {
     toast('Please enter at least one limit', 'error'); return;
   }
-  globalRestriction = { day, month, total };
-  pushAdminLog('Set Global Restriction', 'Day:' + (day||'∞') + ' Month:' + (month||'∞') + ' Total:' + (total||'∞'), 'setting');
+  globalRestriction = { day, month, total, sessionViews, sessionHours };
+  pushAdminLog('Set Global Restriction',
+    'Day:' + (day||'∞') + ' Month:' + (month||'∞') + ' Total:' + (total||'∞')
+    + ' Unverif:' + (sessionViews||'∞') + '/' + (sessionHours||'∞') + 'h',
+    'setting');
   saveState();
   renderRestrictions();
   toast('Global restriction saved');
@@ -12769,18 +12817,22 @@ markAllRead = async function() {
 // Override saveGlobalRestriction to use API
 const _orig_saveGlobalRestriction = saveGlobalRestriction;
 saveGlobalRestriction = async function() {
-  const day   = document.getElementById('gl_day').value.trim();
-  const month = document.getElementById('gl_month').value.trim();
-  const total = document.getElementById('gl_total').value.trim();
-  if (day === '' && month === '' && total === '') {
+  const day          = document.getElementById('gl_day').value.trim();
+  const month        = document.getElementById('gl_month').value.trim();
+  const total        = document.getElementById('gl_total').value.trim();
+  const sessionViews = document.getElementById('gl_uv_views').value.trim();
+  const sessionHours = document.getElementById('gl_uv_hours').value.trim();
+  if (day === '' && month === '' && total === '' && sessionViews === '' && sessionHours === '') {
     toast('Please enter at least one limit', 'error'); return;
   }
   try {
     await apiPost('api/admin/settings.php', {
       section: 'restrictions', action: 'saveGlobal',
-      day, month, total
+      day, month, total,
+      unverified_session_views: sessionViews,
+      unverified_session_hours: sessionHours
     });
-    globalRestriction = { day, month, total };
+    globalRestriction = { day, month, total, sessionViews, sessionHours };
     renderRestrictions();
     toast('Global restriction saved');
   } catch(e) { toast(e.message, 'error'); }
