@@ -8,7 +8,7 @@ import { API_BASE, USER_PANEL_URL } from "./config";
 // ─── Helper Components (defined outside to prevent recreation on re-render) ───
 const SectionHeader = ({ icon, title }) => (
   <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24, paddingBottom: 14, borderBottom: "1px solid rgba(139,0,0,0.12)" }}>
-    <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg,#8B0000,#C41E3A)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0, boxShadow: "0 4px 12px rgba(139,0,0,0.25)" }}>{icon}</div>
+    <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg,#8B0000,#C41E3A)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17.6, flexShrink: 0, boxShadow: "0 4px 12px rgba(139,0,0,0.25)" }}>{icon}</div>
     <h2 style={{ margin: 0, fontSize: "1.15rem", fontFamily: "'Playfair Display',serif", fontWeight: 700, color: "#5A0010", letterSpacing: "0.03em" }}>{title}</h2>
     <div style={{ flex: 1, height: 1, background: "linear-gradient(90deg,rgba(139,0,0,0.2),transparent)" }} />
   </div>
@@ -82,7 +82,7 @@ const CustomSelect = ({ id, value, onChange, options, hasErr, compact, openDropd
         </span>
         <span
           style={{
-            fontSize: 11,
+            fontSize: 12.1,
             color: "#8B0000",
             marginLeft: 6,
             flexShrink: 0,
@@ -449,7 +449,7 @@ export default function PersonalFamilyForm() {
         <style>{`@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Lato:wght@300;400;700&display=swap');`}</style>
         <div style={{ minHeight: "100vh", background: "linear-gradient(135deg,#FFF5F5 0%,#FFF9F0 50%,#FFF5F5 100%)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Lato',sans-serif" }}>
           <div style={{ textAlign: "center", padding: 48, background: "white", borderRadius: 24, boxShadow: "0 20px 60px rgba(139,0,0,0.15)", maxWidth: 500, border: "1px solid rgba(196,30,58,0.1)" }}>
-            <div style={{ fontSize: 56, marginBottom: 16 }}>🎊</div>
+            <div style={{ fontSize: 61.6, marginBottom: 16 }}>🎊</div>
             <h2 style={{ fontFamily: "'Playfair Display',serif", color: "#8B0000", fontSize: "1.8rem", marginBottom: 8 }}>Profile Created!</h2>
             <p style={{ color: "#7A4050", marginBottom: 28, lineHeight: 1.6 }}>Your matrimony profile has been submitted successfully. We will review and activate it shortly.</p>
             <button onClick={handleReset} style={{ background: "linear-gradient(135deg,#8B0000,#C41E3A)", color: "white", border: "none", padding: "12px 32px", borderRadius: 10, fontWeight: 700, cursor: "pointer", fontSize: "0.95rem", letterSpacing: "0.05em" }}>
@@ -489,7 +489,7 @@ export default function PersonalFamilyForm() {
           <div style={{ ...sectionBox, marginBottom: 20, background: "linear-gradient(135deg,#FFF5F5 0%,#FFF9F0 100%)", borderLeft: "4px solid #8B0000" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ fontSize: 20 }}>📄</div>
+                <div style={{ fontSize: 22 }}>📄</div>
                 <div>
                   <h3 style={{ margin: 0, fontSize: "0.95rem", fontFamily: "'Playfair Display',serif", fontWeight: 700, color: "#5A0010", marginBottom: 4 }}>Print or Fill Form Manually</h3>
                   <p style={{ margin: 0, fontSize: "0.8rem", color: "#8A5060", fontStyle: "italic" }}>Download the form as PDF for manual filling and printing</p>
@@ -549,21 +549,21 @@ export default function PersonalFamilyForm() {
             {uploadedCount < 3 && (
               <label className="photo-upload-zone" style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "flex-start", gap: 16, cursor: photoValidating ? "not-allowed" : "pointer", borderRadius: 14, background: "linear-gradient(135deg,#fff 0%,#f8fbff 100%)", padding: "clamp(20px,4vw,28px)", marginBottom: uploadedCount > 0 ? 20 : 0, opacity: photoValidating ? 0.75 : 1, pointerEvents: photoValidating ? "none" : "auto", boxShadow: "0 4px 16px rgba(139,0,0,0.1)", border: "2px solid transparent", transition: "all 0.3s ease-in-out" }}>
                 <div style={{ width: 60, height: 60, borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg,#fde8ec 0%,#fdeef4 100%)", flexShrink: 0, boxShadow: "0 2px 8px rgba(139,0,0,0.12)" }}>
-                  {photoValidating ? <div className="spinner" /> : <span style={{ fontSize: 28 }}>📷</span>}
+                  {photoValidating ? <div className="spinner" /> : <span style={{ fontSize: 30.8 }}>📷</span>}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   {photoValidating ? (
                     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                      <span style={{ color: "#C41E3A", fontSize: 13, fontWeight: 600 }}>Validating & uploading...</span>
+                      <span style={{ color: "#C41E3A", fontSize: 14.3, fontWeight: 600 }}>Validating & uploading...</span>
                       <div style={{ width: "100%", height: 6, background: "#e8eef7", borderRadius: 3, overflow: "hidden" }}>
                         <div style={{ width: `${Math.min(photoProgress, 100)}%`, height: "100%", background: "linear-gradient(90deg,#C41E3A,#8B0000)", borderRadius: 3, transition: "width 0.3s ease" }} />
                       </div>
-                      <span style={{ fontSize: 11, color: "#666", fontWeight: 500 }}>{photoProgress}% complete</span>
+                      <span style={{ fontSize: 12.1, color: "#666", fontWeight: 500 }}>{photoProgress}% complete</span>
                     </div>
                   ) : (
                     <div>
-                      <div style={{ color: "#5A0010", fontSize: 14, fontWeight: 700, marginBottom: 3 }}>Upload Profile Photos</div>
-                      <div style={{ color: "#8A5060", fontSize: 12, lineHeight: 1.4 }}>Select up to {3 - uploadedCount} photo{3 - uploadedCount > 1 ? "s" : ""} • Max 5MB each</div>
+                      <div style={{ color: "#5A0010", fontSize: 15.4, fontWeight: 700, marginBottom: 3 }}>Upload Profile Photos</div>
+                      <div style={{ color: "#8A5060", fontSize: 13.2, lineHeight: 1.4 }}>Select up to {3 - uploadedCount} photo{3 - uploadedCount > 1 ? "s" : ""} • Max 5MB each</div>
                     </div>
                   )}
                 </div>
@@ -586,7 +586,7 @@ export default function PersonalFamilyForm() {
                 )}
                 {uploadedCount < 3 && (
                   <label className="photo-upload-zone" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, cursor: photoValidating ? "not-allowed" : "pointer", border: "2px dashed #D4A0A8", borderRadius: 12, background: "linear-gradient(135deg,#FFF8F9,#FFF5F0)", height: "clamp(130px,25vw,170px)", opacity: photoValidating ? 0.6 : 1, pointerEvents: photoValidating ? "none" : "auto" }}>
-                    <div style={{ fontSize: 28 }}>{photoValidating ? "⏳" : "➕"}</div>
+                    <div style={{ fontSize: 30.8 }}>{photoValidating ? "⏳" : "➕"}</div>
                     <div style={{ color: "#8B0000", fontSize: "0.78rem", fontWeight: 700, textAlign: "center" }}>{photoValidating ? "Validating…" : `Add Photo (${3 - uploadedCount} left)`}</div>
                     <input type="file" accept="image/*" multiple disabled={photoValidating} onChange={e => handlePhotoUpload(e.target.files)} style={{ display: "none" }} />
                   </label>
@@ -892,7 +892,7 @@ export default function PersonalFamilyForm() {
                     </div>
                   ) : (
                     <label style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "clamp(10px,2vw,12px)", cursor: "pointer", height: "clamp(150px,25vw,180px)", border: "2px dashed #D4A0A8", borderRadius: 12, background: "linear-gradient(135deg,#FFF8F9,#FFF5F0)", padding: "clamp(12px,2vw,16px)" }}>
-                      <div style={{ width: 52, height: 52, borderRadius: "50%", background: "rgba(139,0,0,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>{icon}</div>
+                      <div style={{ width: 52, height: 52, borderRadius: "50%", background: "rgba(139,0,0,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26.4 }}>{icon}</div>
                       <div style={{ textAlign: "center" }}>
                         <div style={{ color: "#8B0000", fontWeight: 700, fontSize: "clamp(0.8rem,2vw,0.9rem)" }}>{label}</div>
                         <div style={{ color: "#B08090", fontSize: "clamp(0.65rem,1.5vw,0.72rem)", marginTop: 2 }}>{desc} · Click to upload</div>

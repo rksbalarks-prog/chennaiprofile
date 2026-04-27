@@ -5,7 +5,7 @@ export default function AboutUs() {
 
   const Section = ({ title, children }) => (
     <div style={{ background:'#fff', borderRadius:12, padding:'18px', marginBottom:10, border:'1px solid #f0f0f0', boxShadow:'0 1px 4px rgba(0,0,0,0.04)' }}>
-      <div style={{ fontSize:15, fontWeight:700, color:'#8B0000', marginBottom:10, paddingBottom:8, borderBottom:'2px solid #fef2f2' }}>{title}</div>
+      <div style={{ fontSize:16.5, fontWeight:700, color:'#8B0000', marginBottom:10, paddingBottom:8, borderBottom:'2px solid #fef2f2' }}>{title}</div>
       {children}
     </div>
   );
@@ -13,20 +13,20 @@ export default function AboutUs() {
   return (
     <div style={{ background:'#f5f5f5', minHeight:'100vh', paddingBottom:70 }}>
       <div style={{ background:'#fff', padding:'20px 16px', borderBottom:'1px solid #f0f0f0', textAlign:'center' }}>
-        <h1 style={{ fontSize:20, fontWeight:700, color:'#222', margin:0 }}>About Us</h1>
-        <p style={{ fontSize:13, color:'#999', marginTop:4 }}>Kumbakonam Free Matrimony</p>
+        <h1 style={{ fontSize:22, fontWeight:700, color:'#222', margin:0 }}>About Us</h1>
+        <p style={{ fontSize:14.3, color:'#999', marginTop:4 }}>Kumbakonam Free Matrimony</p>
       </div>
 
       <div style={{ maxWidth:600, margin:'0 auto', padding:'12px' }}>
 
         <Section title="Who We Are">
-          <p style={{ fontSize:14, color:'#444', lineHeight:1.8 }}>
+          <p style={{ fontSize:15.4, color:'#444', lineHeight:1.8 }}>
             Kumbakonam Free Matrimony is a trusted matrimonial platform dedicated to helping individuals find their perfect life partner. Based in the culturally rich town of Kumbakonam, Tamil Nadu, we understand the importance of tradition, values, and compatibility in building lasting relationships.
           </p>
         </Section>
 
         <Section title="Our Mission">
-          <p style={{ fontSize:14, color:'#444', lineHeight:1.8 }}>
+          <p style={{ fontSize:15.4, color:'#444', lineHeight:1.8 }}>
             Our mission is to provide a safe, reliable, and completely free platform for individuals and families to find suitable matches. We believe that everyone deserves to find love and companionship without financial barriers.
           </p>
         </Section>
@@ -41,10 +41,10 @@ export default function AboutUs() {
               { title:'Dedicated Support', desc:'Our team is available to assist you throughout your journey.' },
             ].map((item, i) => (
               <div key={i} style={{ display:'flex', gap:12, padding:'12px', background:'#fafafa', borderRadius:8, border:'1px solid #f0f0f0' }}>
-                <div style={{ width:32, height:32, borderRadius:8, background:'#fef2f2', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14, fontWeight:700, color:'#8B0000', flexShrink:0 }}>{i+1}</div>
+                <div style={{ width:32, height:32, borderRadius:8, background:'#fef2f2', display:'flex', alignItems:'center', justifyContent:'center', fontSize:15.4, fontWeight:700, color:'#8B0000', flexShrink:0 }}>{i+1}</div>
                 <div>
-                  <div style={{ fontSize:14, fontWeight:700, color:'#222' }}>{item.title}</div>
-                  <div style={{ fontSize:13, color:'#777', marginTop:2 }}>{item.desc}</div>
+                  <div style={{ fontSize:15.4, fontWeight:700, color:'#222' }}>{item.title}</div>
+                  <div style={{ fontSize:14.3, color:'#777', marginTop:2 }}>{item.desc}</div>
                 </div>
               </div>
             ))}
@@ -52,7 +52,7 @@ export default function AboutUs() {
         </Section>
 
         <Section title="Our Services">
-          <div style={{ fontSize:14, color:'#444', lineHeight:1.8 }}>
+          <div style={{ fontSize:15.4, color:'#444', lineHeight:1.8 }}>
             <ul style={{ paddingLeft:18, display:'flex', flexDirection:'column', gap:6 }}>
               <li>Profile creation and management</li>
               <li>Advanced search with filters (caste, religion, age, etc.)</li>
@@ -65,7 +65,7 @@ export default function AboutUs() {
         </Section>
 
         <Section title="Contact Information">
-          <div style={{ fontSize:14, color:'#444', lineHeight:2 }}>
+          <div style={{ fontSize:15.4, color:'#444', lineHeight:2 }}>
             <div>Phone: <strong>+91 90253 16833</strong></div>
             <div>Email: <strong>info@kumbakonamfreematrimony.com</strong></div>
             <div>Address: <strong>No. 45, Big Street, Near Mahamaham Tank, Kumbakonam - 612001, Tamil Nadu</strong></div>

@@ -7,20 +7,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─────────────────────────────────────────────────────────────────── */
-/* UNIVERSAL FONT / UI SCALE                                            */
-/* ─────────────────────────────────────────────────────────────────── */
-/* The codebase uses inline `fontSize: <px>` heavily, so a CSS rem cascade
-   wouldn't reach it. `zoom` scales every rendered element (including
-   inline-styled text) proportionally, which is the only single-knob way
-   to resize the whole UI without rewriting every component.
-   Tweak --ui-scale to taste — 1.0 = original, 1.1 = +10%, 0.95 = −5%. */
-:root {
-  --ui-scale: 1.1;
-}
-body {
-  zoom: var(--ui-scale);
-}
 
 /* ─────────────────────────────────────────────────────────────────── */
 /* LANGUAGE-SPECIFIC FONT CONFIGURATION */

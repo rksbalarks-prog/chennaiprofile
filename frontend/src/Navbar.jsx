@@ -340,7 +340,7 @@ export default function Navbar() {
           {verified === null ? null : verified ? (
             <>
               <a href={USER_PANEL_URL} className="desktop-login">👤 My Profile</a>
-              <button onClick={handleLogout} style={{ padding:'8px 14px', background:'transparent', color:'#dc2626', border:'1.5px solid #dc2626', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer' }}>
+              <button onClick={handleLogout} style={{ padding:'8px 14px', background:'transparent', color:'#dc2626', border:'1.5px solid #dc2626', borderRadius:8, fontSize:14.3, fontWeight:600, cursor:'pointer' }}>
                 Sign Out
               </button>
             </>
@@ -411,7 +411,7 @@ export default function Navbar() {
           )}
         </div>
         <div className="slide-menu-footer">
-          <div style={{ fontSize: 11, color: '#999', textAlign: 'center' }}>Kumbakonam Free Matrimony</div>
+          <div style={{ fontSize: 12.1, color: '#999', textAlign: 'center' }}>Kumbakonam Free Matrimony</div>
         </div>
       </div>
 

@@ -442,15 +442,15 @@ export default function Home() {
 
         {slide === 0 ? (
           <>
-            <div style={{ fontSize:13, fontWeight:700, color:'#222', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', paddingRight:26 }}>{p.name}</div>
+            <div style={{ fontSize:14.3, fontWeight:700, color:'#222', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', paddingRight:26 }}>{p.name}</div>
             <div style={{ display:'flex', alignItems:'center', gap:5, flexWrap:'wrap' }}>
-              <span style={{ fontSize:10, color:'#8B0000', fontWeight:600, background:'#fef2f2', padding:'1px 6px', borderRadius:3 }}>{p.cpId}</span>
-              <span style={{ fontSize:10, color:'#8B0000', fontWeight:600, cursor:'pointer' }} onClick={e=>{e.stopPropagation();navigate(`/detail/${p.id}`,{state:{profile:p}});}}>View →</span>
+              <span style={{ fontSize:11, color:'#8B0000', fontWeight:600, background:'#fef2f2', padding:'1px 6px', borderRadius:3 }}>{p.cpId}</span>
+              <span style={{ fontSize:11, color:'#8B0000', fontWeight:600, cursor:'pointer' }} onClick={e=>{e.stopPropagation();navigate(`/detail/${p.id}`,{state:{profile:p}});}}>View →</span>
               <span
                 role="button"
                 tabIndex={0}
                 onClick={e=>{e.stopPropagation();setReportProfileId(p.cpId);setReportReason('');setShowReportModal(true);}}
-                style={{ fontSize:10, fontWeight:700, color:'#b91c1c', background:'#fef2f2', border:'1px solid #fecaca', padding:'1px 7px', borderRadius:10, cursor:'pointer', display:'inline-flex', alignItems:'center', gap:3, lineHeight:1 }}>
+                style={{ fontSize:11, fontWeight:700, color:'#b91c1c', background:'#fef2f2', border:'1px solid #fecaca', padding:'1px 7px', borderRadius:10, cursor:'pointer', display:'inline-flex', alignItems:'center', gap:3, lineHeight:1 }}>
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#b91c1c" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
                   <line x1="12" y1="9" x2="12" y2="13"/>
@@ -459,21 +459,21 @@ export default function Home() {
                 Flag
               </span>
             </div>
-            <div style={{ fontSize:11, color:'#777' }}>{[p.age?p.age+' yrs':'',p.height,getLocation(p)].filter(Boolean).join(' · ')}</div>
-            <div style={{ fontSize:11, color:'#777' }}>{[p.qualification,p.job].filter(Boolean).join(' · ')}</div>
+            <div style={{ fontSize:12.1, color:'#777' }}>{[p.age?p.age+' yrs':'',p.height,getLocation(p)].filter(Boolean).join(' · ')}</div>
+            <div style={{ fontSize:12.1, color:'#777' }}>{[p.qualification,p.job].filter(Boolean).join(' · ')}</div>
             <div style={{ display:'flex', gap:3, flexWrap:'wrap', marginTop:'auto' }}>
-              {p.caste && <span style={{ fontSize:9, fontWeight:600, padding:'1px 6px', borderRadius:8, background:'#f5f0ff', color:'#6d28d9' }}>{p.caste}</span>}
-              {p.religion && <span style={{ fontSize:9, fontWeight:600, padding:'1px 6px', borderRadius:8, background:'#fff7ed', color:'#c2410c' }}>{p.religion}</span>}
-              {p.star && <span style={{ fontSize:9, fontWeight:600, padding:'1px 6px', borderRadius:8, background:'#f0fdf4', color:'#166534' }}>{p.star}</span>}
+              {p.caste && <span style={{ fontSize:9.9, fontWeight:600, padding:'1px 6px', borderRadius:8, background:'#f5f0ff', color:'#6d28d9' }}>{p.caste}</span>}
+              {p.religion && <span style={{ fontSize:9.9, fontWeight:600, padding:'1px 6px', borderRadius:8, background:'#fff7ed', color:'#c2410c' }}>{p.religion}</span>}
+              {p.star && <span style={{ fontSize:9.9, fontWeight:600, padding:'1px 6px', borderRadius:8, background:'#f0fdf4', color:'#166534' }}>{p.star}</span>}
             </div>
           </>
         ) : (
           <>
-            <div style={{ fontSize:13, fontWeight:700, color:'#222', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', paddingRight:26 }}>
-              {p.name} <span style={{ fontSize:10, color:'#8B0000', fontWeight:600, background:'#fef2f2', padding:'1px 6px', borderRadius:3, marginLeft:4 }}>{p.cpId}</span>
+            <div style={{ fontSize:14.3, fontWeight:700, color:'#222', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', paddingRight:26 }}>
+              {p.name} <span style={{ fontSize:11, color:'#8B0000', fontWeight:600, background:'#fef2f2', padding:'1px 6px', borderRadius:3, marginLeft:4 }}>{p.cpId}</span>
             </div>
             <div
-              style={{ fontSize:10.5, lineHeight:1.5, color:'#374151', background:'#fffbeb', border:'1px solid #fde68a', borderRadius:6, padding:'5px 7px', overflow:'hidden', display:'-webkit-box', WebkitLineClamp:4, WebkitBoxOrient:'vertical', flex:1, marginTop:1 }}
+              style={{ fontSize:11.6, lineHeight:1.5, color:'#374151', background:'#fffbeb', border:'1px solid #fde68a', borderRadius:6, padding:'5px 7px', overflow:'hidden', display:'-webkit-box', WebkitLineClamp:4, WebkitBoxOrient:'vertical', flex:1, marginTop:1 }}
             >
               {briefText}
             </div>
@@ -481,7 +481,7 @@ export default function Home() {
               <a
                 href={`/detail/${p.id}`}
                 onClick={e => { e.stopPropagation(); e.preventDefault(); navigate(`/detail/${p.id}`, { state: { profile: p } }); }}
-                style={{ fontSize:10.5, fontWeight:700, color:'#8B0000', textDecoration:'none' }}
+                style={{ fontSize:11.6, fontWeight:700, color:'#8B0000', textDecoration:'none' }}
               >
                 {isTa ? 'மேலும் படிக்க →' : 'Read more →'}
               </a>
@@ -494,12 +494,12 @@ export default function Home() {
           {revealedContactId === p.id ? (() => {
             const num = revealedPhones[p.id] || p.phone || '';
             return (
-              <a href={`tel:${num}`} onClick={e=>e.stopPropagation()} style={{ flex:'1 1 0', minWidth:0, padding:'5px 0', background:'#1a6ea8', color:'#fff', borderRadius:6, fontSize:11, fontWeight:700, textAlign:'center', textDecoration:'none', display:'block', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+              <a href={`tel:${num}`} onClick={e=>e.stopPropagation()} style={{ flex:'1 1 0', minWidth:0, padding:'5px 0', background:'#1a6ea8', color:'#fff', borderRadius:6, fontSize:12.1, fontWeight:700, textAlign:'center', textDecoration:'none', display:'block', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
                 {num ? `Call: ${num}` : 'Number unavailable'}
               </a>
             );
           })() : (
-            <button onClick={e=>{e.stopPropagation();handleViewContact(p.id);}} style={{ flex:'1 1 0', minWidth:0, padding:'5px 4px', background:'linear-gradient(135deg,#16a34a,#15803d)', color:'#fff', border:'none', borderRadius:6, fontSize:11, fontWeight:700, cursor:'pointer', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+            <button onClick={e=>{e.stopPropagation();handleViewContact(p.id);}} style={{ flex:'1 1 0', minWidth:0, padding:'5px 4px', background:'linear-gradient(135deg,#16a34a,#15803d)', color:'#fff', border:'none', borderRadius:6, fontSize:12.1, fontWeight:700, cursor:'pointer', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
               View Free Contact
             </button>
           )}
@@ -622,22 +622,22 @@ export default function Home() {
           locks gender to the opposite of their own (tabs would be confusing). */}
       {!hasUserProfile && (
         <div style={{ display:'flex', gap:6, padding:'8px 12px 6px', background:'#fff' }}>
-          <button onClick={()=>setActiveTab('all')} style={{ flex:1, padding:'8px 0', borderRadius:20, fontSize:12, fontWeight:600, cursor:'pointer', border:'1.5px solid', display:'flex', alignItems:'center', justifyContent:'center', gap:4,
+          <button onClick={()=>setActiveTab('all')} style={{ flex:1, padding:'8px 0', borderRadius:20, fontSize:13.2, fontWeight:600, cursor:'pointer', border:'1.5px solid', display:'flex', alignItems:'center', justifyContent:'center', gap:4,
             background:activeTab==='all'?'#8B0000':'#f5f5f5', color:activeTab==='all'?'#fff':'#666', borderColor:activeTab==='all'?'#8B0000':'#e8e8e8' }}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="7" r="4"/><circle cx="17" cy="7" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M14 21a7 7 0 0 1 8-6.7"/></svg>
-            All <span style={{ fontSize:10, fontWeight:700, background:activeTab==='all'?'rgba(255,255,255,0.25)':'rgba(0,0,0,0.06)', padding:'0 5px', borderRadius:8 }}>{fmtCount(maleCount + femaleCount)}</span>
+            All <span style={{ fontSize:11, fontWeight:700, background:activeTab==='all'?'rgba(255,255,255,0.25)':'rgba(0,0,0,0.06)', padding:'0 5px', borderRadius:8 }}>{fmtCount(maleCount + femaleCount)}</span>
           </button>
-          <button onClick={()=>setActiveTab('bride')} style={{ flex:1, padding:'8px 0', borderRadius:20, fontSize:12, fontWeight:600, cursor:'pointer', border:'1.5px solid', display:'flex', alignItems:'center', justifyContent:'center', gap:4,
+          <button onClick={()=>setActiveTab('bride')} style={{ flex:1, padding:'8px 0', borderRadius:20, fontSize:13.2, fontWeight:600, cursor:'pointer', border:'1.5px solid', display:'flex', alignItems:'center', justifyContent:'center', gap:4,
             background:activeTab==='bride'?'#8B0000':'#f5f5f5', color:activeTab==='bride'?'#fff':'#666', borderColor:activeTab==='bride'?'#8B0000':'#e8e8e8' }}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>
-            Female <span style={{ fontSize:10, fontWeight:700, background:activeTab==='bride'?'rgba(255,255,255,0.25)':'rgba(0,0,0,0.06)', padding:'0 5px', borderRadius:8 }}>{fmtCount(femaleCount)}</span>
+            Female <span style={{ fontSize:11, fontWeight:700, background:activeTab==='bride'?'rgba(255,255,255,0.25)':'rgba(0,0,0,0.06)', padding:'0 5px', borderRadius:8 }}>{fmtCount(femaleCount)}</span>
           </button>
-          <button onClick={()=>setActiveTab('groom')} style={{ flex:1, padding:'8px 0', borderRadius:20, fontSize:12, fontWeight:600, cursor:'pointer', border:'1.5px solid', display:'flex', alignItems:'center', justifyContent:'center', gap:4,
+          <button onClick={()=>setActiveTab('groom')} style={{ flex:1, padding:'8px 0', borderRadius:20, fontSize:13.2, fontWeight:600, cursor:'pointer', border:'1.5px solid', display:'flex', alignItems:'center', justifyContent:'center', gap:4,
             background:activeTab==='groom'?'#8B0000':'#f5f5f5', color:activeTab==='groom'?'#fff':'#666', borderColor:activeTab==='groom'?'#8B0000':'#e8e8e8' }}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>
-            Male <span style={{ fontSize:10, fontWeight:700, background:activeTab==='groom'?'rgba(255,255,255,0.25)':'rgba(0,0,0,0.06)', padding:'0 5px', borderRadius:8 }}>{fmtCount(maleCount)}</span>
+            Male <span style={{ fontSize:11, fontWeight:700, background:activeTab==='groom'?'rgba(255,255,255,0.25)':'rgba(0,0,0,0.06)', padding:'0 5px', borderRadius:8 }}>{fmtCount(maleCount)}</span>
           </button>
-          <button style={{ padding:'8px 14px', borderRadius:20, fontSize:12, fontWeight:600, cursor:'pointer', background:'#fff7ed', color:'#c2410c', border:'1.5px solid #fed7aa', whiteSpace:'nowrap' }}
+          <button style={{ padding:'8px 14px', borderRadius:20, fontSize:13.2, fontWeight:600, cursor:'pointer', background:'#fff7ed', color:'#c2410c', border:'1.5px solid #fed7aa', whiteSpace:'nowrap' }}
             onClick={()=>{setOtpIntent('register');contactVerified?(window.location.href=`${USER_PANEL_URL}?create=1`):setShowOtpModal(true);}}>
             + Add Profile
           </button>
@@ -654,7 +654,7 @@ export default function Home() {
           value={searchQuery}
           onChange={e=>setSearchQuery(e.target.value)}
           placeholder="Search by name or profile ID…"
-          style={{ width:'100%', padding:'8px 34px 8px 34px', border:'1.5px solid #e8e8e8', borderRadius:20, fontSize:13, outline:'none', background:'#fafafa', boxSizing:'border-box' }}
+          style={{ width:'100%', padding:'8px 34px 8px 34px', border:'1.5px solid #e8e8e8', borderRadius:20, fontSize:14.3, outline:'none', background:'#fafafa', boxSizing:'border-box' }}
           onFocus={e=>{e.target.style.borderColor='#8B0000';e.target.style.background='#fff';}}
           onBlur={e=>{e.target.style.borderColor='#e8e8e8';e.target.style.background='#fafafa';}}
         />
@@ -662,7 +662,7 @@ export default function Home() {
           <button
             onClick={()=>setSearchQuery('')}
             aria-label="Clear search"
-            style={{ position:'absolute', right:22, top:'50%', transform:'translateY(-40%)', background:'transparent', border:'none', fontSize:16, color:'#999', cursor:'pointer', padding:'2px 6px', lineHeight:1 }}>
+            style={{ position:'absolute', right:22, top:'50%', transform:'translateY(-40%)', background:'transparent', border:'none', fontSize:17.6, color:'#999', cursor:'pointer', padding:'2px 6px', lineHeight:1 }}>
             ×
           </button>
         )}
@@ -679,7 +679,7 @@ export default function Home() {
           const active = feedFilter === f.key;
           return (
             <button key={f.key} onClick={() => setFeedFilter(f.key)}
-              style={{ flexShrink:0, padding:'6px 14px', borderRadius:18, fontSize:12, fontWeight:600, cursor:'pointer', whiteSpace:'nowrap',
+              style={{ flexShrink:0, padding:'6px 14px', borderRadius:18, fontSize:13.2, fontWeight:600, cursor:'pointer', whiteSpace:'nowrap',
                 background: active ? '#8B0000' : '#f5f5f5',
                 color: active ? '#fff' : '#555',
                 border: active ? '1.5px solid #8B0000' : '1.5px solid #e8e8e8',
@@ -699,8 +699,8 @@ export default function Home() {
       <div style={{ padding:'0 12px', maxWidth:960, margin:'0 auto' }}>
         {visibleFeed.length === 0 && (
           <div style={{ textAlign:'center', padding:60, color:'#bbb' }}>
-            <div style={{ fontSize:40, marginBottom:10 }}>?</div>
-            <div style={{ fontSize:14, fontWeight:500 }}>No profiles found</div>
+            <div style={{ fontSize:44, marginBottom:10 }}>?</div>
+            <div style={{ fontSize:15.4, fontWeight:500 }}>No profiles found</div>
           </div>
         )}
         {(() => {
@@ -722,9 +722,9 @@ export default function Home() {
               flushCards();
               elements.push(
                 <div key={`h-${i}`} style={{ display:'flex', alignItems:'center', gap:6, padding:'14px 0 6px' }}>
-                  <span style={{ fontSize:16 }}>{item.icon}</span>
-                  <span style={{ fontSize:14, fontWeight:700, color:'#222' }}>{item.title}</span>
-                  <span style={{ fontSize:10, color:'#999', background:'#f0f0f0', padding:'1px 7px', borderRadius:10 }}>{fmtCount(item.count)}</span>
+                  <span style={{ fontSize:17.6 }}>{item.icon}</span>
+                  <span style={{ fontSize:15.4, fontWeight:700, color:'#222' }}>{item.title}</span>
+                  <span style={{ fontSize:11, color:'#999', background:'#f0f0f0', padding:'1px 7px', borderRadius:10 }}>{fmtCount(item.count)}</span>
                   <div style={{ flex:1, height:1, background:'#e8e8e8', marginLeft:6 }} />
                 </div>
               );
@@ -740,13 +740,13 @@ export default function Home() {
         {/* Infinite-scroll sentinel — the IntersectionObserver in the effect
             above triggers handleLoadMore whenever this element enters view. */}
         {visibleFeed.length > 0 && hasMore && (
-          <div ref={sentinelRef} style={{ textAlign:'center', padding:'20px 0 28px', color:'#888', fontSize:13, fontWeight:500, display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
+          <div ref={sentinelRef} style={{ textAlign:'center', padding:'20px 0 28px', color:'#888', fontSize:14.3, fontWeight:500, display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
             <span style={{ width:14, height:14, border:'2px solid rgba(139,0,0,0.25)', borderTopColor:'#8B0000', borderRadius:'50%', animation:'spin 0.8s linear infinite' }} />
             Loading more profiles…
           </div>
         )}
         {visibleFeed.length > 0 && !hasMore && (
-          <div style={{ textAlign:'center', padding:'20px 0 28px', color:'#aaa', fontSize:12 }}>You've reached the end</div>
+          <div style={{ textAlign:'center', padding:'20px 0 28px', color:'#aaa', fontSize:13.2 }}>You've reached the end</div>
         )}
       </div>
 
@@ -758,12 +758,12 @@ export default function Home() {
               <div style={{ width:48, height:48, borderRadius:'50%', background:'rgba(255,255,255,0.2)', display:'inline-flex', alignItems:'center', justifyContent:'center', marginBottom:10 }}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
               </div>
-              <div style={{ color:'#fff', fontSize:17, fontWeight:700 }}>{limitMsg.title}</div>
+              <div style={{ color:'#fff', fontSize:18.7, fontWeight:700 }}>{limitMsg.title}</div>
             </div>
             <div style={{ padding:'20px', textAlign:'center' }}>
-              <p style={{ fontSize:14, color:'#333', fontWeight:500, marginBottom:6 }}>{limitMsg.desc}</p>
-              <p style={{ fontSize:12, color:'#999' }}>{limitMsg.sub}</p>
-              <button onClick={()=>setLimitMsg(null)} style={{ marginTop:16, padding:'10px 32px', background:'linear-gradient(135deg,#8B0000,#C41E3A)', color:'#fff', border:'none', borderRadius:8, fontSize:14, fontWeight:700, cursor:'pointer' }}>OK</button>
+              <p style={{ fontSize:15.4, color:'#333', fontWeight:500, marginBottom:6 }}>{limitMsg.desc}</p>
+              <p style={{ fontSize:13.2, color:'#999' }}>{limitMsg.sub}</p>
+              <button onClick={()=>setLimitMsg(null)} style={{ marginTop:16, padding:'10px 32px', background:'linear-gradient(135deg,#8B0000,#C41E3A)', color:'#fff', border:'none', borderRadius:8, fontSize:15.4, fontWeight:700, cursor:'pointer' }}>OK</button>
             </div>
           </div>
         </div>
@@ -775,28 +775,28 @@ export default function Home() {
           <div style={{ background:'#fff', borderRadius:20, overflow:'hidden', maxWidth:380, width:'90%', boxShadow:'0 20px 60px rgba(0,0,0,0.25)' }} onClick={e=>e.stopPropagation()}>
             <div style={{ background:'linear-gradient(135deg,#8B0000,#C41E3A)', padding:22, textAlign:'center', position:'relative' }}>
               <button onClick={skipGateModal} title="Skip"
-                style={{ position:'absolute', top:10, right:10, background:'rgba(255,255,255,0.18)', border:'none', color:'#fff', padding:'4px 10px', borderRadius:14, fontSize:11, fontWeight:700, cursor:'pointer', letterSpacing:0.4 }}>
+                style={{ position:'absolute', top:10, right:10, background:'rgba(255,255,255,0.18)', border:'none', color:'#fff', padding:'4px 10px', borderRadius:14, fontSize:12.1, fontWeight:700, cursor:'pointer', letterSpacing:0.4 }}>
                 Skip ✕
               </button>
-              <div style={{ fontSize:14, fontWeight:700, color:'#fff' }}>Verify Your Mobile</div>
-              <div style={{ fontSize:11, color:'rgba(255,255,255,0.7)', marginTop:4 }}>Enter your number to continue</div>
+              <div style={{ fontSize:15.4, fontWeight:700, color:'#fff' }}>Verify Your Mobile</div>
+              <div style={{ fontSize:12.1, color:'rgba(255,255,255,0.7)', marginTop:4 }}>Enter your number to continue</div>
             </div>
             <div style={{ padding:20 }}>
               {gatePromptMsg && (
-                <div style={{ background:'#fef9e7', border:'1px solid #fde68a', color:'#92400e', padding:'10px 12px', borderRadius:8, fontSize:12.5, lineHeight:1.45, marginBottom:14 }}>
+                <div style={{ background:'#fef9e7', border:'1px solid #fde68a', color:'#92400e', padding:'10px 12px', borderRadius:8, fontSize:13.8, lineHeight:1.45, marginBottom:14 }}>
                   {gatePromptMsg}
                 </div>
               )}
               {!otpSent ? (
                 <>
                   <div style={{ display:'flex', alignItems:'baseline', justifyContent:'space-between', gap:8, marginBottom:6, flexWrap:'wrap' }}>
-                    <label style={{ fontSize:11, fontWeight:700, color:'#8B0000', textTransform:'uppercase', letterSpacing:0.8 }}>Mobile Number</label>
-                    <span style={{ fontSize:11, fontWeight:700, color:'#16a34a', letterSpacing:0.2 }}>Verify &amp; get unlimited free contacts</span>
+                    <label style={{ fontSize:12.1, fontWeight:700, color:'#8B0000', textTransform:'uppercase', letterSpacing:0.8 }}>Mobile Number</label>
+                    <span style={{ fontSize:12.1, fontWeight:700, color:'#16a34a', letterSpacing:0.2 }}>Verify &amp; get unlimited free contacts</span>
                   </div>
                   <input type="tel" maxLength={10} value={otpMobile} onChange={e=>setOtpMobile(e.target.value.replace(/\D/g,''))} placeholder="Enter 10-digit mobile"
-                    style={{ width:'100%', padding:'12px 14px', border:'1.5px solid #e0e0e0', borderRadius:10, fontSize:16, fontFamily:'monospace', letterSpacing:2, outline:'none', boxSizing:'border-box' }} />
+                    style={{ width:'100%', padding:'12px 14px', border:'1.5px solid #e0e0e0', borderRadius:10, fontSize:17.6, fontFamily:'monospace', letterSpacing:2, outline:'none', boxSizing:'border-box' }} />
                   <button onClick={sendOtp} disabled={otpLoading}
-                    style={{ width:'100%', marginTop:14, padding:12, background:'linear-gradient(135deg,#8B0000,#C41E3A)', color:'#fff', border:'none', borderRadius:10, fontSize:15, fontWeight:700, cursor:'pointer' }}>
+                    style={{ width:'100%', marginTop:14, padding:12, background:'linear-gradient(135deg,#8B0000,#C41E3A)', color:'#fff', border:'none', borderRadius:10, fontSize:16.5, fontWeight:700, cursor:'pointer' }}>
                     {otpLoading ? 'Sending...' : 'Send OTP'}
                   </button>
                   {(() => {
@@ -813,17 +813,17 @@ export default function Home() {
                     const limit = gateState.anonViewsLimit || 5;
                     return (
                       <button onClick={skipGateModal}
-                        style={{ width:'100%', marginTop:8, padding:10, background:'transparent', color:'#8B0000', border:'1.5px solid #8B0000', borderRadius:10, fontSize:13, fontWeight:700, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
+                        style={{ width:'100%', marginTop:8, padding:10, background:'transparent', color:'#8B0000', border:'1.5px solid #8B0000', borderRadius:10, fontSize:14.3, fontWeight:700, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
                         <span>⏱</span>
                         <span>To get your {limit} free contacts in</span>
-                        <span style={{ fontFamily:'monospace', background:'#fef2f2', padding:'2px 8px', borderRadius:6, fontSize:12 }}>{hh}:{mm}:{ss}</span>
+                        <span style={{ fontFamily:'monospace', background:'#fef2f2', padding:'2px 8px', borderRadius:6, fontSize:13.2 }}>{hh}:{mm}:{ss}</span>
                       </button>
                     );
                   })()}
                 </>
               ) : (
                 <>
-                  <p style={{ fontSize:13, color:'#666', textAlign:'center', marginBottom:14 }}>
+                  <p style={{ fontSize:14.3, color:'#666', textAlign:'center', marginBottom:14 }}>
                     OTP sent to <strong style={{ color:'#8B0000' }}>{otpMobile.substring(0,3)}****{otpMobile.substring(7)}</strong>
                     {otpTimer > 0 && <span style={{ color:'#999' }}> ({Math.floor(otpTimer/60)}:{String(otpTimer%60).padStart(2,'0')})</span>}
                   </p>
@@ -832,22 +832,22 @@ export default function Home() {
                       <input key={i} id={`home-otp-${i}`} type="tel" maxLength={1} value={otpValue[i]}
                         onChange={e=>handleOtpInput(i,e.target.value)}
                         onKeyDown={e=>{if(e.key==='Backspace'&&!otpValue[i]&&i>0)document.getElementById(`home-otp-${i-1}`)?.focus();}}
-                        style={{ width:48, height:54, textAlign:'center', fontSize:22, fontWeight:700, border:'2px solid #e0e0e0', borderRadius:12, outline:'none', fontFamily:'monospace', color:'#8B0000' }} />
+                        style={{ width:48, height:54, textAlign:'center', fontSize:24.2, fontWeight:700, border:'2px solid #e0e0e0', borderRadius:12, outline:'none', fontFamily:'monospace', color:'#8B0000' }} />
                     ))}
                   </div>
                   <button onClick={verifyOtp} disabled={otpLoading}
-                    style={{ width:'100%', padding:12, background:'linear-gradient(135deg,#8B0000,#C41E3A)', color:'#fff', border:'none', borderRadius:10, fontSize:15, fontWeight:700, cursor:'pointer' }}>
+                    style={{ width:'100%', padding:12, background:'linear-gradient(135deg,#8B0000,#C41E3A)', color:'#fff', border:'none', borderRadius:10, fontSize:16.5, fontWeight:700, cursor:'pointer' }}>
                     {otpLoading ? 'Verifying...' : 'Verify OTP'}
                   </button>
                   {otpTimer === 0 && (
                     <button onClick={()=>{setOtpValue(['','','','']);sendOtp();}}
-                      style={{ width:'100%', marginTop:8, padding:10, background:'transparent', color:'#8B0000', border:'1.5px solid #8B0000', borderRadius:10, fontSize:13, fontWeight:600, cursor:'pointer' }}>
+                      style={{ width:'100%', marginTop:8, padding:10, background:'transparent', color:'#8B0000', border:'1.5px solid #8B0000', borderRadius:10, fontSize:14.3, fontWeight:600, cursor:'pointer' }}>
                       Resend OTP
                     </button>
                   )}
                 </>
               )}
-              {otpMsg && <p style={{ textAlign:'center', marginTop:10, fontSize:13, color:otpMsg.includes('OTP:')||otpMsg.includes('sent')?'#16a34a':'#dc2626', fontWeight:600 }}>{otpMsg}</p>}
+              {otpMsg && <p style={{ textAlign:'center', marginTop:10, fontSize:14.3, color:otpMsg.includes('OTP:')||otpMsg.includes('sent')?'#16a34a':'#dc2626', fontWeight:600 }}>{otpMsg}</p>}
             </div>
           </div>
         </div>
@@ -860,11 +860,11 @@ export default function Home() {
           <div style={{ background:'#fff', borderRadius:16, overflow:'hidden', maxWidth:380, width:'90%', boxShadow:'0 20px 60px rgba(0,0,0,0.25)' }}
             onClick={e => e.stopPropagation()}>
             <div style={{ background:'linear-gradient(135deg,#8B0000,#C41E3A)', padding:'18px 20px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-              <span style={{ color:'#fff', fontSize:15, fontWeight:700 }}>Report Profile {reportProfileId}</span>
-              <button onClick={() => setShowReportModal(false)} style={{ background:'rgba(255,255,255,0.2)', border:'none', color:'#fff', width:28, height:28, borderRadius:'50%', fontSize:14, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>x</button>
+              <span style={{ color:'#fff', fontSize:16.5, fontWeight:700 }}>Report Profile {reportProfileId}</span>
+              <button onClick={() => setShowReportModal(false)} style={{ background:'rgba(255,255,255,0.2)', border:'none', color:'#fff', width:28, height:28, borderRadius:'50%', fontSize:15.4, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>x</button>
             </div>
             <div style={{ padding:20 }}>
-              <p style={{ fontSize:13, color:'#666', marginBottom:16 }}>Why are you reporting this profile?</p>
+              <p style={{ fontSize:14.3, color:'#666', marginBottom:16 }}>Why are you reporting this profile?</p>
               <div style={{ display:'flex', flexDirection:'column', gap:8, marginBottom:16 }}>
                 {[
                   { value:'already_married', label:'Already Married' },
@@ -874,12 +874,12 @@ export default function Home() {
                   <label key={opt.value} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 14px', border: reportReason === opt.value ? '2px solid #8B0000' : '1.5px solid #e8e8e8', borderRadius:8, cursor:'pointer', background: reportReason === opt.value ? '#fef2f2' : '#fff' }}>
                     <input type="radio" name="home-report" value={opt.value} checked={reportReason === opt.value} onChange={e => setReportReason(e.target.value)}
                       style={{ accentColor:'#8B0000' }} />
-                    <span style={{ fontSize:13, fontWeight:600, color: reportReason === opt.value ? '#8B0000' : '#333' }}>{opt.label}</span>
+                    <span style={{ fontSize:14.3, fontWeight:600, color: reportReason === opt.value ? '#8B0000' : '#333' }}>{opt.label}</span>
                   </label>
                 ))}
               </div>
               <div style={{ display:'flex', gap:8 }}>
-                <button onClick={() => setShowReportModal(false)} style={{ flex:1, padding:10, background:'#f5f5f5', border:'1px solid #e8e8e8', borderRadius:8, fontSize:13, fontWeight:600, color:'#666', cursor:'pointer' }}>Cancel</button>
+                <button onClick={() => setShowReportModal(false)} style={{ flex:1, padding:10, background:'#f5f5f5', border:'1px solid #e8e8e8', borderRadius:8, fontSize:14.3, fontWeight:600, color:'#666', cursor:'pointer' }}>Cancel</button>
                 <button disabled={!reportReason} onClick={async () => {
                   try {
                     await fetch(API_BASE, { method:'POST', headers:{'Content-Type':'application/json'},
@@ -887,7 +887,7 @@ export default function Home() {
                     alert('Report submitted. Thank you!');
                   } catch(e) { alert('Report submitted.'); }
                   setShowReportModal(false); setReportReason(''); setReportProfileId(null);
-                }} style={{ flex:1, padding:10, background: reportReason ? 'linear-gradient(135deg,#8B0000,#C41E3A)' : '#ddd', color:'#fff', border:'none', borderRadius:8, fontSize:13, fontWeight:700, cursor: reportReason ? 'pointer' : 'not-allowed' }}>Submit Report</button>
+                }} style={{ flex:1, padding:10, background: reportReason ? 'linear-gradient(135deg,#8B0000,#C41E3A)' : '#ddd', color:'#fff', border:'none', borderRadius:8, fontSize:14.3, fontWeight:700, cursor: reportReason ? 'pointer' : 'not-allowed' }}>Submit Report</button>
               </div>
             </div>
           </div>

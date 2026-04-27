@@ -1,16 +1,16 @@
 export default function PrivacyPolicy() {
   const Section = ({ title, children }) => (
     <div style={{ background:'#fff', borderRadius:12, padding:'18px', marginBottom:10, border:'1px solid #f0f0f0', boxShadow:'0 1px 4px rgba(0,0,0,0.04)' }}>
-      <div style={{ fontSize:14, fontWeight:700, color:'#8B0000', marginBottom:8, paddingBottom:6, borderBottom:'2px solid #fef2f2' }}>{title}</div>
-      <div style={{ fontSize:13, color:'#555', lineHeight:1.8 }}>{children}</div>
+      <div style={{ fontSize:15.4, fontWeight:700, color:'#8B0000', marginBottom:8, paddingBottom:6, borderBottom:'2px solid #fef2f2' }}>{title}</div>
+      <div style={{ fontSize:14.3, color:'#555', lineHeight:1.8 }}>{children}</div>
     </div>
   );
 
   return (
     <div style={{ background:'#f5f5f5', minHeight:'100vh', paddingBottom:70 }}>
       <div style={{ background:'#fff', padding:'20px 16px', borderBottom:'1px solid #f0f0f0', textAlign:'center' }}>
-        <h1 style={{ fontSize:20, fontWeight:700, color:'#222', margin:0 }}>Privacy Policy</h1>
-        <p style={{ fontSize:12, color:'#999', marginTop:4 }}>Last updated: April 2026</p>
+        <h1 style={{ fontSize:22, fontWeight:700, color:'#222', margin:0 }}>Privacy Policy</h1>
+        <p style={{ fontSize:13.2, color:'#999', marginTop:4 }}>Last updated: April 2026</p>
       </div>
 
       <div style={{ maxWidth:600, margin:'0 auto', padding:'12px' }}>
