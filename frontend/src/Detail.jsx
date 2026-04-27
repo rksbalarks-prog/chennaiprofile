@@ -675,9 +675,11 @@ export default function Detail() {
       {/* Image Lightbox */}
       {lightboxImg && (() => {
         // lightboxImg may be a string (rasi/amsam charts) OR a {orig, full}
-        // object (profile photos). Newer profile uploads only have WebP
-        // variants on disk, so a plain <img src={orig}> would 404 — use
-        // <picture> with the full-size WebP first and orig as fallback.
+        // object (profile photos). Prefer the raw upload (often 3-5000px from
+        // phone cameras) so the enlarged view stays sharp on HD screens — the
+        // .webp `full` variant is capped at 1200px and looks blurry when the
+        // viewport is wider. If the original 404s (newer uploads only ship
+        // WebP variants on disk), swap to the WebP via onError.
         const lb = typeof lightboxImg === 'string' ? { orig: lightboxImg, full: null } : lightboxImg;
         return (
         <div onClick={() => setLightboxImg(null)}
@@ -686,11 +688,15 @@ export default function Detail() {
             style={{ position:'absolute', top:16, right:16, width:36, height:36, borderRadius:'50%', background:'rgba(255,255,255,0.2)', border:'none', color:'#fff', fontSize:22, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1 }}>
             x
           </button>
-          <picture onClick={e => e.stopPropagation()}>
-            {lb.full && <source type="image/webp" srcSet={lb.full} />}
-            <img src={lb.orig} alt="Full size"
-              style={{ maxWidth:'95%', maxHeight:'90vh', objectFit:'contain', borderRadius:4, cursor:'default', display:'block' }} />
-          </picture>
+          <img src={lb.orig} alt="Full size"
+            onClick={e => e.stopPropagation()}
+            onError={e => {
+              if (lb.full && e.target.dataset.fb !== '1') {
+                e.target.dataset.fb = '1';
+                e.target.src = lb.full;
+              }
+            }}
+            style={{ maxWidth:'95%', maxHeight:'90vh', objectFit:'contain', borderRadius:4, cursor:'default', display:'block' }} />
         </div>
         );
       })()}
