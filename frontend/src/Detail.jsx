@@ -104,11 +104,14 @@ export default function Detail() {
   // source of truth; these mirror the snapshot it returns.
   const [gateState, setGateState] = useState({ returning:false, anonViewsUsed:0, anonViewsLimit:5, gateRequired:false });
   const [gatePromptMsg, setGatePromptMsg] = useState('');
-  // 4-hour "Verify or Reset" defer. When set, the gate modal is suppressed
-  // until the timestamp passes. Drives the live countdown shown on the skip
-  // button below Send OTP. Persisted in localStorage so it survives reloads.
-  const GATE_SKIP_KEY = 'gate_skip_until';
-  const GATE_SKIP_MS  = 4 * 60 * 60 * 1000;
+  // 24-hour "to get your 5 free contacts" countdown. The window starts the
+  // first time the gate modal opens and persists in localStorage. The user
+  // can dismiss the popup; if they try another contact before the timer
+  // finishes the popup re-opens showing the remaining balance time. After
+  // the timer expires the localStorage entry is cleared so the next gate
+  // hit arms a fresh 24-hour window.
+  const GATE_WINDOW_KEY = 'gate_window_until';
+  const GATE_WINDOW_MS  = 24 * 60 * 60 * 1000;
   const [nowTick, setNowTick] = useState(Date.now());
 
   const submitReport = async (reason) => {
@@ -155,21 +158,22 @@ export default function Detail() {
 
   // Open the OTP modal because the server-side gate blocked a contact view.
   const openGateModal = (reason, limit) => {
-    // Honour the user's "Verify or Reset in 4 Hrs" defer — don't re-pop the
-    // modal until the window expires.
-    const skipUntil = parseInt(localStorage.getItem(GATE_SKIP_KEY) || '0', 10);
-    if (skipUntil && Date.now() < skipUntil) return;
+    // Arm the 24-hour reset window the first time the gate fires, or refresh
+    // it if a previous window has already expired.
+    const existing = parseInt(localStorage.getItem(GATE_WINDOW_KEY) || '0', 10);
+    if (!existing || Date.now() >= existing) {
+      localStorage.setItem(GATE_WINDOW_KEY, String(Date.now() + GATE_WINDOW_MS));
+    }
     setOtpMobile(''); setOtpValue(['','','','']); setOtpSent(false); setOtpMsg('');
     setGatePromptMsg(reason === 'returning_user'
       ? 'Welcome back. Please verify your mobile to continue viewing contacts.'
       : `You've used your ${limit || 5} free contact views. Verify your mobile to keep viewing contacts.`);
     setShowOtpModal(true);
   };
-  // Close the modal and remember the user wants to defer verification for the
-  // next 4 hours. Used by both the top-right skip "x" and the secondary
-  // "Verify or Reset in 4 Hrs" button below Send OTP.
-  const skipGateFor4h = () => {
-    localStorage.setItem(GATE_SKIP_KEY, String(Date.now() + GATE_SKIP_MS));
+  // Skip handler shared by the top-right "✕" and the countdown button below
+  // Send OTP. Just closes the modal — the 24-hour window keeps running so the
+  // next gate hit re-opens the popup showing the remaining balance time.
+  const skipGateModal = () => {
     setShowOtpModal(false);
     setGatePromptMsg('');
   };
@@ -771,7 +775,7 @@ export default function Detail() {
           <div style={{ background:'#fff', borderRadius:20, overflow:'hidden', maxWidth:380, width:'90%', boxShadow:'0 20px 60px rgba(0,0,0,0.25)' }}
             onClick={e => e.stopPropagation()}>
             <div style={{ background:'linear-gradient(135deg,#8B0000,#C41E3A)', padding:22, textAlign:'center', position:'relative' }}>
-              <button onClick={skipGateFor4h} title="Skip for 4 hours"
+              <button onClick={skipGateModal} title="Skip"
                 style={{ position:'absolute', top:10, right:10, background:'rgba(255,255,255,0.18)', border:'none', color:'#fff', padding:'4px 10px', borderRadius:14, fontSize:11, fontWeight:700, cursor:'pointer', letterSpacing:0.4 }}>
                 Skip ✕
               </button>
@@ -797,16 +801,16 @@ export default function Detail() {
                     {otpLoading ? 'Sending...' : 'Send OTP'}
                   </button>
                   {(() => {
-                    const skipUntil = parseInt(localStorage.getItem(GATE_SKIP_KEY) || '0', 10);
-                    const remain = Math.max(0, (skipUntil || (nowTick + GATE_SKIP_MS)) - nowTick);
+                    const windowUntil = parseInt(localStorage.getItem(GATE_WINDOW_KEY) || '0', 10);
+                    const remain = Math.max(0, (windowUntil || (nowTick + GATE_WINDOW_MS)) - nowTick);
                     const hh = String(Math.floor(remain/3600000)).padStart(2,'0');
                     const mm = String(Math.floor((remain%3600000)/60000)).padStart(2,'0');
                     const ss = String(Math.floor((remain%60000)/1000)).padStart(2,'0');
                     return (
-                      <button onClick={skipGateFor4h}
+                      <button onClick={skipGateModal}
                         style={{ width:'100%', marginTop:8, padding:10, background:'transparent', color:'#8B0000', border:'1.5px solid #8B0000', borderRadius:10, fontSize:13, fontWeight:700, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
                         <span>⏱</span>
-                        <span>Verify or Reset in 4 Hrs</span>
+                        <span>To get your 5 free contacts in</span>
                         <span style={{ fontFamily:'monospace', background:'#fef2f2', padding:'2px 8px', borderRadius:6, fontSize:12 }}>{hh}:{mm}:{ss}</span>
                       </button>
                     );

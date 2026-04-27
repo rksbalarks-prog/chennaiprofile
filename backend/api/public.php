@@ -13,6 +13,7 @@ $db = getDB();
 // must pass OTP again. The "ever verified" flag is held in a long-lived
 // cookie (the user's session itself only lives 12h).
 const KFM_FREE_VIEWS       = 5;
+const KFM_FREE_WINDOW_SEC  = 24 * 60 * 60; // rolling 24-hour reset window
 const KFM_RETURNING_COOKIE = 'kfm_returning';
 
 function kfm_set_returning_cookie(): void {
@@ -31,16 +32,33 @@ function kfm_is_returning(): bool {
     return !empty($_COOKIE[KFM_RETURNING_COOKIE]);
 }
 
+// Roll the 24-hour free-view window if it has expired. Clears the recorded
+// cpid list and resets the window-start timestamp so the visitor gets a
+// fresh batch of KFM_FREE_VIEWS contacts.
+function kfm_anon_roll_window(): void {
+    $start = (int)($_SESSION['anon_window_start'] ?? 0);
+    if ($start > 0 && (time() - $start) >= KFM_FREE_WINDOW_SEC) {
+        $_SESSION['anon_view_cpids']   = [];
+        $_SESSION['anon_window_start'] = 0;
+    }
+}
+
 function kfm_anon_views_used(): int {
+    kfm_anon_roll_window();
     $arr = $_SESSION['anon_view_cpids'] ?? [];
     return is_array($arr) ? count($arr) : 0;
 }
 
 function kfm_anon_record(string $cpId): void {
+    kfm_anon_roll_window();
     $arr = $_SESSION['anon_view_cpids'] ?? [];
     if (!is_array($arr)) $arr = [];
     if ($cpId !== '' && !in_array($cpId, $arr, true)) $arr[] = $cpId;
     $_SESSION['anon_view_cpids'] = $arr;
+    // Stamp the window start the first time a view is recorded inside it.
+    if (empty($_SESSION['anon_window_start'])) {
+        $_SESSION['anon_window_start'] = time();
+    }
 }
 
 // True when a contact_view request must be blocked behind OTP.
