@@ -126,6 +126,7 @@ export default function Detail() {
   };
   const [limitMsg, setLimitMsg] = useState(null);
   const [lightboxImg, setLightboxImg] = useState(null);
+  const [showSummaryModal, setShowSummaryModal] = useState(false);
   const [activePhoto, setActivePhoto] = useState(0);
 
   useEffect(() => {
@@ -511,13 +512,18 @@ export default function Detail() {
           const secondaryLabel = isTa ? 'English' : 'தமிழ்';
           return (
             <Section title={isTa ? 'சுருக்கம் / Summary' : 'Profile Summary / சுருக்கம்'}>
-              <div style={{ background:'#fffbeb', border:'1px solid #fde68a', borderRadius:8, padding:'12px 14px', marginBottom:10 }}>
+              <div onDoubleClick={() => setShowSummaryModal(true)}
+                style={{ background:'#fffbeb', border:'1px solid #fde68a', borderRadius:8, padding:'12px 14px', marginBottom:10, cursor:'zoom-in' }}>
                 <div style={{ fontSize:12.1, fontWeight:700, color:'#92400e', textTransform:'uppercase', letterSpacing:0.4, marginBottom:6 }}>{primaryLabel}</div>
                 <p style={{ fontSize:14.9, lineHeight:1.65, color:'#1f2937', margin:0 }}>{primary}</p>
               </div>
-              <div style={{ background:'#f8fafc', border:'1px solid #e2e8f0', borderRadius:8, padding:'12px 14px' }}>
+              <div onDoubleClick={() => setShowSummaryModal(true)}
+                style={{ background:'#f8fafc', border:'1px solid #e2e8f0', borderRadius:8, padding:'12px 14px', cursor:'zoom-in' }}>
                 <div style={{ fontSize:12.1, fontWeight:700, color:'#475569', textTransform:'uppercase', letterSpacing:0.4, marginBottom:6 }}>{secondaryLabel}</div>
                 <p style={{ fontSize:14.3, lineHeight:1.65, color:'#374151', margin:0 }}>{secondary}</p>
+              </div>
+              <div style={{ fontSize:11, color:'#94a3b8', marginTop:8, textAlign:'right', fontStyle:'italic' }}>
+                {isTa ? 'பெரிதாக்கிப் படிக்க இரண்டு முறை தட்டவும்' : 'Double-click to enlarge'}
               </div>
             </Section>
           );
@@ -698,6 +704,41 @@ export default function Detail() {
             }}
             style={{ maxWidth:'95%', maxHeight:'90vh', objectFit:'contain', borderRadius:4, cursor:'default', display:'block' }} />
         </div>
+        );
+      })()}
+
+      {/* Profile Summary — enlarged popup (double-click to open) */}
+      {showSummaryModal && (() => {
+        const s = buildSummary(p);
+        const isTa = i18n.language === 'ta';
+        const primary = isTa ? s.ta : s.en;
+        const secondary = isTa ? s.en : s.ta;
+        const primaryLabel = isTa ? 'சுருக்கம்' : 'Summary';
+        const secondaryLabel = isTa ? 'English' : 'தமிழ்';
+        return (
+          <div onClick={() => setShowSummaryModal(false)}
+            style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.55)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:3000, backdropFilter:'blur(3px)', padding:16 }}>
+            <div onClick={e => e.stopPropagation()}
+              style={{ background:'#fff', borderRadius:14, maxWidth:720, width:'100%', maxHeight:'90vh', overflowY:'auto', boxShadow:'0 20px 60px rgba(0,0,0,0.3)', position:'relative' }}>
+              <button onClick={() => setShowSummaryModal(false)} aria-label="Close"
+                style={{ position:'sticky', top:10, marginLeft:'auto', display:'block', marginRight:10, width:36, height:36, borderRadius:'50%', background:'#fff', border:'1.5px solid #e5e7eb', color:'#475569', fontSize:20, cursor:'pointer', boxShadow:'0 2px 6px rgba(0,0,0,0.08)', zIndex:1 }}>
+                ×
+              </button>
+              <div style={{ padding:'4px 22px 22px 22px', marginTop:-26 }}>
+                <div style={{ fontSize:18, fontWeight:700, color:'#8B0000', marginBottom:14, paddingBottom:10, borderBottom:'2px solid #fef2f2' }}>
+                  {p.name}{p.regId ? ` · ${p.regId}` : ''}
+                </div>
+                <div style={{ background:'#fffbeb', border:'1px solid #fde68a', borderRadius:10, padding:'16px 18px', marginBottom:14 }}>
+                  <div style={{ fontSize:13, fontWeight:700, color:'#92400e', textTransform:'uppercase', letterSpacing:0.5, marginBottom:10 }}>{primaryLabel}</div>
+                  <p style={{ fontSize:20, lineHeight:1.85, color:'#111827', margin:0, fontWeight:500 }}>{primary}</p>
+                </div>
+                <div style={{ background:'#f8fafc', border:'1px solid #e2e8f0', borderRadius:10, padding:'16px 18px' }}>
+                  <div style={{ fontSize:13, fontWeight:700, color:'#475569', textTransform:'uppercase', letterSpacing:0.5, marginBottom:10 }}>{secondaryLabel}</div>
+                  <p style={{ fontSize:19, lineHeight:1.85, color:'#1f2937', margin:0, fontWeight:500 }}>{secondary}</p>
+                </div>
+              </div>
+            </div>
+          </div>
         );
       })()}
 
