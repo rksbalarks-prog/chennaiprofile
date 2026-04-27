@@ -164,13 +164,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             json_ok(['orders' => $rows, 'archive' => $archive]);
         }
         case 'contactViewLog': {
+            // Case-insensitive match — historical rows may have stored variants
+            // like 'Contact_View' before normalization landed.
             $logs = $db->query("SELECT ua.mobile, ua.cp_id, ua.name, ua.plan, ua.target_cp_id, ua.datetime,
                 p.name as target_name, p.mobile as target_mobile
                 FROM usage_activity ua
                 LEFT JOIN profiles p ON p.cp_id = ua.target_cp_id
-                WHERE ua.activity_type = 'contact_view'
+                WHERE LOWER(ua.activity_type) = 'contact_view'
                 ORDER BY ua.datetime DESC LIMIT 1000")->fetchAll();
-            json_ok(['logs' => $logs]);
+            // Diagnostic counts so the admin can tell whether 0 rows means
+            // "no contact reveals yet" or "data is stored but not surfacing".
+            $totals = $db->query("SELECT activity_type, COUNT(*) AS n
+                FROM usage_activity
+                GROUP BY activity_type
+                ORDER BY n DESC")->fetchAll();
+            json_ok(['logs' => $logs, 'activity_totals' => $totals]);
         }
         case 'profileViewLog': {
             $logs = $db->query("SELECT ua.mobile, ua.cp_id, ua.name, ua.plan, ua.target_cp_id, ua.datetime,

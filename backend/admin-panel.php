@@ -11206,10 +11206,12 @@ function isSuspicious(mobile) {
 // ──────────────────────────────────────────────
 contactViewLog = [];
 
+let contactViewLogTotals = [];
 async function loadContactViewLog() {
   try {
     const resp = await apiGet('api/admin/settings.php?section=contactViewLog');
     if (resp.ok && resp.logs) contactViewLog = resp.logs;
+    if (resp.ok && Array.isArray(resp.activity_totals)) contactViewLogTotals = resp.activity_totals;
   } catch(e) {}
 }
 
@@ -11237,7 +11239,28 @@ async function renderContactLog() {
   const tbody = document.getElementById('contactLogTable');
   if (!tbody) return;
   if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="icon">📞</div><p>No contact view records found</p></div></td></tr>`;
+    // Surface the activity_type totals from the server so the admin can
+    // tell whether 0 rows means "nobody has revealed a contact yet" or
+    // "data exists in the table but isn't being surfaced". If contactViewLog
+    // came back empty AND no contact_view rows exist in usage_activity at
+    // all, the only honest message is the first one.
+    const totalRows = contactViewLogTotals.reduce((s, r) => s + (parseInt(r.n,10)||0), 0);
+    const cvRow = contactViewLogTotals.find(r => (r.activity_type||'').toLowerCase() === 'contact_view');
+    const cvCount = cvRow ? (parseInt(cvRow.n,10)||0) : 0;
+    let diag = '';
+    if (totalRows > 0 || contactViewLogTotals.length > 0) {
+      const breakdown = contactViewLogTotals.map(r => `${r.activity_type||'(blank)'}: ${r.n}`).join(' · ');
+      diag = `<div style="margin-top:8px;font-size:12px;color:var(--text-secondary)">
+                usage_activity totals — ${breakdown || 'none'}
+                ${cvCount === 0 && (q || dateFrom || dateTo) ? '<br>Try clearing the search/date filters.' : ''}
+              </div>`;
+    }
+    const empty = (q || dateFrom || dateTo)
+      ? 'No records match the current filters.'
+      : (cvCount === 0
+          ? 'No contact reveals have been logged yet. Records will appear here as visitors reveal contacts.'
+          : 'No contact view records found');
+    tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="icon">📞</div><p>${empty}</p>${diag}</div></td></tr>`;
     return;
   }
 
