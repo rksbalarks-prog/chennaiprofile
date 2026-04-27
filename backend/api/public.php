@@ -528,20 +528,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $type = trim($input['type'] ?? 'profile_view'); // profile_view or contact_view
         if (!$targetCpId) json_ok(['tracked' => false]);
 
-        // Gate contact reveals BEFORE inserting anything — we don't want
-        // analytics rows for blocked attempts.
-        if ($type === 'contact_view' && kfm_gate_required($targetCpId)) {
-            // Mirror json_err's shape but include gate context the SPA needs
-            // to open the OTP modal with the right messaging.
-            http_response_code(403);
-            echo json_encode([
-                'ok'            => false,
-                'error'         => 'OTP verification required',
-                'gate_required' => true,
-                'gate_reason'   => kfm_is_returning() ? 'returning_user' : 'free_limit_reached',
-            ] + kfm_gate_snapshot());
-            exit;
-        }
+        // Decide gate up-front but DON'T short-circuit the INSERT — we want
+        // the Contact View Log to record every attempt (allowed or blocked)
+        // so admins can see who tried what and when. The 403 response below
+        // is unchanged so the SPA still opens the OTP modal.
+        $gateBlocked = ($type === 'contact_view' && kfm_gate_required($targetCpId));
 
         // Get viewer profile info
         $viewerProfile = null;
@@ -555,7 +546,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $scrollDepth = (int)($input['scroll_depth'] ?? 0);
 
         // If time_spent > 0, try to UPDATE existing row first (update duration on page leave)
-        if ($timeSpent > 0 && $viewerMobile) {
+        if ($timeSpent > 0 && $viewerMobile && !$gateBlocked) {
             $upd = $db->prepare("UPDATE usage_activity SET time_spent = :ts, scroll_depth = :sd
                 WHERE mobile = :m AND target_cp_id = :tcp AND activity_type = :t
                 AND datetime >= DATE_SUB(NOW(), INTERVAL 5 MINUTE) ORDER BY id DESC LIMIT 1");
@@ -575,6 +566,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':ts' => $timeSpent,
                 ':sd' => $scrollDepth,
             ]);
+
+        // Now apply the gate response — the row is already logged.
+        if ($gateBlocked) {
+            http_response_code(403);
+            echo json_encode([
+                'ok'            => false,
+                'error'         => 'OTP verification required',
+                'gate_required' => true,
+                'gate_reason'   => kfm_is_returning() ? 'returning_user' : 'free_limit_reached',
+            ] + kfm_gate_snapshot());
+            exit;
+        }
 
         // For a contact reveal, return the target's mobile.
         // - Verified sessions (SPA OTP or user-panel login): always.
