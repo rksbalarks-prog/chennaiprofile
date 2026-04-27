@@ -265,8 +265,9 @@ export default function Home() {
   };
   const handleOtpInput=(i,val)=>{if(!/^\d?$/.test(val))return;const n=[...otpValue];n[i]=val;setOtpValue(n);if(val&&i<3)document.getElementById(`home-otp-${i+1}`)?.focus();};
 
-  // Open the OTP modal because the server-side gate blocked a contact view.
-  // gate_reason is either 'returning_user' or 'free_limit_reached'.
+  // Open the OTP modal because the server-side gate blocked a contact view,
+  // or because a revealed contact had no phone number on file.
+  // gate_reason is one of: 'returning_user' | 'free_limit_reached' | 'number_unavailable'.
   const openGateModal = (profileId, reason, limit) => {
     // Arm the 24-hour reset window the first time the gate fires, or refresh
     // it if a previous window has already expired.
@@ -277,9 +278,14 @@ export default function Home() {
     setPendingContactId(profileId);
     setOtpIntent('view');
     setOtpMobile(''); setOtpValue(['','','','']); setOtpSent(false); setOtpMsg('');
-    setGatePromptMsg(reason === 'returning_user'
-      ? 'Welcome back. Please verify your mobile to continue viewing contacts.'
-      : `You've used your ${limit || 5} free contact views. Verify your mobile to keep viewing contacts.`);
+    const promptByReason = {
+      returning_user:     'Welcome back. Please verify your mobile to continue viewing contacts.',
+      number_unavailable: 'This contact has no phone number on file. Verify your mobile so we can help you reach them.',
+    };
+    setGatePromptMsg(
+      promptByReason[reason]
+      || `You've used your ${limit || 5} free contact views. Verify your mobile to keep viewing contacts.`
+    );
     setShowOtpModal(true);
   };
   // Skip handler shared by the top-right "✕" and the countdown button below
@@ -493,10 +499,20 @@ export default function Home() {
         <div style={{ display:'flex', marginTop:4, minWidth:0, width:'100%' }}>
           {revealedContactId === p.id ? (() => {
             const num = revealedPhones[p.id] || p.phone || '';
+            if (num) {
+              return (
+                <a href={`tel:${num}`} onClick={e=>e.stopPropagation()} style={{ flex:'1 1 0', minWidth:0, padding:'5px 0', background:'#1a6ea8', color:'#fff', borderRadius:6, fontSize:12.1, fontWeight:700, textAlign:'center', textDecoration:'none', display:'block', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                  Call: {num}
+                </a>
+              );
+            }
+            // Number genuinely unavailable for this contact — open the OTP modal so
+            // the visitor can verify and reach support, instead of a dead button.
             return (
-              <a href={`tel:${num}`} onClick={e=>e.stopPropagation()} style={{ flex:'1 1 0', minWidth:0, padding:'5px 0', background:'#1a6ea8', color:'#fff', borderRadius:6, fontSize:12.1, fontWeight:700, textAlign:'center', textDecoration:'none', display:'block', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                {num ? `Call: ${num}` : 'Number unavailable'}
-              </a>
+              <button onClick={e => { e.stopPropagation(); openGateModal(p.id, 'number_unavailable', gateState.anonViewsLimit); }}
+                style={{ flex:'1 1 0', minWidth:0, padding:'5px 4px', background:'#1a6ea8', color:'#fff', border:'none', borderRadius:6, fontSize:12.1, fontWeight:700, cursor:'pointer', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                Number unavailable
+              </button>
             );
           })() : (
             <button onClick={e=>{e.stopPropagation();handleViewContact(p.id);}} style={{ flex:'1 1 0', minWidth:0, padding:'5px 4px', background:'linear-gradient(135deg,#16a34a,#15803d)', color:'#fff', border:'none', borderRadius:6, fontSize:12.1, fontWeight:700, cursor:'pointer', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
@@ -774,10 +790,23 @@ export default function Home() {
         <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:3000, backdropFilter:'blur(4px)' }} onClick={()=>{setShowOtpModal(false);setGatePromptMsg('');}}>
           <div style={{ background:'#fff', borderRadius:20, overflow:'hidden', maxWidth:380, width:'90%', boxShadow:'0 20px 60px rgba(0,0,0,0.25)' }} onClick={e=>e.stopPropagation()}>
             <div style={{ background:'linear-gradient(135deg,#8B0000,#C41E3A)', padding:22, textAlign:'center', position:'relative' }}>
-              <button onClick={skipGateModal} title="Skip"
-                style={{ position:'absolute', top:10, right:10, background:'rgba(255,255,255,0.18)', border:'none', color:'#fff', padding:'4px 10px', borderRadius:14, fontSize:12.1, fontWeight:700, cursor:'pointer', letterSpacing:0.4 }}>
-                Skip ✕
-              </button>
+              {(() => {
+                // Total contacts viewed by this visitor in the current session.
+                // Server-tracked anonViewsUsed is the source of truth for unverified
+                // visitors; verified users may also have prior reveals not in the
+                // anon counter, so fold in the per-mount revealedPhones map too.
+                const viewed = Math.max(
+                  gateState.anonViewsUsed || 0,
+                  Object.keys(revealedPhones).length
+                );
+                return (
+                  <button onClick={skipGateModal} title={`Skip — ${viewed} viewed`}
+                    style={{ position:'absolute', top:10, right:10, background:'rgba(255,255,255,0.18)', border:'none', color:'#fff', padding:'4px 10px', borderRadius:14, fontSize:12.1, fontWeight:700, cursor:'pointer', letterSpacing:0.4, display:'inline-flex', alignItems:'center', gap:6 }}>
+                    <span>Skip{viewed}</span>
+                    <span style={{ opacity:0.85 }}>✕</span>
+                  </button>
+                );
+              })()}
               <div style={{ fontSize:15.4, fontWeight:700, color:'#fff' }}>Verify Your Mobile</div>
               <div style={{ fontSize:12.1, color:'rgba(255,255,255,0.7)', marginTop:4 }}>Enter your number to continue</div>
             </div>
