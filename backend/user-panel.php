@@ -170,6 +170,22 @@ input,select,textarea{outline:none}
 .btn-sm{padding:6px 12px;font-size:12px}
 .action-row{display:flex;gap:7px;flex-wrap:wrap}
 
+/* Compact dropdown used in the topbar — bundles multiple actions behind one
+   trigger so the topbar stays a single line on mobile (no wrapping under the
+   page title). The panel scrolls vertically if it ever overflows. */
+.topbar-menu{position:relative;display:inline-block}
+.topbar-menu-trigger{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;background:var(--accent);color:#fff;border:1.5px solid var(--accent);font-size:12px;font-weight:600;cursor:pointer;line-height:1.2}
+.topbar-menu-trigger:hover{background:var(--accent2);border-color:var(--accent2)}
+.topbar-menu-trigger .chev{font-size:10px;transition:transform .15s ease}
+.topbar-menu.open .topbar-menu-trigger .chev{transform:rotate(180deg)}
+.topbar-menu-list{display:none;position:absolute;top:calc(100% + 6px);right:0;min-width:200px;max-width:80vw;max-height:60vh;overflow-y:auto;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 12px 36px rgba(0,0,0,0.14);padding:6px;z-index:30;-webkit-overflow-scrolling:touch}
+.topbar-menu.open .topbar-menu-list{display:block;animation:fadeUp .15s ease}
+.topbar-menu-list a,.topbar-menu-list button{display:flex;align-items:center;gap:9px;width:100%;padding:10px 12px;border:none;background:none;color:var(--ink2);font-size:13px;font-weight:600;text-align:left;text-decoration:none;border-radius:7px;cursor:pointer;font-family:inherit}
+.topbar-menu-list a:hover,.topbar-menu-list button:hover{background:var(--bg);color:var(--ink)}
+.topbar-menu-list .menu-primary{color:var(--accent)}
+.topbar-menu-list .menu-primary:hover{background:#fef2f2}
+@media(max-width:640px){.topbar{padding:0 14px}.topbar-menu-list{right:-4px;min-width:220px}}
+
 .no-profile-wrap{max-width:500px;margin:0 auto;text-align:center;padding:50px 24px;background:var(--card);border-radius:var(--radius2);box-shadow:var(--shadow);border:2px dashed var(--border2);animation:fadeUp .3s ease}
 .no-profile-icon{font-size:48px;opacity:.45;margin-bottom:14px}
 .no-profile-chip{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--accent);background:var(--accent-bg);padding:4px 14px;border-radius:7px;display:inline-block;margin-bottom:14px}
@@ -1866,12 +1882,20 @@ function setActions(sec) {
     if (canDelete) html += '<button class="btn btn-danger btn-sm" onclick="deleteProf()">Delete</button>';
     acts.innerHTML = html;
   } else if (sec === 'myProfile' && !profile) {
-    let html = '';
+    // Scroll-menu dropdown — keeps the topbar to a single line on mobile and
+    // scrolls vertically if the option list ever grows beyond the viewport.
+    let items = '';
     if (upAllowed('feat_create_profile')) {
-      html += '<button class="btn btn-primary btn-sm" onclick="openCreate()">+ Create New Profile</button>';
+      items += '<button type="button" class="menu-primary" onclick="openCreate()">+ Create New Profile</button>';
     }
-    html += '<a href="/" class="btn btn-outline btn-sm" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Go Home</a>';
-    acts.innerHTML = html;
+    items += '<a href="/"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Go Home</a>';
+    acts.innerHTML = `
+      <div class="topbar-menu" id="myProfileMenu">
+        <button type="button" class="topbar-menu-trigger" onclick="event.stopPropagation();document.getElementById('myProfileMenu').classList.toggle('open')">
+          Menu <span class="chev">▾</span>
+        </button>
+        <div class="topbar-menu-list" onclick="document.getElementById('myProfileMenu').classList.remove('open')">${items}</div>
+      </div>`;
   } else {
     acts.innerHTML = '';
   }
@@ -3494,6 +3518,10 @@ FormAutoSave.track('up_quick_create', { container: '#addProfileSection', fieldPr
       if (wrap && !wrap.contains(e.target)) {
         wizToggle(mid, st.activeDropdown);
       }
+    });
+    // Topbar scroll-menu dropdowns close when clicking anywhere outside them.
+    document.querySelectorAll('.topbar-menu.open').forEach(m => {
+      if (!m.contains(e.target)) m.classList.remove('open');
     });
   });
 
