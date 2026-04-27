@@ -641,9 +641,9 @@ export default function Home() {
       {!hasUserProfile && (
         <div style={{ display:'flex', gap:6, padding:'8px 12px 6px', background:'#fff', overflowX:'auto', scrollbarWidth:'thin' }}>
           {[
-            { key:'all',   label:'All',    count:maleCount + femaleCount, icon:(<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="7" r="4"/><circle cx="17" cy="7" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M14 21a7 7 0 0 1 8-6.7"/></svg>) },
-            { key:'bride', label:'Female', count:femaleCount,             icon:(<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>) },
-            { key:'groom', label:'Male',   count:maleCount,               icon:(<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>) },
+            { key:'all',   label:'All',    icon:(<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="7" r="4"/><circle cx="17" cy="7" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M14 21a7 7 0 0 1 8-6.7"/></svg>) },
+            { key:'bride', label:'Female', icon:(<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>) },
+            { key:'groom', label:'Male',   icon:(<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>) },
           ].map(t => {
             const active = activeTab === t.key;
             return (
@@ -655,7 +655,6 @@ export default function Home() {
                   transition:'all 0.15s' }}>
                 {t.icon}
                 {t.label}
-                <span style={{ fontSize:11, fontWeight:700, background:active?'rgba(255,255,255,0.25)':'rgba(0,0,0,0.06)', padding:'0 6px', borderRadius:8 }}>{fmtCount(t.count)}</span>
               </button>
             );
           })}
