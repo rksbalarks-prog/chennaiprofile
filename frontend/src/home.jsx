@@ -473,7 +473,6 @@ export default function Home() {
               {p.name} <span style={{ fontSize:10, color:'#8B0000', fontWeight:600, background:'#fef2f2', padding:'1px 6px', borderRadius:3, marginLeft:4 }}>{p.cpId}</span>
             </div>
             <div
-              onClick={e => e.stopPropagation()}
               style={{ fontSize:10.5, lineHeight:1.5, color:'#374151', background:'#fffbeb', border:'1px solid #fde68a', borderRadius:6, padding:'5px 7px', overflow:'hidden', display:'-webkit-box', WebkitLineClamp:4, WebkitBoxOrient:'vertical', flex:1, marginTop:1 }}
             >
               {briefText}
