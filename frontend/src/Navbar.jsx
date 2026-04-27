@@ -39,6 +39,37 @@ export default function Navbar() {
 
   useEffect(() => { setMenuOpen(false); }, [location.pathname]);
 
+  // Bottom nav visibility — show when the visitor is within EDGE px of the top
+  // or bottom of the document, hide otherwise. Also stays visible on short
+  // pages that don't scroll. Recomputes on scroll, resize, route change.
+  const [bottomNavVisible, setBottomNavVisible] = useState(true);
+  useEffect(() => {
+    const EDGE = 120;
+    const recompute = () => {
+      const doc = document.documentElement;
+      const scrollY = window.scrollY || window.pageYOffset || 0;
+      const viewport = window.innerHeight || doc.clientHeight;
+      const total = Math.max(doc.scrollHeight, doc.offsetHeight, document.body.scrollHeight);
+      const distFromBottom = total - (scrollY + viewport);
+      // Always-show when the page barely scrolls.
+      if (total - viewport <= EDGE) { setBottomNavVisible(true); return; }
+      setBottomNavVisible(scrollY <= EDGE || distFromBottom <= EDGE);
+    };
+    recompute();
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => { raf = 0; recompute(); });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [location.pathname]);
+
   const handleLogout = async () => {
     await fetch(API_BASE, { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ action:'contact_logout' }), credentials:'include' });
@@ -226,6 +257,14 @@ export default function Navbar() {
           box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
           display: flex; align-items: stretch; justify-content: space-around;
           height: 60px; padding-bottom: env(safe-area-inset-bottom, 0);
+          transform: translateY(0);
+          transition: transform 0.22s ease, opacity 0.22s ease;
+          opacity: 1;
+        }
+        .bottom-nav.is-hidden {
+          transform: translateY(110%);
+          opacity: 0;
+          pointer-events: none;
         }
 
         .bottom-nav-item {
@@ -276,9 +315,12 @@ export default function Navbar() {
         .top-spacer { height: 56px; }
         .bottom-spacer { height: 4px; }
 
-        /* ── DESKTOP: hide bottom nav, show top nav links ── */
+        /* ── DESKTOP: bottom nav stays — but only flashes in at the page top
+              and bottom (controlled by .is-hidden in JS). The desktop top
+              nav links remain available too. ── */
         @media (min-width: 769px) {
-          .bottom-nav { display: none; }
+          .bottom-nav { max-width: 520px; left: 50%; right: auto; transform: translateX(-50%); border-radius: 14px 14px 0 0; bottom: 0; }
+          .bottom-nav.is-hidden { transform: translate(-50%, 110%); }
           .bottom-spacer { display: none; }
           .top-bar { height: 64px; padding: 0 24px; }
           .top-spacer { height: 64px; }
@@ -416,7 +458,7 @@ export default function Navbar() {
       </div>
 
       {/* ═══ BOTTOM NAV ═══ */}
-      <nav className="bottom-nav">
+      <nav className={`bottom-nav ${bottomNavVisible ? '' : 'is-hidden'}`}>
         <Link to="/" className={`bottom-nav-item ${isActive('/') ? 'active' : ''}`}>
           <div className="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
           <span className="bottom-nav-label">Home</span>
