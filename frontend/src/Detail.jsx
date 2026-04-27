@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { API_BASE, PHOTO_BASE, UPLOADS_PREFIX, getPhotoUrls } from "./config";
+import { buildSummary } from "./profileSummary";
 
 function mapProfile(p) {
   const photoVal = p.photo1 || p.photo || '';
@@ -84,7 +85,7 @@ export default function Detail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showContact, setShowContact] = useState(false);
@@ -499,6 +500,28 @@ export default function Detail() {
             </button>
           )}
         </div>
+
+        {/* Profile Summary (bilingual) */}
+        {(() => {
+          const s = buildSummary(p);
+          const isTa = i18n.language === 'ta';
+          const primary = isTa ? s.ta : s.en;
+          const secondary = isTa ? s.en : s.ta;
+          const primaryLabel = isTa ? 'சுருக்கம்' : 'Summary';
+          const secondaryLabel = isTa ? 'English' : 'தமிழ்';
+          return (
+            <Section title={isTa ? 'சுருக்கம் / Summary' : 'Profile Summary / சுருக்கம்'}>
+              <div style={{ background:'#fffbeb', border:'1px solid #fde68a', borderRadius:8, padding:'12px 14px', marginBottom:10 }}>
+                <div style={{ fontSize:11, fontWeight:700, color:'#92400e', textTransform:'uppercase', letterSpacing:0.4, marginBottom:6 }}>{primaryLabel}</div>
+                <p style={{ fontSize:13.5, lineHeight:1.65, color:'#1f2937', margin:0 }}>{primary}</p>
+              </div>
+              <div style={{ background:'#f8fafc', border:'1px solid #e2e8f0', borderRadius:8, padding:'12px 14px' }}>
+                <div style={{ fontSize:11, fontWeight:700, color:'#475569', textTransform:'uppercase', letterSpacing:0.4, marginBottom:6 }}>{secondaryLabel}</div>
+                <p style={{ fontSize:13, lineHeight:1.65, color:'#374151', margin:0 }}>{secondary}</p>
+              </div>
+            </Section>
+          );
+        })()}
 
         {/* Personal Details */}
         <Section title="Personal Details">

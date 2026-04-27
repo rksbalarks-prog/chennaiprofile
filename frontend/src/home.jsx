@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE, PHOTO_BASE, PHOTO_BASE_OLD, UPLOADS_PREFIX, USER_PANEL_URL, getPhotoUrls } from './config';
+import { buildSummary } from './profileSummary';
 
 const mapP = (p) => ({
   id: p.cp_id, cpId: p.cp_id, name: p.name || 'N/A',
@@ -30,7 +31,7 @@ const sortPhotosFirst = (arr) => {
 };
 
 export default function Home() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
 
   const [sections, setSections] = useState({ interest:[], preference:[], withPhotos:[], notViewed:[], viewed:[], others:[] });
@@ -377,7 +378,13 @@ export default function Home() {
     return 'South Arcot District';
   };
 
-  const ProfileCard = ({ p }) => (
+  const ProfileCard = ({ p }) => {
+    const [slide, setSlide] = useState(0); // 0 = details, 1 = brief summary
+    const summary = slide === 1 ? buildSummary(p) : null;
+    const isTa = i18n.language === 'ta';
+    const briefText = summary ? (isTa ? summary.ta : summary.en) : '';
+
+    return (
     <div style={{ position:'relative', display:'flex', background:'#fff', borderRadius:12, overflow:'hidden', boxShadow:'0 1px 6px rgba(0,0,0,0.06)', border:'1px solid #f0f0f0', cursor:'pointer' }}
       onClick={() => navigate(`/detail/${p.id}`, { state: { profile: p } })}>
       {(() => {
@@ -413,32 +420,72 @@ export default function Home() {
           </div>
         );
       })()}
-      <div style={{ flex:1, padding:'8px 10px', display:'flex', flexDirection:'column', gap:2, minWidth:0 }}>
-        <div style={{ fontSize:13, fontWeight:700, color:'#222', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.name}</div>
-        <div style={{ display:'flex', alignItems:'center', gap:5 }}>
-          <span style={{ fontSize:10, color:'#8B0000', fontWeight:600, background:'#fef2f2', padding:'1px 6px', borderRadius:3 }}>{p.cpId}</span>
-          <span style={{ fontSize:10, color:'#8B0000', fontWeight:600, cursor:'pointer' }} onClick={e=>{e.stopPropagation();navigate(`/detail/${p.id}`,{state:{profile:p}});}}>View →</span>
-          <span
-            role="button"
-            tabIndex={0}
-            onClick={e=>{e.stopPropagation();setReportProfileId(p.cpId);setReportReason('');setShowReportModal(true);}}
-            style={{ fontSize:10, fontWeight:700, color:'#b91c1c', background:'#fef2f2', border:'1px solid #fecaca', padding:'1px 7px', borderRadius:10, cursor:'pointer', display:'inline-flex', alignItems:'center', gap:3, lineHeight:1 }}>
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#b91c1c" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-              <line x1="12" y1="9" x2="12" y2="13"/>
-              <line x1="12" y1="17" x2="12.01" y2="17"/>
-            </svg>
-            Flag
-          </span>
-        </div>
-        <div style={{ fontSize:11, color:'#777' }}>{[p.age?p.age+' yrs':'',p.height,getLocation(p)].filter(Boolean).join(' · ')}</div>
-        <div style={{ fontSize:11, color:'#777' }}>{[p.qualification,p.job].filter(Boolean).join(' · ')}</div>
-        <div style={{ display:'flex', gap:3, flexWrap:'wrap', marginTop:'auto' }}>
-          {p.caste && <span style={{ fontSize:9, fontWeight:600, padding:'1px 6px', borderRadius:8, background:'#f5f0ff', color:'#6d28d9' }}>{p.caste}</span>}
-          {p.religion && <span style={{ fontSize:9, fontWeight:600, padding:'1px 6px', borderRadius:8, background:'#fff7ed', color:'#c2410c' }}>{p.religion}</span>}
-          {p.star && <span style={{ fontSize:9, fontWeight:600, padding:'1px 6px', borderRadius:8, background:'#f0fdf4', color:'#166534' }}>{p.star}</span>}
-        </div>
-        {/* Contact button (report is now an absolute-positioned icon in the card's top-right corner) */}
+      <div style={{ flex:1, padding:'8px 10px', display:'flex', flexDirection:'column', gap:2, minWidth:0, position:'relative' }}>
+        {/* Carousel swap arrow — top-right of the right pane */}
+        <button
+          type="button"
+          aria-label={slide === 0 ? 'Show brief summary' : 'Show details'}
+          onClick={e => { e.stopPropagation(); setSlide(s => (s === 0 ? 1 : 0)); }}
+          style={{ position:'absolute', top:6, right:6, width:22, height:22, borderRadius:'50%', background:'#fff', border:'1px solid #e5e7eb', color:'#8B0000', display:'inline-flex', alignItems:'center', justifyContent:'center', cursor:'pointer', padding:0, zIndex:1, boxShadow:'0 1px 2px rgba(0,0,0,0.06)' }}
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            {slide === 0
+              ? <><polyline points="9 18 15 12 9 6"/></>
+              : <><polyline points="15 18 9 12 15 6"/></>}
+          </svg>
+        </button>
+
+        {slide === 0 ? (
+          <>
+            <div style={{ fontSize:13, fontWeight:700, color:'#222', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', paddingRight:26 }}>{p.name}</div>
+            <div style={{ display:'flex', alignItems:'center', gap:5, flexWrap:'wrap' }}>
+              <span style={{ fontSize:10, color:'#8B0000', fontWeight:600, background:'#fef2f2', padding:'1px 6px', borderRadius:3 }}>{p.cpId}</span>
+              <span style={{ fontSize:10, color:'#8B0000', fontWeight:600, cursor:'pointer' }} onClick={e=>{e.stopPropagation();navigate(`/detail/${p.id}`,{state:{profile:p}});}}>View →</span>
+              <span
+                role="button"
+                tabIndex={0}
+                onClick={e=>{e.stopPropagation();setReportProfileId(p.cpId);setReportReason('');setShowReportModal(true);}}
+                style={{ fontSize:10, fontWeight:700, color:'#b91c1c', background:'#fef2f2', border:'1px solid #fecaca', padding:'1px 7px', borderRadius:10, cursor:'pointer', display:'inline-flex', alignItems:'center', gap:3, lineHeight:1 }}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#b91c1c" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                  <line x1="12" y1="9" x2="12" y2="13"/>
+                  <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                Flag
+              </span>
+            </div>
+            <div style={{ fontSize:11, color:'#777' }}>{[p.age?p.age+' yrs':'',p.height,getLocation(p)].filter(Boolean).join(' · ')}</div>
+            <div style={{ fontSize:11, color:'#777' }}>{[p.qualification,p.job].filter(Boolean).join(' · ')}</div>
+            <div style={{ display:'flex', gap:3, flexWrap:'wrap', marginTop:'auto' }}>
+              {p.caste && <span style={{ fontSize:9, fontWeight:600, padding:'1px 6px', borderRadius:8, background:'#f5f0ff', color:'#6d28d9' }}>{p.caste}</span>}
+              {p.religion && <span style={{ fontSize:9, fontWeight:600, padding:'1px 6px', borderRadius:8, background:'#fff7ed', color:'#c2410c' }}>{p.religion}</span>}
+              {p.star && <span style={{ fontSize:9, fontWeight:600, padding:'1px 6px', borderRadius:8, background:'#f0fdf4', color:'#166534' }}>{p.star}</span>}
+            </div>
+          </>
+        ) : (
+          <>
+            <div style={{ fontSize:13, fontWeight:700, color:'#222', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', paddingRight:26 }}>
+              {p.name} <span style={{ fontSize:10, color:'#8B0000', fontWeight:600, background:'#fef2f2', padding:'1px 6px', borderRadius:3, marginLeft:4 }}>{p.cpId}</span>
+            </div>
+            <div
+              onClick={e => e.stopPropagation()}
+              style={{ fontSize:10.5, lineHeight:1.5, color:'#374151', background:'#fffbeb', border:'1px solid #fde68a', borderRadius:6, padding:'5px 7px', overflow:'hidden', display:'-webkit-box', WebkitLineClamp:4, WebkitBoxOrient:'vertical', flex:1, marginTop:1 }}
+            >
+              {briefText}
+            </div>
+            <div style={{ marginTop:2 }}>
+              <a
+                href={`/detail/${p.id}`}
+                onClick={e => { e.stopPropagation(); e.preventDefault(); navigate(`/detail/${p.id}`, { state: { profile: p } }); }}
+                style={{ fontSize:10.5, fontWeight:700, color:'#8B0000', textDecoration:'none' }}
+              >
+                {isTa ? 'மேலும் படிக்க →' : 'Read more →'}
+              </a>
+            </div>
+          </>
+        )}
+
+        {/* Contact button — always visible across both slides */}
         <div style={{ display:'flex', marginTop:4, minWidth:0, width:'100%' }}>
           {revealedContactId === p.id ? (() => {
             const num = revealedPhones[p.id] || p.phone || '';
@@ -455,7 +502,8 @@ export default function Home() {
         </div>
       </div>
     </div>
-  );
+    );
+  };
 
   // Build flat feed: 200 photo profiles first, then "View More" expands the rest
   const [showMore, setShowMore] = useState(false);
