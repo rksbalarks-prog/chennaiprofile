@@ -307,9 +307,16 @@ export default function Home() {
           const lim = await fetch(API_BASE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'user_limits',mobile}),credentials:'include'}).then(r=>r.json());
           if (lim.ok) {
             const {limits,used}=lim;
-            if(limits.day>0&&used.day>=limits.day){setLimitMsg({title:'Daily Limit Reached',desc:`You have used all ${limits.day} contact views for today.`,sub:'Try again tomorrow.'});return;}
-            if(limits.month>0&&used.month>=limits.month){setLimitMsg({title:'Monthly Limit Reached',desc:`You have used all ${limits.month} contact views this month.`,sub:'Limit resets next month.'});return;}
-            if(limits.total>0&&used.total>=limits.total){setLimitMsg({title:'Total Limit Reached',desc:`You have used all ${limits.total} lifetime contact views.`,sub:'Upgrade your plan for more.'});return;}
+            const openVerify = (msg) => {
+              setPendingContactId(profileId);
+              setOtpIntent('view');
+              setOtpMobile(''); setOtpValue(['','','','']); setOtpSent(false); setOtpMsg('');
+              setGatePromptMsg(msg);
+              setShowOtpModal(true);
+            };
+            if(limits.day>0&&used.day>=limits.day){openVerify(`You have used all ${limits.day} contact views for today. Verify your mobile number to continue viewing contacts.`);return;}
+            if(limits.month>0&&used.month>=limits.month){openVerify(`You have used all ${limits.month} contact views this month. Verify your mobile number to continue viewing contacts.`);return;}
+            if(limits.total>0&&used.total>=limits.total){openVerify(`You have used all ${limits.total} lifetime contact views. Verify your mobile number to continue viewing contacts.`);return;}
           }
         }
       } catch(e) {}
