@@ -861,6 +861,103 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         json_ok(['interest' => $interest, 'preference' => $preference, 'notViewed' => $notViewed, 'viewed' => $viewed, 'withPhotos' => $withPhotos, 'allProfiles' => $allProfiles]);
     }
 
+    // ── Matches: basic & mutual ──────────────────────────────────────────────
+    // Basic   = profiles that satisfy MY partner preferences (one-way).
+    // Mutual  = profiles that satisfy MY partner preferences AND whose own
+    //           partner preferences are satisfied by ME (two-way handshake).
+    if ($act === 'basic_matches' || $act === 'mutual_matches') {
+        $mobile = trim($input['mobile'] ?? '');
+        $cpId   = trim($input['cp_id'] ?? '');
+        if (!$mobile && !$cpId) json_err('mobile or cp_id required');
+
+        if ($cpId) {
+            $prof = $db->prepare("SELECT * FROM profiles WHERE cp_id = :c LIMIT 1");
+            $prof->execute([':c' => $cpId]);
+        } else {
+            $prof = $db->prepare("SELECT * FROM profiles WHERE mobile = :m LIMIT 1");
+            $prof->execute([':m' => $mobile]);
+        }
+        $me = $prof->fetch();
+        if (!$me) json_err('Source profile not found');
+
+        $myCpId   = $me['cp_id'];
+        $oppGender = $me['gender'] === 'Male' ? 'Female' : 'Male';
+
+        // Treat these as wildcards in any *_pref text column
+        $isWild = function($v) {
+            if ($v === null) return true;
+            $t = trim((string)$v);
+            if ($t === '') return true;
+            $low = strtolower($t);
+            return in_array($low, ['any', 'doesn\'t matter', "doesn't matter", 'not applicable', 'all'], true);
+        };
+
+        // ── Build "MY partner prefs satisfied by candidate" filter ──────────
+        $where  = ["p.gender = ?", "p.status = 'Approved'", "p.cp_id <> ?"];
+        $params = [$oppGender, $myCpId];
+
+        if (!$isWild($me['partner_caste']))           { $where[] = "p.caste = ?";      $params[] = $me['partner_caste']; }
+        if (!$isWild($me['partner_sub_caste']))       { $where[] = "p.sub_caste = ?";  $params[] = $me['partner_sub_caste']; }
+        if (!$isWild($me['partner_marital_status'])) { $where[] = "p.marital = ?";    $params[] = $me['partner_marital_status']; }
+        if (!$isWild($me['partner_diet']))            { $where[] = "p.diet = ?";       $params[] = $me['partner_diet']; }
+        if (!$isWild($me['partner_qualification']))   { $where[] = "p.qualification = ?"; $params[] = $me['partner_qualification']; }
+        if (!$isWild($me['partner_job']))             { $where[] = "p.job = ?";        $params[] = $me['partner_job']; }
+        if (!empty($me['partner_age_from'])) { $where[] = "p.age >= ?"; $params[] = (int)$me['partner_age_from']; }
+        if (!empty($me['partner_age_to']))   { $where[] = "p.age <= ?"; $params[] = (int)$me['partner_age_to']; }
+
+        // ── Mutual: ALSO require candidate's prefs are satisfied by me ──────
+        if ($act === 'mutual_matches') {
+            // Candidate's partner_caste either wild or = my caste, etc.
+            $oppExpr = function($prefCol, $myVal) use (&$where, &$params) {
+                $where[] = "(p.$prefCol IS NULL OR p.$prefCol = '' OR LOWER(p.$prefCol) IN ('any','doesn\\'t matter','not applicable','all') OR p.$prefCol = ?)";
+                $params[] = (string)($myVal ?? '');
+            };
+            $oppExpr('partner_caste',           $me['caste']);
+            $oppExpr('partner_sub_caste',       $me['sub_caste']);
+            $oppExpr('partner_marital_status',  $me['marital'] ?? '');
+            $oppExpr('partner_diet',            $me['diet']);
+            $oppExpr('partner_qualification',   $me['qualification']);
+            $oppExpr('partner_job',             $me['job']);
+
+            $myAge = (int)($me['age'] ?? 0);
+            if ($myAge > 0) {
+                $where[] = "(p.partner_age_from IS NULL OR p.partner_age_from = '' OR CAST(p.partner_age_from AS UNSIGNED) <= ?)";
+                $params[] = $myAge;
+                $where[] = "(p.partner_age_to IS NULL OR p.partner_age_to = '' OR CAST(p.partner_age_to AS UNSIGNED) >= ?)";
+                $params[] = $myAge;
+            }
+        }
+
+        $limit  = max(1, min(60, (int)($input['limit'] ?? 30)));
+        $offset = max(0, (int)($input['offset'] ?? 0));
+
+        $sql = "SELECT p.cp_id, p.name, p.age, p.gender, p.caste, p.sub_caste, p.star, p.raasi,
+                       p.photo1, p.qualification, p.job, p.height, p.marital, p.religion,
+                       p.present_city, p.present_district, p.present_state
+                FROM profiles p
+                WHERE " . implode(' AND ', $where) . "
+                ORDER BY p.id DESC
+                LIMIT $limit OFFSET $offset";
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        $rows = $stmt->fetchAll();
+
+        // Also return total count (without limit) for paging UI
+        $cntSql = "SELECT COUNT(*) FROM profiles p WHERE " . implode(' AND ', $where);
+        $cntStmt = $db->prepare($cntSql);
+        $cntStmt->execute($params);
+        $total = (int)$cntStmt->fetchColumn();
+
+        json_ok([
+            'profiles' => $rows,
+            'total'    => $total,
+            'limit'    => $limit,
+            'offset'   => $offset,
+            'mode'     => $act,
+            'source'   => ['cp_id' => $myCpId, 'gender' => $me['gender']],
+        ]);
+    }
+
     if ($act === 'tag_profile') {
         $mobile = trim($input['mobile'] ?? '');
         $targetCpId = trim($input['target_cp_id'] ?? '');

@@ -128,6 +128,12 @@ body {
   padding: 12px 14px 4px;
 }
 
+.nav-parent[aria-expanded="true"] .nav-caret { transform: rotate(180deg); }
+.nav-sub { display: flex; flex-direction: column; gap: 1px; padding: 2px 0 4px 8px; border-left: 1.5px solid rgba(255,255,255,0.07); margin: 0 0 2px 18px; }
+.nav-sub[hidden] { display: none; }
+.nav-child { padding-left: 18px; font-size: 12.5px; }
+.nav-bullet { color: rgba(255,255,255,0.35); font-size: 14px; line-height: 1; margin-right: 2px; }
+
 .sidebar-footer {
   padding: 16px 20px;
   border-top: 1px solid rgba(255,255,255,0.08);
@@ -1289,6 +1295,19 @@ input[type="date"].filter-select { padding:8px 10px; cursor:pointer; }
       Profile Reports
     </button>
     <div class="nav-section-label">Operations</div>
+    <button class="nav-btn nav-parent" data-perm="view_profiles" onclick="toggleAdminSubmenu(this)" aria-expanded="false">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      Matches
+      <svg class="nav-caret" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left:auto;transition:transform .2s"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="nav-sub" data-parent="matches" hidden>
+      <button class="nav-btn nav-child" data-perm="view_profiles" onclick="show('basicMatches',this)">
+        <span class="nav-bullet">•</span> Basic Matches
+      </button>
+      <button class="nav-btn nav-child" data-perm="view_profiles" onclick="show('mutualMatches',this)">
+        <span class="nav-bullet">•</span> Mutual Matches
+      </button>
+    </div>
     <button class="nav-btn" data-perm="view_followups" onclick="show('follow',this)">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.36 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.27 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16.92z"/></svg>
       Follow-ups
@@ -1501,6 +1520,44 @@ input[type="date"].filter-select { padding:8px 10px; cursor:pointer; }
         <button class="btn btn-outline btn-sm" id="serverPagNext2" onclick="profPageNext()">Next →</button>
       </div>
     </div>
+  </div>
+
+  <!-- BASIC MATCHES -->
+  <div class="section" id="basicMatchesSection">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Basic Matches</div>
+        <div class="page-subtitle">Profiles that satisfy a user's partner preferences (one-way).</div>
+      </div>
+    </div>
+    <div class="card" style="padding:14px 16px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+      <label style="font-size:12px;font-weight:600;color:var(--text-secondary)">Source:</label>
+      <input type="text" id="bmSourceCpId" placeholder="CP ID (e.g. CP1234)" style="padding:7px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;width:160px">
+      <span style="font-size:11px;color:var(--text-secondary)">or</span>
+      <input type="text" id="bmSourceMobile" placeholder="Mobile" style="padding:7px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;width:140px">
+      <button class="btn btn-primary btn-sm" onclick="loadAdminMatches('basic')">Find Matches</button>
+      <span id="bmStatus" style="font-size:12px;color:var(--text-secondary);margin-left:auto"></span>
+    </div>
+    <div id="bmResults"></div>
+  </div>
+
+  <!-- MUTUAL MATCHES -->
+  <div class="section" id="mutualMatchesSection">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Mutual Matches</div>
+        <div class="page-subtitle">Two-way fit — both sides' partner preferences are satisfied.</div>
+      </div>
+    </div>
+    <div class="card" style="padding:14px 16px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+      <label style="font-size:12px;font-weight:600;color:var(--text-secondary)">Source:</label>
+      <input type="text" id="mmSourceCpId" placeholder="CP ID (e.g. CP1234)" style="padding:7px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;width:160px">
+      <span style="font-size:11px;color:var(--text-secondary)">or</span>
+      <input type="text" id="mmSourceMobile" placeholder="Mobile" style="padding:7px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;width:140px">
+      <button class="btn btn-primary btn-sm" onclick="loadAdminMatches('mutual')">Find Matches</button>
+      <span id="mmStatus" style="font-size:12px;color:var(--text-secondary);margin-left:auto"></span>
+    </div>
+    <div id="mmResults"></div>
   </div>
 
   <!-- FOLLOW-UPS -->
@@ -5105,7 +5162,8 @@ const SECTION_PERM_MAP = {
   bill:'view_bills', usage:'view_usage', addProfile:'add_profile', addOrder:'create_bill',
   settings:'view_settings', deleted:'view_deleted', expired:'view_expired',
   reports:'view_reports', notifications:'view_notifs', stories:'view_stories',
-  accounts:'view_bills', userOrders:'view_bills', directLogin:'view_settings', profileReports:'view_reports', updateHistory:'view_settings'
+  accounts:'view_bills', userOrders:'view_bills', directLogin:'view_settings', profileReports:'view_reports', updateHistory:'view_settings',
+  basicMatches:'view_profiles', mutualMatches:'view_profiles'
 };
 
 function show(s, btn) {
@@ -5145,6 +5203,73 @@ function show(s, btn) {
   if (s === 'messages')    loadMessages();
   if (s === 'updateHistory') loadUpdateHistory();
   if (s === 'addProfile') FormAutoSave.showRestoreBanner('admin_quick_add', '#apResult', () => toast('Draft restored'));
+}
+
+// SIDEBAR: collapsible parent submenus (Matches)
+function toggleAdminSubmenu(btn) {
+  const sub = btn.nextElementSibling;
+  if (!sub || !sub.classList.contains('nav-sub')) return;
+  const open = btn.getAttribute('aria-expanded') === 'true';
+  btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+  sub.hidden = open;
+}
+
+// MATCHES (Basic / Mutual) — admin selects a source profile by CP ID or mobile
+async function loadAdminMatches(mode) {
+  const isMutual = mode === 'mutual';
+  const cpIdEl   = document.getElementById(isMutual ? 'mmSourceCpId'  : 'bmSourceCpId');
+  const mobileEl = document.getElementById(isMutual ? 'mmSourceMobile': 'bmSourceMobile');
+  const status   = document.getElementById(isMutual ? 'mmStatus'      : 'bmStatus');
+  const results  = document.getElementById(isMutual ? 'mmResults'     : 'bmResults');
+  const cpId   = (cpIdEl?.value || '').trim();
+  const mobile = (mobileEl?.value || '').trim();
+  if (!cpId && !mobile) { toast('Enter a CP ID or mobile number', 'error'); return; }
+  status.textContent = 'Loading…';
+  results.innerHTML = '';
+  let data = null;
+  try {
+    const body = { action: isMutual ? 'mutual_matches' : 'basic_matches', limit: 60 };
+    if (cpId) body.cp_id = cpId; else body.mobile = mobile;
+    const resp = await fetch('api/public.php', { method:'POST', headers:{'Content-Type':'application/json'}, credentials:'same-origin', body: JSON.stringify(body) });
+    data = await resp.json();
+  } catch(e) {}
+  if (!data || !data.ok) {
+    status.textContent = '';
+    results.innerHTML = `<div class="card" style="padding:24px;text-align:center;color:#dc2626">${(data && data.error) || 'Could not load matches.'}</div>`;
+    return;
+  }
+  const list = data.profiles || [];
+  status.textContent = `${list.length} of ${data.total||list.length} matches · source ${data.source?.cp_id||''} (${data.source?.gender||''})`;
+  if (!list.length) {
+    results.innerHTML = `<div class="card" style="padding:28px;text-align:center;color:var(--text-secondary)">No profiles match this user's preferences.</div>`;
+    return;
+  }
+  const photoBase = 'api/uploads/';
+  const escA = (s) => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
+  const card = (p) => {
+    const src = p.photo1 && !p.photo1.startsWith('default_')
+      ? (p.photo1.startsWith('uploads/') ? 'api/' + p.photo1 : photoBase + p.photo1) : '';
+    const img = src
+      ? `<img src="${src}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:1.5px solid var(--border)" onerror="this.outerHTML='<div style=&quot;width:48px;height:48px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-weight:700;color:#9ca3af&quot;>${escA((p.name||'?').charAt(0))}</div>'">`
+      : `<div style="width:48px;height:48px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-weight:700;color:#9ca3af">${escA((p.name||'?').charAt(0))}</div>`;
+    const where = [p.present_city, p.present_district, p.present_state].filter(Boolean).join(', ');
+    return `<tr style="cursor:pointer" onclick="window.open('/detail/${escA(p.cp_id)}','_blank')">
+      <td style="padding:8px 12px">${img}</td>
+      <td style="padding:8px 12px"><b>${escA(p.name)}</b><div style="font-size:11px;color:var(--text-secondary)">${escA(p.cp_id)}</div></td>
+      <td style="padding:8px 12px">${escA(p.age||'')} · ${escA(p.gender||'')}</td>
+      <td style="padding:8px 12px">${escA(p.caste||'')}${p.sub_caste?(' / '+escA(p.sub_caste)):''}</td>
+      <td style="padding:8px 12px">${escA(p.marital||'')}</td>
+      <td style="padding:8px 12px">${escA(p.qualification||'')}<div style="font-size:11px;color:var(--text-secondary)">${escA(p.job||'')}</div></td>
+      <td style="padding:8px 12px">${escA(p.star||'')}</td>
+      <td style="padding:8px 12px">${escA(where)}</td>
+    </tr>`;
+  };
+  results.innerHTML = `<div class="card">
+    <div class="table-wrap"><table>
+      <thead><tr><th>Photo</th><th>Name / CP</th><th>Age · Gender</th><th>Caste</th><th>Marital</th><th>Qualification</th><th>Star</th><th>Location</th></tr></thead>
+      <tbody>${list.map(card).join('')}</tbody>
+    </table></div>
+  </div>`;
 }
 
 // MODAL

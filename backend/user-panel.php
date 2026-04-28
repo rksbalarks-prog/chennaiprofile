@@ -149,6 +149,11 @@ input,select,textarea{outline:none}
 .sb-btn:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.85)}
 .sb-btn:hover svg{opacity:1}
 .sb-btn.active{background:var(--accent);color:#fff}.sb-btn.active svg{opacity:1}
+.sb-parent[aria-expanded="true"] .sb-caret{transform:rotate(180deg)}
+.sb-sub{display:flex;flex-direction:column;gap:1px;padding:1px 0 3px 6px;border-left:1.5px solid rgba(255,255,255,.07);margin:0 0 2px 14px}
+.sb-sub[hidden]{display:none}
+.sb-child{padding-left:14px;font-size:12px}
+.sb-bullet{color:rgba(255,255,255,.35);font-size:14px;line-height:1;margin-right:2px}
 .sb-foot{padding:11px 15px;border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between}
 .sb-ver{font-size:10px;color:rgba(255,255,255,.16);font-family:var(--mono)}
 .sb-logout{background:none;border:none;color:rgba(255,255,255,.28);font-size:11.5px;cursor:pointer;display:flex;align-items:center;gap:4px;transition:color .13s;padding:3px 7px;border-radius:5px}
@@ -448,6 +453,19 @@ input,select,textarea{outline:none}
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
         Suggestions
       </button>
+      <button class="sb-btn sb-parent" data-page="page_matches" onclick="toggleSubmenu(this)" aria-expanded="false">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        Matches
+        <svg class="sb-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left:auto;transition:transform .2s"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="sb-sub" data-parent="page_matches" hidden>
+        <button class="sb-btn sb-child" data-page="page_matches" onclick="showSec('basicMatches',this)">
+          <span class="sb-bullet">•</span> Basic Matches
+        </button>
+        <button class="sb-btn sb-child" data-page="page_matches" onclick="showSec('mutualMatches',this)">
+          <span class="sb-bullet">•</span> Mutual Matches
+        </button>
+      </div>
       <button class="sb-btn" data-page="page_allprofiles" onclick="showSec('allProfiles',this)">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><circle cx="17" cy="7" r="3"/><path d="M21 21v-1.5a3.5 3.5 0 0 0-3.5-3.5"/></svg>
         All Profiles
@@ -560,6 +578,20 @@ input,select,textarea{outline:none}
           </span>
         </div>
         <div id="suggestionsContent" style="display:flex;flex-direction:column;gap:16px"></div>
+      </div>
+      <div class="u-section" id="basicMatchesSection">
+        <div class="u-card" style="padding:14px 16px;margin-bottom:14px;background:linear-gradient(135deg,#fef9c3 0%,#fef3c7 100%);border-left:3px solid #d97706">
+          <div style="font-weight:700;color:#92400e;font-size:13px;margin-bottom:4px">💑 Basic Matches</div>
+          <div style="font-size:11.5px;color:#78350f;line-height:1.5">Profiles that satisfy <b>your</b> partner preferences (caste, age, qualification, marital status, etc.).</div>
+        </div>
+        <div id="basicMatchesContent" style="display:flex;flex-direction:column;gap:10px"></div>
+      </div>
+      <div class="u-section" id="mutualMatchesSection">
+        <div class="u-card" style="padding:14px 16px;margin-bottom:14px;background:linear-gradient(135deg,#dcfce7 0%,#bbf7d0 100%);border-left:3px solid #059669">
+          <div style="font-weight:700;color:#065f46;font-size:13px;margin-bottom:4px">💞 Mutual Matches</div>
+          <div style="font-size:11.5px;color:#064e3b;line-height:1.5">Two-way fit: profiles that match <b>your</b> preferences <i>and</i> whose own preferences are satisfied by <b>your basic details</b>.</div>
+        </div>
+        <div id="mutualMatchesContent" style="display:flex;flex-direction:column;gap:10px"></div>
       </div>
       <div class="u-section" id="allProfilesSection">
         <!-- Embeds the public homepage (filter tabs + cards + search) in headerless mode -->
@@ -1507,8 +1539,8 @@ function fillSidebar() {
 }
 
 // ===== NAVIGATION =====
-const TITLES = { myProfile: 'My Profile', suggestions: 'Suggestions', allProfiles: 'All Profiles', myBills: 'My Bills', myActivity: 'My Activity', loginHistory: 'Login History', myReports: 'My Reports', profileViewLog: 'Profile View Log', contactLog: 'Contact View Log', mySettings: 'Settings', addProfile: 'Add Profile', addOrder: 'Pay Later' };
-const SEC_TO_PAGE = { myProfile: 'page_profile', suggestions: 'page_suggestions', allProfiles: 'page_allprofiles', myBills: 'page_bills', myActivity: 'page_activity', loginHistory: 'page_loginhistory', myReports: 'page_myreports', profileViewLog: 'page_profileviewlog', contactLog: 'page_contactlog', mySettings: 'page_settings', addProfile: '', addOrder: 'page_addorder' };
+const TITLES = { myProfile: 'My Profile', suggestions: 'Suggestions', basicMatches: 'Basic Matches', mutualMatches: 'Mutual Matches', allProfiles: 'All Profiles', myBills: 'My Bills', myActivity: 'My Activity', loginHistory: 'Login History', myReports: 'My Reports', profileViewLog: 'Profile View Log', contactLog: 'Contact View Log', mySettings: 'Settings', addProfile: 'Add Profile', addOrder: 'Pay Later' };
+const SEC_TO_PAGE = { myProfile: 'page_profile', suggestions: 'page_suggestions', basicMatches: 'page_matches', mutualMatches: 'page_matches', allProfiles: 'page_allprofiles', myBills: 'page_bills', myActivity: 'page_activity', loginHistory: 'page_loginhistory', myReports: 'page_myreports', profileViewLog: 'page_profileviewlog', contactLog: 'page_contactlog', mySettings: 'page_settings', addProfile: '', addOrder: 'page_addorder' };
 
 // ===== ADD PROFILE (USER PANEL) =====
 let upApSelectedPlan = 'free';
@@ -1869,7 +1901,7 @@ function showSec(name, btn) {
   document.querySelector('.sidebar')?.classList.remove('mob-open');
   document.getElementById('mobOverlay')?.classList.remove('open');
   setActions(name);
-  const renderers = { myProfile: renderMyProfile, suggestions: renderSuggestions, allProfiles: renderAllProfiles, myBills: renderMyBills, addOrder: renderMyOrders, myActivity: renderMyActivity, loginHistory: renderLoginHistory, myReports: renderMyReports, profileViewLog: renderUserProfileViewLog, contactLog: renderUserContactLog, mySettings: renderSettings };
+  const renderers = { myProfile: renderMyProfile, suggestions: renderSuggestions, basicMatches: () => renderMatches('basic'), mutualMatches: () => renderMatches('mutual'), allProfiles: renderAllProfiles, myBills: renderMyBills, addOrder: renderMyOrders, myActivity: renderMyActivity, loginHistory: renderLoginHistory, myReports: renderMyReports, profileViewLog: renderUserProfileViewLog, contactLog: renderUserContactLog, mySettings: renderSettings };
   if (renderers[name]) renderers[name]();
   // Show autosave restore banner for add profile section
   if (name === 'addProfile') FormAutoSave.showRestoreBanner('up_quick_create', '#addProfileSection .profile-card > div:nth-child(2)', () => toast('Draft restored'));
@@ -2672,6 +2704,78 @@ function renderSuggestionsUI() {
   }
 
   container.innerHTML = html || '<div style="text-align:center;padding:30px;color:var(--ink3)">No profiles match this filter</div>';
+}
+
+// ===== SIDEBAR: collapsible parent submenus =====
+function toggleSubmenu(btn) {
+  const sub = btn.nextElementSibling;
+  if (!sub || !sub.classList.contains('sb-sub')) return;
+  const open = btn.getAttribute('aria-expanded') === 'true';
+  btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+  sub.hidden = open;
+}
+
+// ===== BASIC / MUTUAL MATCHES =====
+async function renderMatches(mode) {
+  const containerId = mode === 'mutual' ? 'mutualMatchesContent' : 'basicMatchesContent';
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = '<div style="text-align:center;padding:36px 20px;color:var(--ink3);display:flex;flex-direction:column;align-items:center;gap:12px">'
+    + '<span class="u-spinner lg"></span>'
+    + '<span style="font-size:13px;font-weight:500">Finding matches…</span>'
+    + '</div>';
+  if (!profile) {
+    container.innerHTML = '<div style="text-align:center;padding:30px;color:var(--ink3);font-size:13px">Create your profile first to see matches.</div>';
+    return;
+  }
+  const action = mode === 'mutual' ? 'mutual_matches' : 'basic_matches';
+  let data = null;
+  try {
+    const resp = await fetch('api/public.php', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin',
+      body: JSON.stringify({ action, mobile: mob, limit: 60 })
+    });
+    data = await resp.json();
+  } catch (e) {}
+  if (!data || !data.ok) {
+    container.innerHTML = '<div style="text-align:center;padding:30px;color:#dc2626;font-size:13px">Could not load matches. Please try again.</div>';
+    return;
+  }
+  const list = data.profiles || [];
+  if (!list.length) {
+    container.innerHTML = '<div class="u-card" style="padding:28px 20px;text-align:center;color:var(--ink3)">'
+      + '<div style="font-size:34px;margin-bottom:8px">🔍</div>'
+      + '<div style="font-weight:600;color:#1a1a2e;margin-bottom:4px">No matches yet</div>'
+      + '<div style="font-size:12px">Try widening your partner preferences (age range, caste, qualification) in Settings.</div>'
+      + '</div>';
+    return;
+  }
+  const photoBase = 'api/uploads/';
+  const card = (p) => {
+    const src = p.photo1 && !p.photo1.startsWith('default_')
+      ? (p.photo1.startsWith('uploads/') ? 'api/' + p.photo1 : photoBase + p.photo1) : '';
+    const imgHtml = src
+      ? `<img src="${src}" style="width:54px;height:54px;border-radius:50%;object-fit:cover;border:2px solid #e5e7eb" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+      : '';
+    const fallback = `<div style="${src?'display:none;':'display:flex;'}width:54px;height:54px;border-radius:50%;background:var(--bg);align-items:center;justify-content:center;font-size:16px;color:var(--ink3);font-weight:700;border:2px solid #e5e7eb">${esc((p.name||'?').charAt(0))}</div>`;
+    const where = [p.present_city, p.present_district, p.present_state].filter(Boolean).join(', ');
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border-radius:10px;border:1.5px solid #f0e0e4;cursor:pointer;transition:all .15s"
+      onclick="window.open('/detail/${esc(p.cp_id)}','_blank')"
+      onmouseover="this.style.boxShadow='0 4px 12px rgba(139,0,0,0.1)';this.style.borderColor='#d4a574'"
+      onmouseout="this.style.boxShadow='none';this.style.borderColor='#f0e0e4'">
+      <div style="flex-shrink:0">${imgHtml}${fallback}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:13px;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.name)}</div>
+        <div style="font-size:11px;color:var(--ink3)">${esc(p.cp_id)} · ${p.age||''} yrs · ${esc(p.caste||'')} ${p.marital?('· '+esc(p.marital)):''}</div>
+        <div style="font-size:10.5px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.qualification||'')}${p.job?(' · '+esc(p.job)):''}${where?(' · '+esc(where)):''}</div>
+      </div>
+      <div style="font-size:10px;color:var(--ink3);text-align:right;flex-shrink:0">${esc(p.star||'')}<br>${esc(p.height||'')}</div>
+    </div>`;
+  };
+  const header = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;padding:0 4px">
+    <span style="font-size:12px;color:var(--ink3);font-weight:600">${list.length} of ${data.total||list.length} matches</span>
+  </div>`;
+  container.innerHTML = header + list.map(card).join('');
 }
 
 // ===== ALL PROFILES (opposite-gender browse) =====
