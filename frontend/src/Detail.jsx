@@ -452,7 +452,7 @@ export default function Detail() {
                 <img src={ph.orig} alt={`Photo ${i+1}`}
                   loading="lazy" decoding="async"
                   width="56" height="56"
-                  style={{ width:56, height:56, objectFit:'cover', borderRadius:8, border: activePhoto === i ? '2.5px solid #8B0000' : '2px solid #e0e0e0', opacity: activePhoto === i ? 1 : 0.6, background:'#f5f5f5' }}
+                  style={{ width:56, height:56, objectFit:'cover', objectPosition:'center 20%', borderRadius:8, border: activePhoto === i ? '2.5px solid #8B0000' : '2px solid #e0e0e0', opacity: activePhoto === i ? 1 : 0.6, background:'#f5f5f5', filter:'contrast(1.05) saturate(1.05)' }}
                   onError={e => { e.target.onerror=null; e.target.style.display='none'; }} />
               </picture>
             ))}

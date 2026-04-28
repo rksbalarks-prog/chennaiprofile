@@ -414,18 +414,22 @@ export default function Home() {
         const isSvg = typeof photoSrc === 'string' && photoSrc.endsWith('.svg');
         const urls = (!isSvg && photoSrc) ? getPhotoUrls(photoSrc.replace(UPLOADS_PREFIX, '').replace(PHOTO_BASE, '').replace(PHOTO_BASE_OLD, '')) : null;
         return (
-          <div style={{ width:100, height:120, flexShrink:0, overflow:'hidden', background:`#f0f0f0 url(${svgFallback}) center/60% no-repeat` }}>
+          <div style={{ width:110, height:140, flexShrink:0, overflow:'hidden', background:`#f0f0f0 url(${svgFallback}) center/60% no-repeat` }}>
             <picture>
-              {urls && <source type="image/webp" srcSet={urls.thumb} />}
+              {urls && <source type="image/webp" srcSet={`${urls.thumb} 1x, ${urls.full} 2x`} />}
               <img
                 src={urls ? urls.orig : svgFallback}
                 alt=""
                 loading="lazy" decoding="async"
-                width="100" height="120"
+                width="110" height="140"
                 style={{
-                  width:'100%', height:'100%', objectFit:'cover', display:'block',
-                  // Blur + scale slightly so edge-pixels don't leak when hasPhoto=false
-                  filter: hasPhoto ? 'none' : 'blur(10px) saturate(0.9)',
+                  width:'100%', height:'100%', objectFit:'cover',
+                  // Pin towards the top so portrait full-body shots keep the face
+                  // in frame instead of cropping it off above the card.
+                  objectPosition: hasPhoto ? 'center 20%' : 'center',
+                  display:'block',
+                  // Subtle contrast + saturation lift sharpens compressed thumbs.
+                  filter: hasPhoto ? 'contrast(1.06) saturate(1.06)' : 'blur(10px) saturate(0.9)',
                   transform: hasPhoto ? 'none' : 'scale(1.15)',
                 }}
                 onError={e => {

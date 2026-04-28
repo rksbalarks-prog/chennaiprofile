@@ -270,10 +270,10 @@ export default function MatrimonySearch() {
                 <div style={{ position:'relative', width:'100%', aspectRatio:'4 / 3', background:'#f5f5f5' }}>
                   {p.photo ? (
                     <picture>
-                      {urls && <source type="image/webp" srcSet={urls.thumb} />}
+                      {urls && <source type="image/webp" srcSet={`${urls.thumb} 1x, ${urls.full} 2x`} />}
                       <img src={urls ? urls.orig : p.photo} alt={p.name}
                         loading="lazy" decoding="async"
-                        style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}
+                        style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center 20%', display:'block', filter:'contrast(1.05) saturate(1.05)' }}
                         onError={e => { e.target.onerror=null; e.target.src = genderFallback; }} />
                     </picture>
                   ) : (
