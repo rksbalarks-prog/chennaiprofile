@@ -399,6 +399,7 @@ export default function Home() {
     const summary = slide === 1 ? buildSummary(p) : null;
     const isTa = i18n.language === 'ta';
     const briefText = summary ? (isTa ? summary.ta : summary.en) : '';
+    const isViewed = sections.viewed.some(v => v.id === p.id);
 
     return (
     <div style={{ position:'relative', display:'flex', background:'#fff', borderRadius:12, overflow:'hidden', boxShadow:'0 1px 6px rgba(0,0,0,0.06)', border:'1px solid #f0f0f0', cursor:'pointer' }}
@@ -461,7 +462,7 @@ export default function Home() {
           <>
             <div style={{ fontSize:14.3, fontWeight:700, color:'#222', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', paddingRight:26 }}>{p.name}</div>
             <div style={{ display:'flex', alignItems:'center', gap:5, flexWrap:'wrap' }}>
-              <span style={{ fontSize:11, color:'#8B0000', fontWeight:600, background:'#fef2f2', padding:'1px 6px', borderRadius:3 }}>{p.cpId}</span>
+              <span style={{ fontSize:11, color: isViewed ? '#16a34a' : '#8B0000', fontWeight:600, background: isViewed ? '#f0fdf4' : '#fef2f2', padding:'1px 6px', borderRadius:3 }}>{p.cpId}</span>
               <span style={{ fontSize:11, color:'#8B0000', fontWeight:600, cursor:'pointer' }} onClick={e=>{e.stopPropagation();navigate(`/detail/${p.id}`,{state:{profile:p}});}}>View →</span>
               <span
                 role="button"
@@ -487,7 +488,7 @@ export default function Home() {
         ) : (
           <>
             <div style={{ fontSize:14.3, fontWeight:700, color:'#222', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', paddingRight:26 }}>
-              {p.name} <span style={{ fontSize:11, color:'#8B0000', fontWeight:600, background:'#fef2f2', padding:'1px 6px', borderRadius:3, marginLeft:4 }}>{p.cpId}</span>
+              {p.name} <span style={{ fontSize:11, color: isViewed ? '#16a34a' : '#8B0000', fontWeight:600, background: isViewed ? '#f0fdf4' : '#fef2f2', padding:'1px 6px', borderRadius:3, marginLeft:4 }}>{p.cpId}</span>
             </div>
             <div
               style={{ fontSize:11.6, lineHeight:1.5, color:'#374151', background:'#fffbeb', border:'1px solid #fde68a', borderRadius:6, padding:'5px 7px', overflow:'hidden', display:'-webkit-box', WebkitLineClamp:4, WebkitBoxOrient:'vertical', flex:1, marginTop:1 }}
