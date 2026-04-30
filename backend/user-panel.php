@@ -1975,7 +1975,7 @@ function renderMyProfile() {
   const p = profile;
   if (!p) {
     const canCreate = upAllowed('feat_create_profile');
-    const _oc = canCreate ? 'openCreate()' : 'alert("Contact admin to create a profile.")';
+    const _oc = 'openCreate()';
     const tabBtn = (label, icon) =>
       '<button onclick="' + _oc + '" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:20px;border:1px solid #d1d5db;background:#fff;font-size:13px;font-weight:500;color:#374151;cursor:pointer">'
       + icon + label + '</button>';
