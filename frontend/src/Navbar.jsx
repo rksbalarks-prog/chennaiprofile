@@ -478,10 +478,10 @@ export default function Navbar() {
           <span className="bottom-nav-fab-label">Register</span>
         </a>
 
-        <button className={`bottom-nav-item`} onClick={() => setMenuOpen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+        <a href={USER_PANEL_URL} className="bottom-nav-item">
           <div className="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></div>
           <span className="bottom-nav-label">More</span>
-        </button>
+        </a>
       </nav>
 
       <div className="bottom-spacer" />
