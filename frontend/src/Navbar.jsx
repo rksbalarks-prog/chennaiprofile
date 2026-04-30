@@ -402,6 +402,10 @@ export default function Navbar() {
             {i18n.language === 'en' ? 'தமிழ்' : 'EN'}
           </button>
 
+          <Link to="/search" aria-label="Search" style={{ display:'flex', alignItems:'center', justifyContent:'center', width:36, height:36, borderRadius:8, color:'#333', textDecoration:'none' }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </Link>
+
           <button className="hamburger-btn" onClick={() => setMenuOpen(true)}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
           </button>
@@ -464,19 +468,14 @@ export default function Navbar() {
           <span className="bottom-nav-label">Home</span>
         </Link>
 
-        <Link to="/search" className={`bottom-nav-item ${isActive('/search') ? 'active' : ''}`}>
-          <div className="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
-          <span className="bottom-nav-label">Search</span>
-        </Link>
+        <a href={USER_PANEL_URL} className="bottom-nav-item">
+          <div className="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <span className="bottom-nav-label">My Profile</span>
+        </a>
 
         <a href={`${USER_PANEL_URL}?create=1`} className="bottom-nav-fab">
           <div className="bottom-nav-fab-circle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
           <span className="bottom-nav-fab-label">Register</span>
-        </a>
-
-        <a href={USER_PANEL_URL} className="bottom-nav-item">
-          <div className="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-          <span className="bottom-nav-label">My Profile</span>
         </a>
 
         <button className={`bottom-nav-item`} onClick={() => setMenuOpen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
