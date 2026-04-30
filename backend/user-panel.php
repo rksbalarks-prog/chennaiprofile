@@ -2880,7 +2880,7 @@ async function renderUserProfileViewLog() {
       ? emp(4, 'No profiles viewed yet')
       : pv.map((v, i) => `<tr>
           <td style="color:var(--ink4)">${i+1}</td>
-          <td><code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-size:11.5px">${esc(v.target_cp_id)}</code></td>
+          <td><a href="/detail/${esc(v.target_cp_id)}" target="_blank" rel="noopener" style="text-decoration:none"><code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-size:11.5px;color:#1d4ed8;cursor:pointer">${esc(v.target_cp_id)}</code></a></td>
           <td style="font-size:12px">${esc(v.target_name || '-')}</td>
           <td style="font-size:11.5px">${esc(v.datetime)}</td>
         </tr>`).join('');
@@ -2913,7 +2913,7 @@ async function renderUserContactLog() {
       ? emp(4, 'No contacts viewed yet')
       : cv.map((v, i) => `<tr>
           <td style="color:var(--ink4)">${i+1}</td>
-          <td><code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-size:11.5px">${esc(v.target_cp_id)}</code></td>
+          <td><a href="/detail/${esc(v.target_cp_id)}" target="_blank" rel="noopener" style="text-decoration:none"><code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-size:11.5px;color:#1d4ed8;cursor:pointer">${esc(v.target_cp_id)}</code></a></td>
           <td style="font-size:12px">${esc(v.target_name || '-')}</td>
           <td style="font-size:11.5px">${esc(v.datetime)}</td>
         </tr>`).join('');
