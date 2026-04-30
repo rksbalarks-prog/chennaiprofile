@@ -594,8 +594,8 @@ input,select,textarea{outline:none}
         <div id="mutualMatchesContent" style="display:flex;flex-direction:column;gap:10px"></div>
       </div>
       <div class="u-section" id="allProfilesSection">
-        <!-- Embeds the public homepage (filter tabs + cards + search) in headerless mode -->
-        <iframe id="allProfilesFrame" src="about:blank" title="Browse profiles" style="width:100%;height:calc(100vh - 130px);min-height:520px;border:1px solid var(--border);border-radius:12px;background:#fff;display:block"></iframe>
+        <div id="allProfilesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px"></div>
+        <div id="allProfilesMore" style="text-align:center;margin-top:14px"></div>
       </div>
       <div class="u-section" id="myBillsSection">
         <div class="stats-row" id="billStats"></div>
@@ -2006,7 +2006,7 @@ function renderMyProfile() {
       + activeTabBtn('All', '&#128101; ')
       + tabBtn('Female', '&#128100; ')
       + tabBtn('Male', '&#128100; ')
-      + (canCreate ? '<button onclick="' + _oc + '" style="margin-left:auto;display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:20px;border:2px solid var(--primary,#7f1d1d);background:#fff;color:var(--primary,#7f1d1d);font-size:13px;font-weight:600;cursor:pointer">+ Add Profile</button>' : '')
+      + '<button onclick="' + _oc + '" style="margin-left:auto;display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:20px;border:2px solid var(--primary,#7f1d1d);background:#fff;color:var(--primary,#7f1d1d);font-size:13px;font-weight:600;cursor:pointer">+ Add Profile</button>'
       + '</div>'
       // search bar (decorative, click → create)
       + '<div style="padding:10px 14px;border-bottom:1px solid #f3f4f6" onclick="' + _oc + '">'
@@ -2022,12 +2022,12 @@ function renderMyProfile() {
       // placeholder cards with CTA overlay
       + '<div style="position:relative;padding:14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">'
       + dummyCard + dummyCard + dummyCard + dummyCard
-      + '<div style="position:absolute;inset:0;background:rgba(255,255,255,0.82);backdrop-filter:blur(2px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;border-radius:0 0 12px 12px;cursor:pointer" onclick="' + _oc + '">'
+      + '<div style="position:absolute;inset:0;background:rgba(255,255,255,0.82);backdrop-filter:blur(2px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;border-radius:0 0 12px 12px">'
       + '<div style="font-size:38px">&#128100;</div>'
-      + (canCreate
-        ? '<div style="font-weight:700;font-size:15px;color:#111827">Create your profile to get started</div>'
-          + '<button onclick="' + _oc + '" style="background:var(--primary,#7f1d1d);color:#fff;border:none;padding:12px 32px;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer">+ Create Profile</button>'
-        : '<div style="font-weight:600;font-size:14px;color:#374151">Contact admin to create a profile</div>')
+      + '<div style="font-weight:700;font-size:15px;color:#111827;text-align:center">'
+      + (canCreate ? 'Create your profile to get started' : 'Want to create a profile?') + '</div>'
+      + '<button onclick="' + _oc + '" style="background:var(--primary,#7f1d1d);color:#fff;border:none;padding:12px 32px;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer">+ Create Profile</button>'
+      + (!canCreate ? '<div style="font-size:12px;color:#6b7280;text-align:center">Admin will set up your profile</div>' : '')
       + '</div></div>'
       + '</div>';
     return;
@@ -2825,21 +2825,49 @@ async function renderMatches(mode) {
 
 // ===== ALL PROFILES (opposite-gender browse) =====
 let apData = [];
+let apLoaded = false;
 
-// All Profiles section now embeds the public homepage (filter tabs + search +
-// card feed) inside an iframe with ?embed=1 so the inner Navbar/bottom-nav hide.
-// Lazy-loaded: the iframe src is set only on first visit so the panel's cold
-// start stays fast.
-function renderAllProfiles() {
-  const frame = document.getElementById('allProfilesFrame');
-  if (!frame) return;
-  if (!frame.src || frame.src === 'about:blank' || frame.src.endsWith('about:blank')) {
-    frame.src = '/?embed=1';
+async function renderAllProfiles() {
+  if (apLoaded) return;
+  apLoaded = true;
+  const grid = document.getElementById('allProfilesGrid');
+  const more = document.getElementById('allProfilesMore');
+  if (!grid) return;
+  grid.innerHTML = '<div style="padding:24px;text-align:center;color:var(--ink3);grid-column:1/-1">Loading profiles…</div>';
+  try {
+    const resp = await fetch('api/public.php?action=bootstrap&limit=24', { credentials:'same-origin' });
+    const data = await resp.json();
+    const profiles = [...(data.female || []), ...(data.male || [])];
+    if (!profiles.length) { grid.innerHTML = '<div style="padding:24px;text-align:center;color:var(--ink3);grid-column:1/-1">No profiles found.</div>'; return; }
+    const photoBase = 'api/uploads/';
+    const card = (p) => {
+      const src = p.photo1 && !p.photo1.startsWith('default_')
+        ? (p.photo1.startsWith('uploads/') ? 'api/' + p.photo1 : photoBase + p.photo1) : '';
+      const imgHtml = src
+        ? `<img src="${src}" style="width:60px;height:72px;object-fit:cover;border-radius:8px;flex-shrink:0" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+        : '';
+      const fallback = `<div style="${src?'display:none;':'display:flex;'}width:60px;height:72px;border-radius:8px;background:#f3f4f6;align-items:center;justify-content:center;font-size:22px;color:#9ca3af;font-weight:700;flex-shrink:0">${esc((p.name||'?').charAt(0))}</div>`;
+      return `<div style="display:flex;gap:12px;align-items:center;padding:12px;background:#fff;border-radius:10px;border:1px solid #e5e7eb;cursor:pointer"
+        onclick="window.open('/detail/${esc(p.cp_id)}','_blank')"
+        onmouseover="this.style.boxShadow='0 4px 12px rgba(139,0,0,0.1)';this.style.borderColor='#c4b5a0'"
+        onmouseout="this.style.boxShadow='none';this.style.borderColor='#e5e7eb'">
+        ${imgHtml}${fallback}
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:13px;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.name)}</div>
+          <div style="font-size:11px;color:#8B0000;font-weight:600;margin:1px 0">${esc(p.cp_id)}</div>
+          <div style="font-size:11px;color:var(--ink3)">${[p.age?p.age+' yrs':'',p.caste,p.marital].filter(Boolean).join(' · ')}</div>
+          <div style="font-size:10.5px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc([p.qualification,p.job].filter(Boolean).join(' · '))}</div>
+        </div>
+      </div>`;
+    };
+    grid.innerHTML = profiles.map(card).join('');
+    if (more) more.innerHTML = `<a href="/" target="_blank" style="font-size:13px;color:#8B0000;font-weight:600;text-decoration:none">View all profiles on home page →</a>`;
+  } catch(e) {
+    grid.innerHTML = '<div style="padding:24px;text-align:center;color:var(--ink3);grid-column:1/-1">Could not load profiles.</div>';
   }
 }
 
-// Legacy hooks (search/sort widgets were removed) — kept as no-ops so any stale
-// inline onchange/oninput references don't throw at runtime.
+// Legacy hooks — kept as no-ops so stale inline references don't throw.
 function renderAllProfilesUI() {}
 
 async function tagProfile(cpId, tag) {
