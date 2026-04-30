@@ -1975,16 +1975,61 @@ function renderMyProfile() {
   const sec = document.getElementById('myProfileSection');
   const p = profile;
   if (!p) {
-    // No profile yet — embed the public homepage so the user can browse all
-    // profiles in place while they decide. The "Create New Profile" + "Go Home"
-    // actions live in the topbar (set by setActions) so they stay visible.
     const canCreate = upAllowed('feat_create_profile');
-    sec.innerHTML = '<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;font-size:13px;color:#92400e;flex-wrap:wrap">'
+    const _oc = canCreate ? 'openCreate()' : 'alert("Contact admin to create a profile.")';
+    const tabBtn = (label, icon) =>
+      '<button onclick="' + _oc + '" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:20px;border:1px solid #d1d5db;background:#fff;font-size:13px;font-weight:500;color:#374151;cursor:pointer">'
+      + icon + label + '</button>';
+    const activeTabBtn = (label, icon) =>
+      '<button onclick="' + _oc + '" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:20px;border:none;background:var(--primary,#7f1d1d);color:#fff;font-size:13px;font-weight:600;cursor:pointer">'
+      + icon + label + '</button>';
+    const filterBtn = (label, icon) =>
+      '<button onclick="' + _oc + '" style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:16px;border:1px solid #d1d5db;background:#fff;font-size:12px;color:#374151;cursor:pointer">'
+      + icon + label + '</button>';
+    const activeFilterBtn = (label, icon) =>
+      '<button onclick="' + _oc + '" style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:16px;border:none;background:var(--primary,#7f1d1d);color:#fff;font-size:12px;font-weight:600;cursor:pointer">'
+      + icon + label + '</button>';
+    const dummyCard = '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:14px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="' + _oc + '">'
+      + '<div style="width:60px;height:72px;border-radius:8px;background:#f3f4f6;flex-shrink:0"></div>'
+      + '<div style="flex:1"><div style="height:12px;background:#e5e7eb;border-radius:6px;width:60%;margin-bottom:8px"></div>'
+      + '<div style="height:10px;background:#f3f4f6;border-radius:6px;width:80%;margin-bottom:6px"></div>'
+      + '<div style="height:10px;background:#f3f4f6;border-radius:6px;width:50%"></div></div></div>';
+    sec.innerHTML =
+      '<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;font-size:13px;color:#92400e;flex-wrap:wrap">'
       + '<span style="font-size:16px">&#128100;</span>'
-      + '<div style="flex:1;min-width:180px">No profile linked to <strong>' + esc(mob) + '</strong>. Browse profiles below, then '
-      + (canCreate ? 'click <strong>+ Create New Profile</strong> (top right) when ready.' : 'contact admin to create one.')
+      + '<div style="flex:1;min-width:180px">No profile linked to <strong>' + esc(mob) + '</strong>. '
+      + (canCreate ? 'Click any button below to <strong>create your profile</strong>.' : 'Contact admin to create one.')
       + '</div></div>'
-      + '<iframe src="/?embed=1" title="Browse profiles" style="width:100%;height:calc(100vh - 170px);min-height:520px;border:1px solid var(--border);border-radius:12px;background:#fff;display:block"></iframe>';
+      + '<div style="border:1px solid var(--border,#e5e7eb);border-radius:12px;background:#fff;overflow:hidden">'
+      // tab row
+      + '<div style="padding:12px 14px;border-bottom:1px solid #f3f4f6;display:flex;gap:8px;flex-wrap:wrap;align-items:center">'
+      + activeTabBtn('All', '&#128101; ')
+      + tabBtn('Female', '&#128100; ')
+      + tabBtn('Male', '&#128100; ')
+      + (canCreate ? '<button onclick="' + _oc + '" style="margin-left:auto;display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:20px;border:2px solid var(--primary,#7f1d1d);background:#fff;color:var(--primary,#7f1d1d);font-size:13px;font-weight:600;cursor:pointer">+ Add Profile</button>' : '')
+      + '</div>'
+      // search bar (decorative, click → create)
+      + '<div style="padding:10px 14px;border-bottom:1px solid #f3f4f6" onclick="' + _oc + '">'
+      + '<div style="display:flex;align-items:center;gap:8px;border:1px solid #d1d5db;border-radius:8px;padding:7px 12px;cursor:pointer;color:#9ca3af;font-size:13px">'
+      + '<span>&#128269;</span> Search by name or profile ID...</div></div>'
+      // filter pills
+      + '<div style="padding:10px 14px;border-bottom:1px solid #f3f4f6;display:flex;gap:8px;flex-wrap:wrap">'
+      + activeFilterBtn('Recent', '&#128197; ')
+      + filterBtn('Random', '&#127922; ')
+      + filterBtn('Photos', '&#128247; ')
+      + filterBtn('Not Viewed', '&#10024; ')
+      + '</div>'
+      // placeholder cards with CTA overlay
+      + '<div style="position:relative;padding:14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">'
+      + dummyCard + dummyCard + dummyCard + dummyCard
+      + '<div style="position:absolute;inset:0;background:rgba(255,255,255,0.82);backdrop-filter:blur(2px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;border-radius:0 0 12px 12px;cursor:pointer" onclick="' + _oc + '">'
+      + '<div style="font-size:38px">&#128100;</div>'
+      + (canCreate
+        ? '<div style="font-weight:700;font-size:15px;color:#111827">Create your profile to get started</div>'
+          + '<button onclick="' + _oc + '" style="background:var(--primary,#7f1d1d);color:#fff;border:none;padding:12px 32px;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer">+ Create Profile</button>'
+        : '<div style="font-weight:600;font-size:14px;color:#374151">Contact admin to create a profile</div>')
+      + '</div></div>'
+      + '</div>';
     return;
   }
   const sb = p.status === 'Approved' ? '<span class="badge badge-green">Approved</span>' : '<span class="badge badge-amber">Pending</span>';
