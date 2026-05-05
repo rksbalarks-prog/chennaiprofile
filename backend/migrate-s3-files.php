@@ -21,13 +21,13 @@ $photoColumns = ['photo1', 'photo2', 'photo3', 'rasi_photo', 'amsam_photo'];
 $mimeMap = ['jpg'=>'image/jpeg','jpeg'=>'image/jpeg','png'=>'image/png',
             'gif'=>'image/gif','webp'=>'image/webp'];
 
-// Only scan original files (skip .thumb.webp and full .webp variants)
+// Scan originals (.jpg/.png/.gif) AND full-size .webp (skip .thumb.webp)
 $files = glob($uploadDir . '*') ?: [];
 $originals = array_filter($files, function($f) {
     $base = basename($f);
     if (str_ends_with($base, '.thumb.webp')) return false;
     $ext = strtolower(pathinfo($base, PATHINFO_EXTENSION));
-    return in_array($ext, ['jpg','jpeg','png','gif']);
+    return in_array($ext, ['jpg','jpeg','png','gif','webp']);
 });
 
 echo "Found " . count($originals) . " original images to process.\n\n";
@@ -52,11 +52,17 @@ foreach ($originals as $absPath) {
         continue;
     }
 
-    // Upload WebP variants if they exist
-    $fullWebp  = $uploadDir . $stem . '.webp';
-    $thumbWebp = $uploadDir . $stem . '.thumb.webp';
-    if (is_file($fullWebp))  s3_put($fullWebp,  'photos/' . $stem . '.webp',       'image/webp');
-    if (is_file($thumbWebp)) s3_put($thumbWebp, 'photos/' . $stem . '.thumb.webp', 'image/webp');
+    // Upload WebP variants if they exist (skip if source is already .webp — already uploaded above)
+    if ($ext !== 'webp') {
+        $fullWebp  = $uploadDir . $stem . '.webp';
+        $thumbWebp = $uploadDir . $stem . '.thumb.webp';
+        if (is_file($fullWebp))  s3_put($fullWebp,  'photos/' . $stem . '.webp',       'image/webp');
+        if (is_file($thumbWebp)) s3_put($thumbWebp, 'photos/' . $stem . '.thumb.webp', 'image/webp');
+    } else {
+        // Source is full-size .webp — also upload the thumbnail variant
+        $thumbWebp = $uploadDir . $stem . '.thumb.webp';
+        if (is_file($thumbWebp)) s3_put($thumbWebp, 'photos/' . $stem . '.thumb.webp', 'image/webp');
+    }
 
     $uploaded++;
     echo "OK: {$filename} → {$s3Url}\n";
