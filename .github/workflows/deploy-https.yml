@@ -44,12 +44,19 @@ jobs:
         run: npm run build
 
       - name: Assemble deploy payload
+        env:
+          PROD_DB_HOST: ${{ secrets.PROD_DB_HOST }}
+          PROD_DB_USER: ${{ secrets.PROD_DB_USER }}
+          PROD_DB_PASS: ${{ secrets.PROD_DB_PASS }}
+          PROD_DB_NAME: ${{ secrets.PROD_DB_NAME }}
+          PROD_AWS_KEY: ${{ secrets.AWS_KEY }}
+          PROD_AWS_SECRET: ${{ secrets.AWS_SECRET }}
         run: |
           set -euo pipefail
           mkdir -p payload/backend
           # Frontend build output → site root
           cp -r frontend/dist/. payload/
-          # Backend source, excluding secrets, uploads, and logs
+          # Backend source, excluding sensitive/runtime files
           rsync -a \
             --exclude='config.php' \
             --exclude='config.production.php' \
@@ -59,6 +66,22 @@ jobs:
             --exclude='api/uploads/' \
             --exclude='logs/' \
             backend/ payload/backend/
+          # Generate config.php from GitHub Secrets
+          cat > payload/backend/config.php << PHPEOF
+<?php
+define('DB_HOST', '${PROD_DB_HOST}');
+define('DB_USER', '${PROD_DB_USER}');
+define('DB_PASS', '${PROD_DB_PASS}');
+define('DB_NAME', '${PROD_DB_NAME}');
+define('S3_ENABLED', true);
+define('S3_BUCKET',  'chennaiprofile-media');
+define('S3_REGION',  'ap-south-1');
+define('AWS_KEY',    '${PROD_AWS_KEY}');
+define('AWS_SECRET', '${PROD_AWS_SECRET}');
+define('S3_CDN_URL', '');
+PHPEOF
+          # Append the rest of config.php (helpers, cache, logging, etc.)
+          tail -n +9 backend/config.php >> payload/backend/config.php || true
           # frontend/API (PHP helpers referenced by the app), excluding its db.php
           if [ -d frontend/API ]; then
             mkdir -p payload/frontend/API

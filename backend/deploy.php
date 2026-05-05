@@ -107,7 +107,6 @@ if ($zip->open($tmpZip) !== true) {
 
 // Paths (relative to siteRoot) that must NEVER be overwritten.
 $protected = [
-    'backend/config.php',
     'backend/config.production.php',
     'backend/sms.php',
     'backend/payu-config.php',
