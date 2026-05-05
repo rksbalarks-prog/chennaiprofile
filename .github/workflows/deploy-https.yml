@@ -67,21 +67,20 @@ jobs:
             --exclude='logs/' \
             backend/ payload/backend/
           # Generate config.php from GitHub Secrets
-          cat > payload/backend/config.php << PHPEOF
-<?php
-define('DB_HOST', '${PROD_DB_HOST}');
-define('DB_USER', '${PROD_DB_USER}');
-define('DB_PASS', '${PROD_DB_PASS}');
-define('DB_NAME', '${PROD_DB_NAME}');
-define('S3_ENABLED', true);
-define('S3_BUCKET',  'chennaiprofile-media');
-define('S3_REGION',  'ap-south-1');
-define('AWS_KEY',    '${PROD_AWS_KEY}');
-define('AWS_SECRET', '${PROD_AWS_SECRET}');
-define('S3_CDN_URL', '');
-PHPEOF
-          # Append the rest of config.php (helpers, cache, logging, etc.)
-          tail -n +9 backend/config.php >> payload/backend/config.php || true
+          {
+            printf '<?php\n'
+            printf "define('DB_HOST', '%s');\n"    "$PROD_DB_HOST"
+            printf "define('DB_USER', '%s');\n"    "$PROD_DB_USER"
+            printf "define('DB_PASS', '%s');\n"    "$PROD_DB_PASS"
+            printf "define('DB_NAME', '%s');\n"    "$PROD_DB_NAME"
+            printf "define('S3_ENABLED', true);\n"
+            printf "define('S3_BUCKET',  'chennaiprofile-media');\n"
+            printf "define('S3_REGION',  'ap-south-1');\n"
+            printf "define('AWS_KEY',    '%s');\n" "$PROD_AWS_KEY"
+            printf "define('AWS_SECRET', '%s');\n" "$PROD_AWS_SECRET"
+            printf "define('S3_CDN_URL', '');\n"
+            printf "require_once __DIR__ . '/config-helpers.php';\n"
+          } > payload/backend/config.php
           # frontend/API (PHP helpers referenced by the app), excluding its db.php
           if [ -d frontend/API ]; then
             mkdir -p payload/frontend/API
