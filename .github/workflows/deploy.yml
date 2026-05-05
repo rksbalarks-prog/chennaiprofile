@@ -12,21 +12,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install lftp
+        run: sudo apt-get install -y lftp
+
       - name: Deploy via SFTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: host4.hosteasy.in
-          port: 22
-          protocol: sftp
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /public_html/
-          local-dir: ./
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            **/.github/**
-            **/README*
-            **/.env*
-            **/backend/logs/**
+        env:
+          FTP_HOST: host4.hosteasy.in
+          FTP_USER: ${{ secrets.FTP_USERNAME }}
+          FTP_PASS: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          lftp -c "
+            set sftp:auto-confirm yes;
+            set net:max-retries 3;
+            set net:reconnect-interval-base 5;
+            open -u \"$FTP_USER\",\"$FTP_PASS\" sftp://$FTP_HOST:2222;
+            mirror -R \
+              --exclude=^\.git/ \
+              --exclude=^\.github/ \
+              --exclude=^node_modules/ \
+              --exclude=^backend/logs/ \
+              --exclude=^backend/logs/.last_prune \
+              --parallel=4 \
+              --verbose \
+              ./ /public_html/;
+            bye;
+          "
