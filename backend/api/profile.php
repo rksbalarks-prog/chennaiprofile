@@ -277,8 +277,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $fname = uniqid() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '', basename($f['name']));
                     if (move_uploaded_file($f['tmp_name'], $uploadDir . $fname)) {
                         @generate_webp_variants($uploadDir . $fname);
+                        require_once __DIR__ . '/s3.php';
+                        $storedPath = s3_upload_photo($uploadDir . $fname) ?? 'uploads/' . $fname;
                         $db->prepare("UPDATE profiles SET `{$column}` = :p WHERE mobile = :m")
-                           ->execute([':p' => 'uploads/' . $fname, ':m' => $mobile]);
+                           ->execute([':p' => $storedPath, ':m' => $mobile]);
                     }
                 }
             }

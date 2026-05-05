@@ -113,7 +113,9 @@ function kfm_gate_snapshot(): array {
         'anon_window_start' => (int)($_SESSION['anon_window_start'] ?? 0),
         // Will the *next* contact_view on a brand-new profile be gated?
         'gate_required'     => !$verified && (kfm_is_returning() || $used >= $cfg['views']),
-    ];
+
+
+        ];
 }
 
 // ── GET: Check mobile duplicate ─────────────────────────────────────────────
@@ -1068,9 +1070,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!in_array($ext, $allowedExts) || $file['size'] > $maxSize) return null;
         $filename = uniqid() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '', basename($file['name']));
         if (move_uploaded_file($file['tmp_name'], $uploadDir . $filename)) {
-            // Generate WebP full + thumbnail alongside the original
             @generate_webp_variants($uploadDir . $filename);
-            return 'uploads/' . $filename;
+            require_once __DIR__ . '/s3.php';
+            return s3_upload_photo($uploadDir . $filename) ?? 'uploads/' . $filename;
         }
         return null;
     };
