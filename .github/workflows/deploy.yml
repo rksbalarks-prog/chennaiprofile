@@ -25,7 +25,7 @@ jobs:
             set sftp:auto-confirm yes;
             set net:max-retries 3;
             set net:reconnect-interval-base 5;
-            open -u \"$FTP_USER\",\"$FTP_PASS\" sftp://$FTP_HOST:2222;
+            open -u \"$FTP_USER\",\"$FTP_PASS\" sftp://$FTP_HOST:22;
             mirror -R \
               --exclude=^\.git/ \
               --exclude=^\.github/ \
