@@ -25,10 +25,18 @@ switch ($action) {
             pushAdminLog('Failed Login', 'Unknown: ' . $username, 'login');
             json_err('Invalid username or account inactive.');
         }
-        if (!password_verify($password, $admin['password'])) {
-            $newHash = password_hash($password, PASSWORD_DEFAULT);
-            $db->prepare("UPDATE admins SET password = :p, plain_password = :pp WHERE id = :id")
-               ->execute([':p' => $newHash, ':pp' => $password, ':id' => $admin['id']]);
+        $hashOk = password_verify($password, $admin['password']);
+        if (!$hashOk) {
+            // Fallback: plain-text comparison for accounts not yet upgraded to bcrypt
+            if ($password !== $admin['password']) {
+                pushAdminLog('Failed Login', 'Bad password: ' . $username, 'login');
+                json_err('Invalid username or password.');
+            }
+            // Plain-text matched — silently upgrade to bcrypt
+            try {
+                $db->prepare("UPDATE admins SET password = :p WHERE id = :id")
+                   ->execute([':p' => password_hash($password, PASSWORD_DEFAULT), ':id' => $admin['id']]);
+            } catch (Throwable $e) { /* column/permission issue — non-fatal */ }
         }
 
         // Generate OTP and send to admin's mobile
