@@ -97,11 +97,12 @@ echo "  Errors   : {$errors}\n";
 
 if ($done) {
     echo "\n✓ ALL FILES PROCESSED. DELETE this script from the server.\n";
+    echo '</pre>';
 } else {
     $remaining = $total - $nextOffset;
     $url = '?offset=' . $nextOffset;
-    echo "\n{$remaining} files remaining.\n";
-    echo '</pre><a href="' . htmlspecialchars($url) . '" style="display:inline-block;margin:16px;padding:10px 24px;background:#8B0000;color:#fff;font-size:15px;font-weight:700;text-decoration:none;border-radius:6px">Next batch →</a><pre>';
+    echo "\n{$remaining} files remaining — auto-advancing in 2 seconds...\n";
+    echo '</pre>';
+    echo '<meta http-equiv="refresh" content="2;url=' . htmlspecialchars($url) . '">';
+    echo '<p style="font-family:monospace;padding:0 16px">Batch ' . ($offset/$batchSize + 1) . ' of ' . ceil($total/$batchSize) . ' done. &nbsp; <a href="' . htmlspecialchars($url) . '" style="color:#8B0000;font-weight:700">Click here if not redirected</a></p>';
 }
-
-echo '</pre>';
