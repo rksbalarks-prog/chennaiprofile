@@ -254,9 +254,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                    ->execute([':n' => str_clean($b['name'], 150), ':m' => $mobile]);
             }
 
-            // Multipart uploads — save profile photos / horoscope charts if provided
+            // Multipart uploads — temp file → WebP → S3, no local storage kept
             if ($isMultipart && !empty($_FILES)) {
                 require_once __DIR__ . '/image-utils.php';
+                require_once __DIR__ . '/s3.php';
                 $uploadDir = __DIR__ . '/uploads/';
                 if (!is_dir($uploadDir)) @mkdir($uploadDir, 0755, true);
                 $allowedExts = ['jpg','jpeg','png','gif','webp'];
@@ -268,6 +269,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'rasiPhoto'  => 'rasi_photo',
                     'amsamPhoto' => 'amsam_photo',
                 ];
+                $curStmt = $db->prepare("SELECT photo1, photo2, photo3, rasi_photo, amsam_photo FROM profiles WHERE mobile = :m LIMIT 1");
+                $curStmt->execute([':m' => $mobile]);
+                $curPhotos = $curStmt->fetch() ?: [];
                 foreach ($fileMap as $field => $column) {
                     if (!isset($_FILES[$field]) || $_FILES[$field]['error'] !== UPLOAD_ERR_OK) continue;
                     $f = $_FILES[$field];
@@ -275,13 +279,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $ext = strtolower(pathinfo($f['name'], PATHINFO_EXTENSION));
                     if (!in_array($ext, $allowedExts, true)) continue;
                     $fname = uniqid() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '', basename($f['name']));
-                    if (move_uploaded_file($f['tmp_name'], $uploadDir . $fname)) {
-                        @generate_webp_variants($uploadDir . $fname);
-                        require_once __DIR__ . '/s3.php';
-                        $storedPath = s3_upload_photo($uploadDir . $fname) ?? 'uploads/' . $fname;
-                        $db->prepare("UPDATE profiles SET `{$column}` = :p WHERE mobile = :m")
-                           ->execute([':p' => $storedPath, ':m' => $mobile]);
-                    }
+                    if (!move_uploaded_file($f['tmp_name'], $uploadDir . $fname)) continue;
+                    generate_webp_variants($uploadDir . $fname);
+                    $s3Url = s3_upload_photo($uploadDir . $fname);
+                    if (!$s3Url) { @unlink($uploadDir . $fname); continue; }
+                    s3_delete_photo($curPhotos[$column] ?? '');
+                    $db->prepare("UPDATE profiles SET `{$column}` = :p WHERE mobile = :m")
+                       ->execute([':p' => $s3Url, ':m' => $mobile]);
                 }
             }
 
@@ -319,6 +323,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             json_ok(['msg' => 'Profile deleted. You can register a new profile and pay again whenever you like.']);
+        }
+
+        // ── delete_photo ─────────────────────────────────────────────────────
+        case 'delete_photo': {
+            $column  = str_clean($b['column'] ?? '', 20);
+            $allowed = ['photo1', 'photo2', 'photo3', 'rasi_photo', 'amsam_photo'];
+            if (!in_array($column, $allowed, true)) json_err('Invalid column.');
+            require_once __DIR__ . '/s3.php';
+            $stmt = $db->prepare("SELECT `{$column}` FROM profiles WHERE mobile = :m LIMIT 1");
+            $stmt->execute([':m' => $mobile]);
+            $row = $stmt->fetch();
+            if (!$row) json_err('Profile not found.', 404);
+            s3_delete_photo($row[$column] ?? '');
+            $db->prepare("UPDATE profiles SET `{$column}` = NULL WHERE mobile = :m")
+               ->execute([':m' => $mobile]);
+            $profile = fetchProfile($db, $mobile);
+            json_ok(['profile' => $profile, 'msg' => 'Photo deleted.']);
         }
 
         default:

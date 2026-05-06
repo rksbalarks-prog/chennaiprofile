@@ -100,19 +100,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $stmt->execute($params);
     $rows = $stmt->fetchAll();
 
-    $uploadsDir = __DIR__ . '/../uploads/';
-    // Minimal post-processing: photo-presence flag only (no md5 hashing on list view).
     foreach ($rows as &$r) {
         $r['age'] = $r['age'] !== null ? (int)$r['age'] : null;
         $r['has_photo'] = false;
         foreach (['photo1','photo2','photo3'] as $ph) {
             $val = trim($r[$ph] ?? '');
-            if ($val && strpos($val, 'default_') !== 0) {
-                $filePath = strpos($val, 'uploads/') === 0
-                    ? __DIR__ . '/../' . $val
-                    : $uploadsDir . basename($val);
-                if (file_exists($filePath)) { $r['has_photo'] = true; break; }
-            }
+            if ($val && strpos($val, 'default_') !== 0) { $r['has_photo'] = true; break; }
         }
     }
     unset($r);
@@ -122,10 +115,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // for the audit flow but no longer on the hot path.
     $dupCpIds = [];
     if ($detectDupes) {
+        $uploadsDir = __DIR__ . '/../uploads/';
         $sizeMap = [];
         foreach ($rows as $r) {
             $val = trim($r['photo1'] ?? '');
             if (!$val || strpos($val, 'default_') === 0) continue;
+            if (strpos($val, 'http') === 0) continue; // S3 URL — skip local check
             $filePath = strpos($val, 'uploads/') === 0 ? __DIR__ . '/../' . $val : $uploadsDir . basename($val);
             if (!file_exists($filePath)) continue;
             $sizeMap[filesize($filePath)][] = ['cp_id' => $r['cp_id'], 'path' => $filePath];
@@ -224,12 +219,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $cpId = str_clean($b['cp_id'] ?? '', 20);
             if (!$cpId) json_err('cp_id required.');
 
-            // ── Handle photo uploads (multipart) ──────────────────────────
+            // Fetch existing record first (needed for old photo URLs and history)
+            $oldStmt = $db->prepare("SELECT * FROM profiles WHERE cp_id = :c LIMIT 1");
+            $oldStmt->execute([':c' => $cpId]);
+            $oldData = $oldStmt->fetch() ?: [];
+
+            // ── Handle photo uploads — temp file → WebP → S3, no local storage ──
             $uploadDir = __DIR__ . '/../uploads/';
             if (!is_dir($uploadDir)) @mkdir($uploadDir, 0755, true);
             $allowedExts = ['jpg','jpeg','png','webp','gif'];
             $maxSize = 5 * 1024 * 1024;
             require_once __DIR__ . '/../image-utils.php';
+            require_once __DIR__ . '/../s3.php';
             $uploadFile = function($key) use ($uploadDir, $allowedExts, $maxSize) {
                 if (!isset($_FILES[$key]) || $_FILES[$key]['error'] !== UPLOAD_ERR_OK) return null;
                 $file = $_FILES[$key];
@@ -237,17 +238,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
                 if (!in_array($ext, $allowedExts)) return null;
                 $filename = uniqid() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '', basename($file['name']));
-                if (move_uploaded_file($file['tmp_name'], $uploadDir . $filename)) {
-                    @generate_webp_variants($uploadDir . $filename);
-                    return 'uploads/' . $filename;
-                }
-                return null;
+                if (!move_uploaded_file($file['tmp_name'], $uploadDir . $filename)) return null;
+                generate_webp_variants($uploadDir . $filename);
+                $s3Url = s3_upload_photo($uploadDir . $filename);
+                if (!$s3Url) { @unlink($uploadDir . $filename); return null; }
+                return $s3Url;
             };
-            if ($p1 = $uploadFile('photo1'))     $b['photo1']      = $p1;
-            if ($p2 = $uploadFile('photo2'))     $b['photo2']      = $p2;
-            if ($p3 = $uploadFile('photo3'))     $b['photo3']      = $p3;
-            if ($rp = $uploadFile('rasiPhoto'))  $b['rasi_photo']  = $rp;
-            if ($ap = $uploadFile('amsamPhoto')) $b['amsam_photo'] = $ap;
+            $photoMap = ['photo1'=>'photo1','photo2'=>'photo2','photo3'=>'photo3',
+                         'rasiPhoto'=>'rasi_photo','amsamPhoto'=>'amsam_photo'];
+            foreach ($photoMap as $fileKey => $colKey) {
+                $newUrl = $uploadFile($fileKey);
+                if ($newUrl) {
+                    s3_delete_photo($oldData[$colKey] ?? '');
+                    $b[$colKey] = $newUrl;
+                }
+            }
 
             $sets = []; $params = [':cpid' => $cpId];
             $allowed = ['name','age','gender','dob','birth_hour','birth_min','birth_ampm',
@@ -272,12 +277,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
             if (empty($sets)) json_err('No fields to update.');
-            // Fetch old data for history
-            $oldStmt = $db->prepare("SELECT * FROM profiles WHERE cp_id = :c LIMIT 1");
-            $oldStmt->execute([':c' => $cpId]);
-            $oldData = $oldStmt->fetch() ?: [];
             $db->prepare("UPDATE profiles SET ".implode(',',$sets)." WHERE cp_id = :cpid")->execute($params);
-            // Record field changes
             foreach ($allowed as $f) {
                 if (array_key_exists($f, $b)) {
                     $ov = $oldData[$f] ?? '';
@@ -348,6 +348,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                ->execute([':c'=>$cpId]);
             pushAdminLog('Expired Profile', $p['name'].' - '.$reason, 'expired', $admin);
             json_ok(['msg' => 'Profile expired.']);
+        }
+
+        case 'delete_photo': {
+            $cpId    = str_clean($b['cp_id'] ?? '', 20);
+            $column  = str_clean($b['column'] ?? '', 20);
+            $allowed = ['photo1', 'photo2', 'photo3', 'rasi_photo', 'amsam_photo'];
+            if (!$cpId || !in_array($column, $allowed, true)) json_err('Invalid request.');
+            require_once __DIR__ . '/../s3.php';
+            $stmt = $db->prepare("SELECT `{$column}` FROM profiles WHERE cp_id = :c LIMIT 1");
+            $stmt->execute([':c' => $cpId]);
+            $row = $stmt->fetch();
+            if (!$row) json_err('Profile not found.', 404);
+            s3_delete_photo($row[$column] ?? '');
+            $db->prepare("UPDATE profiles SET `{$column}` = NULL WHERE cp_id = :c")
+               ->execute([':c' => $cpId]);
+            pushAdminLog('Deleted Photo', "{$column} for {$cpId}", 'profile', $admin);
+            json_ok(['msg' => 'Photo deleted.']);
         }
 
         default: json_err('Unknown action.');

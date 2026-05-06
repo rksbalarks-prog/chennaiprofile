@@ -85,6 +85,87 @@ function s3_put(string $localPath, string $s3Key, string $contentType = 'applica
     return $base . $uri;
 }
 
+function s3_delete(string $s3Key): bool {
+    if (!defined('S3_ENABLED') || !S3_ENABLED) return false;
+
+    $bucket   = S3_BUCKET;
+    $region   = S3_REGION;
+    $awsKey   = AWS_KEY;
+    $awsSec   = AWS_SECRET;
+    $host     = "{$bucket}.s3.{$region}.amazonaws.com";
+    $uri      = '/' . ltrim($s3Key, '/');
+    $datetime = gmdate('Ymd\THis\Z');
+    $date     = substr($datetime, 0, 8);
+    $bodyHash = hash('sha256', '');
+
+    $hdrs = [
+        'host'                 => $host,
+        'x-amz-content-sha256' => $bodyHash,
+        'x-amz-date'           => $datetime,
+    ];
+
+    $canonicalHdrs = $signedHdrsList = '';
+    foreach ($hdrs as $k => $v) {
+        $canonicalHdrs  .= $k . ':' . $v . "\n";
+        $signedHdrsList .= $k . ';';
+    }
+    $signedHdrsList = rtrim($signedHdrsList, ';');
+
+    $canonicalRequest = "DELETE\n{$uri}\n\n{$canonicalHdrs}\n{$signedHdrsList}\n{$bodyHash}";
+    $credScope        = "{$date}/{$region}/s3/aws4_request";
+    $stringToSign     = "AWS4-HMAC-SHA256\n{$datetime}\n{$credScope}\n" . hash('sha256', $canonicalRequest);
+
+    $sigKey = hash_hmac('sha256', 'aws4_request',
+        hash_hmac('sha256', 's3',
+            hash_hmac('sha256', $region,
+                hash_hmac('sha256', $date, 'AWS4' . $awsSec, true),
+            true),
+        true),
+    true);
+    $signature = hash_hmac('sha256', $stringToSign, $sigKey);
+
+    $authHeader = "AWS4-HMAC-SHA256 Credential={$awsKey}/{$credScope}, SignedHeaders={$signedHdrsList}, Signature={$signature}";
+
+    $ch = curl_init("https://{$host}{$uri}");
+    curl_setopt_array($ch, [
+        CURLOPT_CUSTOMREQUEST  => 'DELETE',
+        CURLOPT_HTTPHEADER     => [
+            "Authorization: {$authHeader}",
+            "host: {$host}",
+            "x-amz-content-sha256: {$bodyHash}",
+            "x-amz-date: {$datetime}",
+        ],
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_TIMEOUT        => 15,
+    ]);
+    curl_exec($ch);
+    $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    return $httpCode === 204 || $httpCode === 200;
+}
+
+/**
+ * Delete a photo and its WebP variants from S3.
+ * Accepts a full S3 URL (https://...). Silently skips local/empty/default values.
+ */
+function s3_delete_photo(string $dbValue): void {
+    if (!$dbValue || str_starts_with($dbValue, 'default_') || str_starts_with($dbValue, 'uploads/')) return;
+    if (!str_starts_with($dbValue, 'http')) return;
+
+    $path = parse_url($dbValue, PHP_URL_PATH);
+    if (!$path) return;
+    $key    = ltrim($path, '/');
+    $dir    = dirname($key);
+    $stem   = pathinfo(basename($key), PATHINFO_FILENAME);
+    $prefix = ($dir && $dir !== '.') ? $dir . '/' : '';
+
+    s3_delete($key);
+    s3_delete($prefix . $stem . '.webp');
+    s3_delete($prefix . $stem . '.thumb.webp');
+}
+
 /**
  * Upload the original file and its WebP variants to S3.
  * Returns the S3 URL of the original, or null on failure.
