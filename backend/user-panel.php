@@ -2760,6 +2760,81 @@ function toggleSubmenu(btn) {
 }
 
 // ===== BASIC / MUTUAL MATCHES =====
+// ── Shared view-mode helpers ──────────────────────────────────────────────
+let _viewMode = localStorage.getItem('up_view_mode') || 'table';
+function _setViewMode(v) { _viewMode = v; localStorage.setItem('up_view_mode', v); }
+
+function _viewToggleHtml(countLabel, onToggle) {
+  const isTable = _viewMode === 'table';
+  return `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px">
+    <span style="font-size:12px;color:var(--ink3);font-weight:600">${countLabel}</span>
+    <div style="display:flex;gap:0;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden">
+      <button onclick="${onToggle}('table')" style="padding:5px 12px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:${isTable?'#8B0000':'#fff'};color:${isTable?'#fff':'#374151'}">
+        ☰ Table</button>
+      <button onclick="${onToggle}('cards')" style="padding:5px 12px;font-size:12px;font-weight:600;border:none;border-left:1px solid #e5e7eb;cursor:pointer;background:${!isTable?'#8B0000':'#fff'};color:${!isTable?'#fff':'#374151'}">
+        ⊞ Cards</button>
+    </div>
+  </div>`;
+}
+
+function _profileTableRow(p, i) {
+  const photoBase = 'api/uploads/';
+  const src = p.photo1 && !p.photo1.startsWith('default_')
+    ? (p.photo1.startsWith('uploads/') ? 'api/' + p.photo1 : photoBase + p.photo1) : '';
+  const thumb = src
+    ? `<img src="${src}" style="width:40px;height:48px;object-fit:cover;border-radius:6px;display:block" onerror="this.style.display='none'">`
+    : `<div style="width:40px;height:48px;border-radius:6px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#9ca3af">${esc((p.name||'?').charAt(0))}</div>`;
+  const loc = [p.present_city||p.present_district, p.nativity].filter(Boolean).join(', ');
+  return `<tr style="cursor:pointer" onclick="window.open('/detail/${esc(p.cp_id)}','_blank')"
+    onmouseover="this.style.background='#fef9f9'" onmouseout="this.style.background=''">
+    <td style="padding:7px 8px;color:var(--ink4);font-size:11px;text-align:center">${i+1}</td>
+    <td style="padding:7px 8px">${thumb}</td>
+    <td style="padding:7px 8px">
+      <div style="font-weight:700;font-size:12.5px;color:#1a1a2e">${esc(p.name)}</div>
+      <div style="font-size:10.5px;color:#8B0000;font-weight:600">${esc(p.cp_id)}</div>
+    </td>
+    <td style="padding:7px 8px;font-size:11.5px;color:var(--ink2)">${p.age||'-'} yrs<br><span style="color:var(--ink4)">${esc(p.height||'-')}</span></td>
+    <td style="padding:7px 8px;font-size:11.5px;color:var(--ink2)">${esc(p.caste||'-')}<br><span style="color:var(--ink4)">${esc(p.religion||'')}</span></td>
+    <td style="padding:7px 8px;font-size:11px;color:var(--ink3);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc([p.qualification,p.job].filter(Boolean).join(' · ')||'-')}</td>
+    <td style="padding:7px 8px;font-size:11px;color:var(--ink3)">${esc(loc||'-')}</td>
+    <td style="padding:7px 8px"><a href="/detail/${esc(p.cp_id)}" target="_blank" style="font-size:11px;font-weight:600;color:#8B0000;text-decoration:none;white-space:nowrap">View →</a></td>
+  </tr>`;
+}
+
+function _profileTableHtml(list) {
+  return `<div class="u-tw"><table class="u-tbl">
+    <thead><tr><th>#</th><th>Photo</th><th>Name / ID</th><th>Age</th><th>Caste</th><th>Education / Job</th><th>Location</th><th></th></tr></thead>
+    <tbody>${list.map((p,i) => _profileTableRow(p,i)).join('')}</tbody>
+  </table></div>`;
+}
+
+function _profileCardHtml(list) {
+  const photoBase = 'api/uploads/';
+  return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px">${list.map(p => {
+    const src = p.photo1 && !p.photo1.startsWith('default_')
+      ? (p.photo1.startsWith('uploads/') ? 'api/' + p.photo1 : photoBase + p.photo1) : '';
+    const imgHtml = src ? `<img src="${src}" style="width:54px;height:54px;border-radius:50%;object-fit:cover;border:2px solid #e5e7eb" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : '';
+    const fallback = `<div style="${src?'display:none;':'display:flex;'}width:54px;height:54px;border-radius:50%;background:var(--bg);align-items:center;justify-content:center;font-size:16px;color:var(--ink3);font-weight:700;border:2px solid #e5e7eb">${esc((p.name||'?').charAt(0))}</div>`;
+    const where = [p.present_city, p.present_district].filter(Boolean).join(', ');
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border-radius:10px;border:1.5px solid #f0e0e4;cursor:pointer"
+      onclick="window.open('/detail/${esc(p.cp_id)}','_blank')"
+      onmouseover="this.style.boxShadow='0 4px 12px rgba(139,0,0,0.1)'" onmouseout="this.style.boxShadow='none'">
+      <div style="flex-shrink:0">${imgHtml}${fallback}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:13px;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.name)}</div>
+        <div style="font-size:11px;color:var(--ink3)">${esc(p.cp_id)} · ${p.age||''} yrs · ${esc(p.caste||'')}</div>
+        <div style="font-size:10.5px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc([p.qualification,p.job,where].filter(Boolean).join(' · '))}</div>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function _renderProfileList(container, list, total, toggleFn) {
+  const label = `${list.length} of ${total||list.length} profiles`;
+  const body = _viewMode === 'table' ? _profileTableHtml(list) : _profileCardHtml(list);
+  container.innerHTML = _viewToggleHtml(label, toggleFn) + body;
+}
+
 async function renderMatches(mode) {
   const containerId = mode === 'mutual' ? 'mutualMatchesContent' : 'basicMatchesContent';
   const container = document.getElementById(containerId);
@@ -2794,32 +2869,10 @@ async function renderMatches(mode) {
       + '</div>';
     return;
   }
-  const photoBase = 'api/uploads/';
-  const card = (p) => {
-    const src = p.photo1 && !p.photo1.startsWith('default_')
-      ? (p.photo1.startsWith('uploads/') ? 'api/' + p.photo1 : photoBase + p.photo1) : '';
-    const imgHtml = src
-      ? `<img src="${src}" style="width:54px;height:54px;border-radius:50%;object-fit:cover;border:2px solid #e5e7eb" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
-      : '';
-    const fallback = `<div style="${src?'display:none;':'display:flex;'}width:54px;height:54px;border-radius:50%;background:var(--bg);align-items:center;justify-content:center;font-size:16px;color:var(--ink3);font-weight:700;border:2px solid #e5e7eb">${esc((p.name||'?').charAt(0))}</div>`;
-    const where = [p.present_city, p.present_district, p.present_state].filter(Boolean).join(', ');
-    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border-radius:10px;border:1.5px solid #f0e0e4;cursor:pointer;transition:all .15s"
-      onclick="window.open('/detail/${esc(p.cp_id)}','_blank')"
-      onmouseover="this.style.boxShadow='0 4px 12px rgba(139,0,0,0.1)';this.style.borderColor='#d4a574'"
-      onmouseout="this.style.boxShadow='none';this.style.borderColor='#f0e0e4'">
-      <div style="flex-shrink:0">${imgHtml}${fallback}</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-weight:700;font-size:13px;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.name)}</div>
-        <div style="font-size:11px;color:var(--ink3)">${esc(p.cp_id)} · ${p.age||''} yrs · ${esc(p.caste||'')} ${p.marital?('· '+esc(p.marital)):''}</div>
-        <div style="font-size:10.5px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.qualification||'')}${p.job?(' · '+esc(p.job)):''}${where?(' · '+esc(where)):''}</div>
-      </div>
-      <div style="font-size:10px;color:var(--ink3);text-align:right;flex-shrink:0">${esc(p.star||'')}<br>${esc(p.height||'')}</div>
-    </div>`;
-  };
-  const header = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;padding:0 4px">
-    <span style="font-size:12px;color:var(--ink3);font-weight:600">${list.length} of ${data.total||list.length} matches</span>
-  </div>`;
-  container.innerHTML = header + list.map(card).join('');
+  window[`_matchList_${mode}`] = { list, total: data.total||list.length };
+  const toggleFn = `_toggleMatchView_${mode}`;
+  window[toggleFn] = (v) => { _setViewMode(v); _renderProfileList(container, list, data.total||list.length, toggleFn); };
+  _renderProfileList(container, list, data.total||list.length, toggleFn);
 }
 
 // ===== ALL PROFILES (opposite-gender browse) =====
