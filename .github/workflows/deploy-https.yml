@@ -51,6 +51,10 @@ jobs:
           PROD_DB_NAME: ${{ secrets.PROD_DB_NAME }}
           PROD_AWS_KEY: ${{ secrets.AWS_KEY }}
           PROD_AWS_SECRET: ${{ secrets.AWS_SECRET }}
+          SMS_USERNAME: ${{ secrets.SMS_USERNAME }}
+          SMS_API_KEY: ${{ secrets.SMS_API_KEY }}
+          SMS_SENDER_ID: ${{ secrets.SMS_SENDER_ID }}
+          SMS_DLT_TE_ID: ${{ secrets.SMS_DLT_TE_ID }}
         run: |
           set -euo pipefail
           mkdir -p payload/backend
@@ -81,6 +85,13 @@ jobs:
             printf "define('S3_CDN_URL', '');\n"
             printf "require_once __DIR__ . '/config-helpers.php';\n"
           } > payload/backend/config.php
+          # Generate sms.php from template + GitHub Secrets (credentials never in the public repo)
+          sed \
+            -e "s|%%SMS_USERNAME%%|$SMS_USERNAME|g" \
+            -e "s|%%SMS_API_KEY%%|$SMS_API_KEY|g" \
+            -e "s|%%SMS_SENDER_ID%%|$SMS_SENDER_ID|g" \
+            -e "s|%%SMS_DLT_TE_ID%%|$SMS_DLT_TE_ID|g" \
+            backend/sms.template.php > payload/backend/sms.php
           # frontend/API (PHP helpers referenced by the app), excluding its db.php
           if [ -d frontend/API ]; then
             mkdir -p payload/frontend/API
