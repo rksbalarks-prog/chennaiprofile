@@ -624,7 +624,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             // ─────────────────────────────────────────────────────────────
 
-            $tgt = $db->prepare("SELECT mobile FROM profiles WHERE cp_id = :c AND status = 'Approved' LIMIT 1");
+            $tgt = $db->prepare("SELECT mobile, alt_mobile, email, contact_person FROM profiles WHERE cp_id = :c AND status = 'Approved' LIMIT 1");
             $tgt->execute([':c' => $targetCpId]);
             $row = $tgt->fetch();
             $extra = [];
@@ -633,8 +633,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($viewerMob2) $extra['points_balance'] = pts_get_balance($db, $viewerMob2);
             }
             json_ok(array_merge([
-                'tracked' => true,
-                'mobile'  => $row['mobile'] ?? '',
+                'tracked'        => true,
+                'mobile'         => $row['mobile'] ?? '',
+                'alt_mobile'     => $row['alt_mobile'] ?? '',
+                'email'          => $row['email'] ?? '',
+                'contact_person' => $row['contact_person'] ?? '',
             ], kfm_gate_snapshot(), $extra));
         }
         json_ok(['tracked' => true]);
@@ -1503,6 +1506,19 @@ switch ($action) {
 
         // Remove sensitive fields
         unset($profile['pending_plan'], $profile['pending_amount'], $profile['pending_pay_opt_id'], $profile['payment_status']);
+
+        // Chennai Profile: strip contact fields from public detail response.
+        // Contact is only returned by track_view after points are deducted.
+        if (defined('SITE_ID') && SITE_ID === 'chennaip') {
+            secureSession();
+            $authed = !empty($_SESSION['mobile']) || !empty($_SESSION['contact_mobile']);
+            if (!$authed) {
+                $profile['mobile'] = '';
+                $profile['alt_mobile'] = '';
+                $profile['email'] = '';
+                $profile['contact_person'] = '';
+            }
+        }
 
         json_ok(['profile' => $profile]);
     }

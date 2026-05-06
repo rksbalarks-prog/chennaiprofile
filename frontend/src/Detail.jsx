@@ -89,6 +89,7 @@ export default function Detail() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showContact, setShowContact] = useState(false);
+  const [revealedContact, setRevealedContact] = useState(null);
   const [contactVerified, setContactVerified] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [otpMobile, setOtpMobile] = useState('');
@@ -235,6 +236,12 @@ export default function Detail() {
         return;
       }
       if (tv && tv.points_balance != null) setPointsBalance(tv.points_balance);
+      setRevealedContact({
+        phone: tv?.mobile || '',
+        altMobile: tv?.alt_mobile || '',
+        email: tv?.email || '',
+        contactPerson: tv?.contact_person || '',
+      });
     } catch(e) {}
     setShowContact(true);
   };
@@ -497,20 +504,20 @@ export default function Detail() {
             <div>
               <div style={{ fontSize:13.2, fontWeight:600, color:'#999', textTransform:'uppercase', marginBottom:8 }}>Contact Details</div>
               <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
-                {p.contactNumber && (
-                  <a href={`tel:${p.contactNumber}`} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 14px', background:'#f0fdf4', borderRadius:8, textDecoration:'none', border:'1px solid #bbf7d0' }}>
+                {revealedContact?.phone && (
+                  <a href={`tel:${revealedContact.phone}`} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 14px', background:'#f0fdf4', borderRadius:8, textDecoration:'none', border:'1px solid #bbf7d0' }}>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                    <span style={{ fontSize:17.6, fontWeight:700, color:'#16a34a', letterSpacing:1 }}>{p.contactNumber}</span>
+                    <span style={{ fontSize:17.6, fontWeight:700, color:'#16a34a', letterSpacing:1 }}>{revealedContact.phone}</span>
                   </a>
                 )}
-                {p.altMobile && (
-                  <a href={`tel:${p.altMobile}`} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 14px', background:'#eff6ff', borderRadius:8, textDecoration:'none', border:'1px solid #bfdbfe' }}>
+                {revealedContact?.altMobile && (
+                  <a href={`tel:${revealedContact.altMobile}`} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 14px', background:'#eff6ff', borderRadius:8, textDecoration:'none', border:'1px solid #bfdbfe' }}>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                    <span style={{ fontSize:15.4, fontWeight:600, color:'#2563eb' }}>{p.altMobile} (Alt)</span>
+                    <span style={{ fontSize:15.4, fontWeight:600, color:'#2563eb' }}>{revealedContact.altMobile} (Alt)</span>
                   </a>
                 )}
-                {p.contactPerson && <div style={{ fontSize:14.3, color:'#666' }}>Contact Person: <strong>{p.contactPerson}</strong></div>}
-                {p.email && <div style={{ fontSize:14.3, color:'#666' }}>Email: <strong>{p.email}</strong></div>}
+                {revealedContact?.contactPerson && <div style={{ fontSize:14.3, color:'#666' }}>Contact Person: <strong>{revealedContact.contactPerson}</strong></div>}
+                {revealedContact?.email && <div style={{ fontSize:14.3, color:'#666' }}>Email: <strong>{revealedContact.email}</strong></div>}
               </div>
               <button onClick={() => setShowContact(false)} style={{ marginTop:10, width:'100%', padding:'8px', background:'#f5f5f5', border:'1px solid #e8e8e8', borderRadius:8, fontSize:13.2, fontWeight:600, color:'#888', cursor:'pointer' }}>Hide Contact</button>
             </div>
