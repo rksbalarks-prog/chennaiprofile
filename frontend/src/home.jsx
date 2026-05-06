@@ -301,7 +301,8 @@ export default function Home() {
   const handleViewContact = async (profileId) => {
     // Verified users still face their plan-based limits (day/month/total) —
     // those are independent of the anonymous 5-view gate.
-    if (contactVerified) {
+    // Chennai Profile uses points only — skip plan-limit OTP prompts entirely.
+    if (!IS_CHENNAI_PROFILE && contactVerified) {
       try {
         const chk = await fetch(API_BASE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'contact_check'}),credentials:'include'}).then(r=>r.json());
         const mobile = chk.mobile||'';
@@ -352,7 +353,7 @@ export default function Home() {
         setShowPointsModal(true);
         return;
       }
-      if (!res.ok && tv && tv.gate_required) {
+      if (!IS_CHENNAI_PROFILE && !res.ok && tv && tv.gate_required) {
         openGateModal(profileId, tv.gate_reason, tv.anon_views_limit);
         return;
       }

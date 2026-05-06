@@ -533,11 +533,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $type = trim($input['type'] ?? 'profile_view'); // profile_view or contact_view
         if (!$targetCpId) json_ok(['tracked' => false]);
 
-        // Decide gate up-front but DON'T short-circuit the INSERT — we want
-        // the Contact View Log to record every attempt (allowed or blocked)
-        // so admins can see who tried what and when. The 403 response below
-        // is unchanged so the SPA still opens the OTP modal.
-        $gateBlocked = ($type === 'contact_view' && kfm_gate_required($targetCpId));
+        // Chennai Profile uses a points gate instead of OTP gate — skip KFM gate entirely.
+        $isChennai   = defined('SITE_ID') && SITE_ID === 'chennaip';
+        $gateBlocked = (!$isChennai && $type === 'contact_view' && kfm_gate_required($targetCpId));
 
         // Get viewer profile info
         $viewerProfile = null;
@@ -589,7 +587,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // - Anonymous within free quota: also yes (record toward quota).
         if ($type === 'contact_view') {
             $verified = !empty($_SESSION['contact_mobile']) || !empty($_SESSION['mobile']);
-            if (!$verified) kfm_anon_record($targetCpId); // count this reveal toward the 5
+            // Don't count toward the anon quota on Chennai Profile — points gate handles access.
+            if (!$verified && !$isChennai) kfm_anon_record($targetCpId);
 
             // ── Points gate (Chennai Profile only) ────────────────────────
             // Kumbakonam keeps free access. Chennai Profile requires login + points
