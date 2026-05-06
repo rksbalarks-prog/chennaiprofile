@@ -1775,6 +1775,7 @@ input[type="date"].filter-select { padding:8px 10px; cursor:pointer; }
         <button class="stab"        id="stab_adminLog"   onclick="switchStab('adminLogPanel',   this)">📋 Admin Log</button>
         <button class="stab"        id="stab_mobileReq"  onclick="switchStab('mobileReqPanel',  this)">📱 Number Change Requests</button>
         <button class="stab"        id="stab_payment"    onclick="switchStab('paymentPanel',    this)">💳 Payment Options</button>
+        <button class="stab"        id="stab_points"     onclick="switchStab('pointsPanel',     this)">🪙 Points (Chennai Profile)</button>
         <button class="stab"        id="stab_userCtrl"   onclick="switchStab('userCtrlPanel',   this)">📱 User Panel Control</button>
       </div>
 
@@ -2400,6 +2401,56 @@ input[type="date"].filter-select { padding:8px 10px; cursor:pointer; }
             </div>
           </div>
 
+        </div>
+      </div>
+
+      <!-- ══ POINTS PANEL ══ -->
+      <div class="stab-panel" id="pointsPanel">
+        <div style="padding:20px;max-width:900px">
+          <h3 style="margin:0 0 4px;font-size:16px">🪙 Points System — Chennai Profile</h3>
+          <p style="color:#888;font-size:13px;margin:0 0 18px">Manage user point balances. 10 pts per contact view. Only applies to Chennai Profile.</p>
+
+          <!-- Stats row -->
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px" id="ptsStatsRow">
+            <div style="background:#fff;border:1px solid #e5;border-radius:10px;padding:14px;text-align:center"><div style="font-size:22px;font-weight:800;color:#8B0000" id="aPtsUsers">—</div><div style="font-size:11px;color:#aaa">Users with Points</div></div>
+            <div style="background:#fff;border:1px solid #e5;border-radius:10px;padding:14px;text-align:center"><div style="font-size:22px;font-weight:800;color:#166534" id="aPtsBought">—</div><div style="font-size:11px;color:#aaa">Total Purchased</div></div>
+            <div style="background:#fff;border:1px solid #e5;border-radius:10px;padding:14px;text-align:center"><div style="font-size:22px;font-weight:800;color:#1e40af" id="aPtsUsed">—</div><div style="font-size:11px;color:#aaa">Total Used</div></div>
+            <div style="background:#fff;border:1px solid #e5;border-radius:10px;padding:14px;text-align:center"><div style="font-size:22px;font-weight:800;color:#78350f" id="aPtsBalance">—</div><div style="font-size:11px;color:#aaa">Total Balance</div></div>
+          </div>
+
+          <!-- Manual credit/debit -->
+          <div style="background:#fff;border:1px solid #e5;border-radius:10px;padding:16px;margin-bottom:20px">
+            <div style="font-weight:700;margin-bottom:12px;font-size:14px">Credit / Debit Points Manually</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+              <div><label style="font-size:12px;color:#666">Mobile</label><br><input id="aPtsMobile" type="text" placeholder="10-digit mobile" style="border:1px solid #ddd;border-radius:6px;padding:7px 10px;font-size:13px;width:160px"></div>
+              <div><label style="font-size:12px;color:#666">Points</label><br><input id="aPtsAmount" type="number" min="1" placeholder="e.g. 100" style="border:1px solid #ddd;border-radius:6px;padding:7px 10px;font-size:13px;width:100px"></div>
+              <div style="flex:1;min-width:160px"><label style="font-size:12px;color:#666">Note</label><br><input id="aPtsNote" type="text" placeholder="Reason" style="border:1px solid #ddd;border-radius:6px;padding:7px 10px;font-size:13px;width:100%"></div>
+              <button onclick="adminPtsCredit()" style="background:#166534;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:13px;cursor:pointer;font-weight:600">+ Credit</button>
+              <button onclick="adminPtsDebit()" style="background:#991b1b;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:13px;cursor:pointer;font-weight:600">− Debit</button>
+            </div>
+            <div id="aPtsMsgBox" style="margin-top:10px;font-size:13px;display:none"></div>
+          </div>
+
+          <!-- Recent transactions -->
+          <div style="background:#fff;border:1px solid #e5;border-radius:10px;overflow:hidden;margin-bottom:20px">
+            <div style="padding:12px 16px;border-bottom:1px solid #f0f0f0;font-weight:700;font-size:14px">Recent Transactions</div>
+            <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px">
+              <thead><tr style="background:#f9f9f9"><th style="padding:8px 12px;text-align:left">Mobile</th><th>Name</th><th>Type</th><th>Points</th><th>Balance After</th><th>Description</th><th>Date</th></tr></thead>
+              <tbody id="aPtsTxnTbody"><tr><td colspan="7" style="padding:16px;text-align:center;color:#aaa">Loading…</td></tr></tbody>
+            </table></div>
+          </div>
+
+          <!-- User balances -->
+          <div style="background:#fff;border:1px solid #e5;border-radius:10px;overflow:hidden">
+            <div style="padding:12px 16px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:10px">
+              <span style="font-weight:700;font-size:14px">User Balances</span>
+              <input id="aPtsSearch" type="text" placeholder="Search mobile or name…" style="margin-left:auto;border:1px solid #ddd;border-radius:6px;padding:5px 10px;font-size:12px;width:200px" oninput="loadPtsUsers()">
+            </div>
+            <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px">
+              <thead><tr style="background:#f9f9f9"><th style="padding:8px 12px;text-align:left">Mobile</th><th>Name</th><th>Balance</th><th>Purchased</th><th>Used</th><th>Last Update</th></tr></thead>
+              <tbody id="aPtsUserTbody"><tr><td colspan="6" style="padding:16px;text-align:center;color:#aaa">Loading…</td></tr></tbody>
+            </table></div>
+          </div>
         </div>
       </div>
 
@@ -7293,6 +7344,79 @@ function switchStab(id, btn) {
   if (id === 'mobileReqPanel') { renderMobileReqs(); }
   if (id === 'paymentPanel')   { renderPaymentOptions(); }
   if (id === 'userCtrlPanel')  { renderUserCtrlPanel(); renderUPCtrlHistory(); }
+  if (id === 'pointsPanel')    { loadPtsStats(); loadPtsUsers(); }
+}
+
+// ─── POINTS MANAGEMENT ─────────────────────────────────────────────────────
+async function loadPtsStats() {
+  try {
+    const d = await apiFetch('/backend/api/admin/points.php?action=stats');
+    if (!d.ok) return;
+    document.getElementById('aPtsUsers').textContent   = d.total_users   || 0;
+    document.getElementById('aPtsBought').textContent  = d.total_bought  || 0;
+    document.getElementById('aPtsUsed').textContent    = d.total_used    || 0;
+    document.getElementById('aPtsBalance').textContent = d.total_balance || 0;
+    const tb = document.getElementById('aPtsTxnTbody');
+    if (!tb) return;
+    if (!d.recent?.length) { tb.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:12px">No transactions.</td></tr>'; return; }
+    tb.innerHTML = d.recent.map(t => {
+      const sign = t.points > 0 ? '+' : '';
+      const col  = t.points > 0 ? '#166534' : '#991b1b';
+      const tl   = {purchase:'Purchase',deduct:'Contact View',admin_credit:'Admin Credit',admin_debit:'Admin Debit'}[t.type]||t.type;
+      return `<tr style="border-bottom:1px solid #f5f5f5"><td style="padding:7px 12px">${t.mobile}</td><td>${t.name||'-'}</td><td>${tl}</td><td style="color:${col};font-weight:700">${sign}${t.points}</td><td>${t.balance_after}</td><td>${t.description||'-'}</td><td>${(t.created_at||'').slice(0,16)}</td></tr>`;
+    }).join('');
+  } catch(e) {}
+}
+
+async function loadPtsUsers() {
+  const q = document.getElementById('aPtsSearch')?.value || '';
+  try {
+    const d = await apiFetch('/backend/api/admin/points.php?action=users&q=' + encodeURIComponent(q));
+    const tb = document.getElementById('aPtsUserTbody');
+    if (!tb) return;
+    if (!d.ok || !d.users?.length) { tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:#aaa;padding:12px">No users found.</td></tr>'; return; }
+    tb.innerHTML = d.users.map(u =>
+      `<tr style="border-bottom:1px solid #f5f5f5"><td style="padding:7px 12px;font-family:monospace">${u.mobile}</td><td>${u.name||'-'}</td><td style="font-weight:700;color:#8B0000">${u.balance}</td><td>${u.total_bought}</td><td>${u.total_used}</td><td>${(u.updated_at||'').slice(0,16)}</td></tr>`
+    ).join('');
+  } catch(e) {}
+}
+
+async function adminPtsCredit() {
+  const mobile = document.getElementById('aPtsMobile').value.trim();
+  const pts    = parseInt(document.getElementById('aPtsAmount').value) || 0;
+  const note   = document.getElementById('aPtsNote').value.trim() || 'Admin credit';
+  const msg    = document.getElementById('aPtsMsgBox');
+  if (!mobile || pts <= 0) { showMsg(msg, '⚠️ Mobile and points required.', 'warn'); return; }
+  try {
+    const d = await apiFetch('/backend/api/admin/points.php?action=credit', { method:'POST', body: JSON.stringify({mobile, points:pts, note}) });
+    showMsg(msg, d.ok ? '✅ ' + d.msg : '❌ ' + (d.error||'Error'), d.ok ? 'ok' : 'err');
+    if (d.ok) { loadPtsStats(); loadPtsUsers(); }
+  } catch(e) { showMsg(msg, '❌ Network error', 'err'); }
+}
+
+async function adminPtsDebit() {
+  const mobile = document.getElementById('aPtsMobile').value.trim();
+  const pts    = parseInt(document.getElementById('aPtsAmount').value) || 0;
+  const note   = document.getElementById('aPtsNote').value.trim() || 'Admin debit';
+  const msg    = document.getElementById('aPtsMsgBox');
+  if (!mobile || pts <= 0) { showMsg(msg, '⚠️ Mobile and points required.', 'warn'); return; }
+  try {
+    const d = await apiFetch('/backend/api/admin/points.php?action=debit', { method:'POST', body: JSON.stringify({mobile, points:pts, note}) });
+    showMsg(msg, d.ok ? '✅ ' + d.msg : '❌ ' + (d.error||'Error'), d.ok ? 'ok' : 'err');
+    if (d.ok) { loadPtsStats(); loadPtsUsers(); }
+  } catch(e) { showMsg(msg, '❌ Network error', 'err'); }
+}
+
+function showMsg(el, text, type) {
+  if (!el) return;
+  const colors = { ok:'#166534', warn:'#92400e', err:'#991b1b' };
+  const bgs    = { ok:'#f0fdf4', warn:'#fffbeb', err:'#fef2f2' };
+  el.style.display = '';
+  el.style.color   = colors[type] || '#333';
+  el.style.background = bgs[type] || '#fff';
+  el.style.padding = '8px 12px';
+  el.style.borderRadius = '6px';
+  el.textContent   = text;
 }
 
 // ADMIN DATA

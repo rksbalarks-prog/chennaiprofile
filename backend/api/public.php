@@ -590,13 +590,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($type === 'contact_view') {
             $verified = !empty($_SESSION['contact_mobile']) || !empty($_SESSION['mobile']);
             if (!$verified) kfm_anon_record($targetCpId); // count this reveal toward the 5
+
+            // ── Points gate (Chennai Profile only) ────────────────────────
+            // Only applies when SITE_ID = 'chennaip'. Kumbakonam keeps free access.
+            if (defined('SITE_ID') && SITE_ID === 'chennaip' && $verified) {
+                $viewerMob = $_SESSION['mobile'] ?? $_SESSION['contact_mobile'] ?? '';
+                if ($viewerMob) {
+                    require_once __DIR__ . '/points.php';
+                    $bal = pts_get_balance($db, $viewerMob);
+                    if ($bal < POINTS_PER_CONTACT) {
+                        http_response_code(402);
+                        echo json_encode([
+                            'ok'          => false,
+                            'need_points' => true,
+                            'balance'     => $bal,
+                            'required'    => POINTS_PER_CONTACT,
+                            'error'       => 'Insufficient points to view contact.',
+                        ]);
+                        exit;
+                    }
+                    pts_deduct($db, $viewerMob, POINTS_PER_CONTACT, 'Contact view: ' . $targetCpId, $targetCpId);
+                }
+            }
+            // ─────────────────────────────────────────────────────────────
+
             $tgt = $db->prepare("SELECT mobile FROM profiles WHERE cp_id = :c AND status = 'Approved' LIMIT 1");
             $tgt->execute([':c' => $targetCpId]);
             $row = $tgt->fetch();
-            json_ok([
+            $extra = [];
+            if (defined('SITE_ID') && SITE_ID === 'chennaip') {
+                $viewerMob2 = $_SESSION['mobile'] ?? $_SESSION['contact_mobile'] ?? '';
+                if ($viewerMob2) $extra['points_balance'] = pts_get_balance($db, $viewerMob2);
+            }
+            json_ok(array_merge([
                 'tracked' => true,
                 'mobile'  => $row['mobile'] ?? '',
-            ] + kfm_gate_snapshot());
+            ], kfm_gate_snapshot(), $extra));
         }
         json_ok(['tracked' => true]);
     }

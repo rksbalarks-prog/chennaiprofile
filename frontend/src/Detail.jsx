@@ -105,6 +105,8 @@ export default function Detail() {
   // source of truth; these mirror the snapshot it returns.
   const [gateState, setGateState] = useState({ returning:false, anonViewsUsed:0, anonViewsLimit:5, gateRequired:false, anonWindowSec:24*3600, anonWindowStart:0 });
   const [gatePromptMsg, setGatePromptMsg] = useState('');
+  const [pointsBalance, setPointsBalance] = useState(null);
+  const [showPointsModal, setShowPointsModal] = useState(false);
   // 24-hour "to get your 5 free contacts" countdown. The window starts the
   // first time the gate modal opens and persists in localStorage. The user
   // can dismiss the popup; if they try another contact before the timer
@@ -222,10 +224,16 @@ export default function Detail() {
         anonWindowSec:    tv.anon_window_sec   ?? g.anonWindowSec,
         anonWindowStart:  tv.anon_window_start ?? g.anonWindowStart,
       }));
+      if (res.status === 402 && tv && tv.need_points) {
+        setPointsBalance(tv.balance ?? 0);
+        setShowPointsModal(true);
+        return;
+      }
       if (!res.ok && tv && tv.gate_required) {
         openGateModal(tv.gate_reason, tv.anon_views_limit);
         return;
       }
+      if (tv && tv.points_balance != null) setPointsBalance(tv.points_balance);
     } catch(e) {}
     setShowContact(true);
   };
@@ -778,6 +786,44 @@ export default function Detail() {
       )}
 
       {/* Report Modal */}
+      {/* ── Points modal ── */}
+      {showPointsModal && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.55)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:3100, backdropFilter:'blur(4px)' }}
+          onClick={() => setShowPointsModal(false)}>
+          <div style={{ background:'#fff', borderRadius:20, overflow:'hidden', maxWidth:360, width:'92%', boxShadow:'0 24px 64px rgba(0,0,0,0.28)' }}
+            onClick={e => e.stopPropagation()}>
+            <div style={{ background:'linear-gradient(135deg,#8B0000,#C41E3A)', padding:'20px 22px' }}>
+              <div style={{ color:'#FFD700', fontSize:28, textAlign:'center' }}>🪙</div>
+              <div style={{ color:'#fff', fontSize:17, fontWeight:700, textAlign:'center', marginTop:6 }}>Points Required</div>
+              <div style={{ color:'rgba(255,255,255,0.8)', fontSize:13, textAlign:'center', marginTop:4 }}>Viewing contact costs 10 points</div>
+            </div>
+            <div style={{ padding:'20px 22px' }}>
+              <div style={{ background:'#fef3f2', borderRadius:10, padding:'12px 16px', marginBottom:16, textAlign:'center' }}>
+                <div style={{ fontSize:13, color:'#888' }}>Your balance</div>
+                <div style={{ fontSize:26, fontWeight:800, color:'#8B0000' }}>{pointsBalance ?? 0} pts</div>
+                <div style={{ fontSize:12, color:'#aaa', marginTop:2 }}>Need 10 pts to reveal contact</div>
+              </div>
+              <div style={{ fontSize:13.5, color:'#555', marginBottom:16, lineHeight:1.6 }}>
+                Purchase points to view contact details. Each contact reveal costs <strong>10 points</strong>.
+              </div>
+              <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+                {[{pts:100,price:100},{pts:500,price:500},{pts:1000,price:1000}].map(pkg => (
+                  <a key={pkg.pts} href={`/backend/user-panel.php?buy_pts=${pkg.pts}`}
+                    style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 16px', border:'2px solid #8B0000', borderRadius:10, background:'#fff', textDecoration:'none', cursor:'pointer' }}>
+                    <span style={{ fontWeight:700, color:'#8B0000', fontSize:15 }}>{pkg.pts} Points</span>
+                    <span style={{ background:'#8B0000', color:'#fff', borderRadius:8, padding:'4px 14px', fontSize:13.5, fontWeight:600 }}>₹{pkg.price}</span>
+                  </a>
+                ))}
+              </div>
+              <button onClick={() => setShowPointsModal(false)}
+                style={{ marginTop:16, width:'100%', padding:'10px', border:'1px solid #ddd', borderRadius:10, background:'#f5f5f5', color:'#666', fontSize:14, cursor:'pointer' }}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showReportModal && (
         <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:3000, backdropFilter:'blur(4px)' }}
           onClick={() => setShowReportModal(false)}>

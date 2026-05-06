@@ -498,6 +498,11 @@ input,select,textarea{outline:none}
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.36 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.27 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16.92z"/></svg>
         Contact View Log
       </button>
+      <div class="sb-grp">Points</div>
+      <button class="sb-btn" data-page="page_points" onclick="showSec('myPoints',this)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        My Points <span id="sbPointsBadge" style="margin-left:auto;background:#FFD700;color:#8B0000;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;display:none"></span>
+      </button>
       <div class="sb-grp">Settings</div>
       <button class="sb-btn" data-page="page_settings" onclick="showSec('mySettings',this)">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M22 12h-2M4 12H2M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M12 22v-2M12 4V2"/></svg>
@@ -656,6 +661,48 @@ input,select,textarea{outline:none}
             <table class="u-tbl">
               <thead><tr><th>#</th><th>Viewed Profile</th><th>Name</th><th>Date &amp; Time</th></tr></thead>
               <tbody id="upCvlTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="u-section" id="myPointsSection">
+        <div class="u-card" style="margin-bottom:16px">
+          <div class="u-card-head" style="background:linear-gradient(135deg,#8B0000,#C41E3A)">
+            <span class="u-card-title" style="color:#fff">🪙 My Points Balance</span>
+          </div>
+          <div class="u-card-body" style="padding:20px;text-align:center">
+            <div style="font-size:42px;font-weight:900;color:#8B0000" id="ptsBalance">—</div>
+            <div style="font-size:13px;color:#888;margin-top:4px">Available Points</div>
+            <div style="display:flex;justify-content:center;gap:24px;margin-top:16px;flex-wrap:wrap">
+              <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#333" id="ptsBought">—</div><div style="font-size:11px;color:#aaa">Total Purchased</div></div>
+              <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#333" id="ptsUsed">—</div><div style="font-size:11px;color:#aaa">Total Used</div></div>
+              <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#2563eb">10 pts</div><div style="font-size:11px;color:#aaa">Per Contact View</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="u-card" style="margin-bottom:16px">
+          <div class="u-card-head"><span class="u-card-title">Buy Points</span></div>
+          <div class="u-card-body" style="padding:16px">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px">
+              <?php foreach([['pts'=>100,'price'=>100,'badge'=>''],['pts'=>500,'price'=>500,'badge'=>'Popular'],['pts'=>1000,'price'=>1000,'badge'=>'Best Value']] as $pkg): ?>
+              <div style="border:2px solid <?= $pkg['badge'] ? '#8B0000' : '#e5e7eb' ?>;border-radius:12px;padding:14px;text-align:center;cursor:pointer;position:relative;transition:all .2s"
+                onclick="initPointsBuy(<?= $pkg['pts'] ?>)">
+                <?php if($pkg['badge']): ?><div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#8B0000;color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap"><?= $pkg['badge'] ?></div><?php endif; ?>
+                <div style="font-size:22px;font-weight:900;color:#8B0000"><?= $pkg['pts'] ?></div>
+                <div style="font-size:11px;color:#888;margin:2px 0">points</div>
+                <div style="background:#8B0000;color:#fff;border-radius:8px;padding:5px 12px;font-size:13px;font-weight:700;margin-top:8px;display:inline-block">₹<?= $pkg['price'] ?></div>
+              </div>
+              <?php endforeach; ?>
+            </div>
+            <div id="ptsPayMsg" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px;font-size:13px;color:#166534;margin-top:8px"></div>
+          </div>
+        </div>
+        <div class="u-card">
+          <div class="u-card-head"><span class="u-card-title">Transaction History</span></div>
+          <div class="u-tw">
+            <table class="u-tbl">
+              <thead><tr><th>#</th><th>Type</th><th>Points</th><th>Balance After</th><th>Description</th><th>Date</th></tr></thead>
+              <tbody id="ptsTxnTbody"></tbody>
             </table>
           </div>
         </div>
@@ -1538,8 +1585,8 @@ function fillSidebar() {
 }
 
 // ===== NAVIGATION =====
-const TITLES = { myProfile: 'My Profile', suggestions: 'Suggestions', basicMatches: 'Basic Matches', mutualMatches: 'Mutual Matches', allProfiles: 'All Profiles', myBills: 'My Bills', myActivity: 'My Activity', loginHistory: 'Login History', myReports: 'My Reports', profileViewLog: 'Profile View Log', contactLog: 'Contact View Log', mySettings: 'Settings', addProfile: 'Add Profile', addOrder: 'Pay Later' };
-const SEC_TO_PAGE = { myProfile: 'page_profile', suggestions: 'page_suggestions', basicMatches: 'page_matches', mutualMatches: 'page_matches', allProfiles: 'page_allprofiles', myBills: 'page_bills', myActivity: 'page_activity', loginHistory: 'page_loginhistory', myReports: 'page_myreports', profileViewLog: 'page_profileviewlog', contactLog: 'page_contactlog', mySettings: 'page_settings', addProfile: '', addOrder: 'page_addorder' };
+const TITLES = { myProfile: 'My Profile', suggestions: 'Suggestions', basicMatches: 'Basic Matches', mutualMatches: 'Mutual Matches', allProfiles: 'All Profiles', myBills: 'My Bills', myActivity: 'My Activity', loginHistory: 'Login History', myReports: 'My Reports', profileViewLog: 'Profile View Log', contactLog: 'Contact View Log', mySettings: 'Settings', addProfile: 'Add Profile', addOrder: 'Pay Later', myPoints: 'My Points' };
+const SEC_TO_PAGE = { myProfile: 'page_profile', suggestions: 'page_suggestions', basicMatches: 'page_matches', mutualMatches: 'page_matches', allProfiles: 'page_allprofiles', myBills: 'page_bills', myActivity: 'page_activity', loginHistory: 'page_loginhistory', myReports: 'page_myreports', profileViewLog: 'page_profileviewlog', contactLog: 'page_contactlog', mySettings: 'page_settings', addProfile: '', addOrder: 'page_addorder', myPoints: 'page_points' };
 
 // ===== ADD PROFILE (USER PANEL) =====
 let upApSelectedPlan = 'free';
@@ -1900,7 +1947,7 @@ function showSec(name, btn) {
   document.querySelector('.sidebar')?.classList.remove('mob-open');
   document.getElementById('mobOverlay')?.classList.remove('open');
   setActions(name);
-  const renderers = { myProfile: renderMyProfile, suggestions: renderSuggestions, basicMatches: () => renderMatches('basic'), mutualMatches: () => renderMatches('mutual'), allProfiles: renderAllProfiles, myBills: renderMyBills, addOrder: renderMyOrders, myActivity: renderMyActivity, loginHistory: renderLoginHistory, myReports: renderMyReports, profileViewLog: renderUserProfileViewLog, contactLog: renderUserContactLog, mySettings: renderSettings };
+  const renderers = { myProfile: renderMyProfile, suggestions: renderSuggestions, basicMatches: () => renderMatches('basic'), mutualMatches: () => renderMatches('mutual'), allProfiles: renderAllProfiles, myBills: renderMyBills, addOrder: renderMyOrders, myActivity: renderMyActivity, loginHistory: renderLoginHistory, myReports: renderMyReports, profileViewLog: renderUserProfileViewLog, contactLog: renderUserContactLog, mySettings: renderSettings, myPoints: renderMyPoints };
   if (renderers[name]) renderers[name]();
   // Show autosave restore banner for add profile section
   if (name === 'addProfile') FormAutoSave.showRestoreBanner('up_quick_create', '#addProfileSection .profile-card > div:nth-child(2)', () => toast('Draft restored'));
@@ -3479,6 +3526,95 @@ attachDoshamSelect('cp_dosham', 'cp_dosham_type_wrap');
 FormAutoSave.track('up_create', { container: '#createModal', fieldPrefix: 'cp_', excludeIds: ['cp_mobile'] });
 FormAutoSave.track('up_edit', { container: '#editModal', fieldPrefix: 'ep_', excludeIds: ['ep_mobile'] });
 FormAutoSave.track('up_quick_create', { container: '#addProfileSection', fieldPrefix: 'up_ap_', excludeIds: ['up_ap_mobile'] });
+
+// ===== POINTS SYSTEM =====
+async function renderMyPoints() {
+  try {
+    const r = await fetch('/backend/api/points.php?action=balance', { credentials:'include' });
+    const d = await r.json();
+    if (d.ok) {
+      document.getElementById('ptsBalance').textContent = d.balance;
+      document.getElementById('ptsBought').textContent  = d.total_bought;
+      document.getElementById('ptsUsed').textContent    = d.total_used;
+      const badge = document.getElementById('sbPointsBadge');
+      if (badge) { badge.textContent = d.balance + ' pts'; badge.style.display = ''; }
+    }
+  } catch(e) {}
+  try {
+    const r = await fetch('/backend/api/points.php?action=history', { credentials:'include' });
+    const d = await r.json();
+    const tb = document.getElementById('ptsTxnTbody');
+    if (!tb) return;
+    if (!d.ok || !d.history?.length) { tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:16px">No transactions yet.</td></tr>'; return; }
+    tb.innerHTML = d.history.map((t,i) => {
+      const sign   = t.points > 0 ? '+' : '';
+      const color  = t.points > 0 ? '#166534' : '#991b1b';
+      const typeLabel = {purchase:'Purchase',deduct:'Contact View',admin_credit:'Admin Credit',admin_debit:'Admin Debit'}[t.type] || t.type;
+      return `<tr><td>${i+1}</td><td>${typeLabel}</td><td style="color:${color};font-weight:700">${sign}${t.points}</td><td>${t.balance_after}</td><td>${t.description||'-'}</td><td>${t.created_at?.slice(0,16)||'-'}</td></tr>`;
+    }).join('');
+  } catch(e) {}
+}
+
+async function initPointsBuy(pts) {
+  const pkg = {100:'p100',500:'p500',1000:'p1000'}[pts];
+  if (!pkg) return;
+  const msg = document.getElementById('ptsPayMsg');
+  if (msg) { msg.style.display=''; msg.textContent = 'Initiating payment…'; }
+  try {
+    const r = await fetch('/backend/api/points.php?action=buy_init', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ pkg_id: pkg }), credentials:'include'
+    });
+    const d = await r.json();
+    if (!d.ok) { if (msg) msg.textContent = d.error || 'Error'; return; }
+    if (d.payu) {
+      // Build and submit PayU form
+      const form = document.createElement('form');
+      form.method = 'post'; form.action = d.endpoint;
+      Object.entries(d.params).forEach(([k,v]) => {
+        const inp = document.createElement('input');
+        inp.type='hidden'; inp.name=k; inp.value=v; form.appendChild(inp);
+      });
+      document.body.appendChild(form); form.submit();
+    } else {
+      if (msg) msg.innerHTML = `<strong>Manual Payment</strong><br>Pay ₹${d.amount} via UPI/bank transfer.<br>Reference ID: <strong>${d.txn_id}</strong><br>Share screenshot with admin — they will credit your points within a few hours.`;
+    }
+  } catch(e) { if (msg) msg.textContent = 'Network error. Try again.'; }
+}
+
+// Auto-load points balance on page load
+(async () => {
+  try {
+    const r = await fetch('/backend/api/points.php?action=balance', { credentials:'include' });
+    const d = await r.json();
+    if (d.ok && d.balance > 0) {
+      const badge = document.getElementById('sbPointsBadge');
+      if (badge) { badge.textContent = d.balance + ' pts'; badge.style.display = ''; }
+    }
+  } catch(e) {}
+})();
+
+// Handle ?buy_pts= redirect from detail page
+(function() {
+  const p = new URLSearchParams(location.search);
+  if (p.has('buy_pts')) {
+    const pts = parseInt(p.get('buy_pts')) || 0;
+    if ([100,500,1000].includes(pts)) {
+      document.addEventListener('DOMContentLoaded', () => {
+        const btns = document.querySelectorAll('[data-page="page_points"]');
+        if (btns[0]) btns[0].click();
+        setTimeout(() => initPointsBuy(pts), 400);
+      });
+    }
+  }
+  // Handle PayU return
+  if (p.get('pay') === 'pts_ok') {
+    toast('✅ ' + (p.get('pts')||'') + ' points added to your account!', 'success');
+    setTimeout(renderMyPoints, 500);
+  } else if (p.get('pay') === 'pts_fail') {
+    toast('❌ Payment failed. Try again or contact support.', 'error');
+  }
+})();
 </script>
 
 <script>

@@ -83,6 +83,7 @@ jobs:
             printf "define('AWS_KEY',    '%s');\n" "$PROD_AWS_KEY"
             printf "define('AWS_SECRET', '%s');\n" "$PROD_AWS_SECRET"
             printf "define('S3_CDN_URL', '');\n"
+            printf "define('SITE_ID', 'chennaip');\n"
             printf "require_once __DIR__ . '/config-helpers.php';\n"
           } > payload/backend/config.php
           # Generate sms.php from template + GitHub Secrets (credentials never in the public repo)
