@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { API_BASE, PHOTO_BASE, UPLOADS_PREFIX, getPhotoUrls } from "./config";
+import { API_BASE, PHOTO_BASE, UPLOADS_PREFIX, getPhotoUrls, IS_CHENNAI_PROFILE, POINTS_PER_CONTACT } from "./config";
 import { buildSummary } from "./profileSummary";
 
 function mapProfile(p) {
@@ -189,7 +189,8 @@ export default function Detail() {
   // returns 403 + gate_required when blocked.
   const revealContact = async () => {
     // Verified users: enforce plan limits first (independent of the anon gate).
-    if (contactVerified) {
+    // Chennai Profile uses points only — skip plan-limit OTP prompts.
+    if (!IS_CHENNAI_PROFILE && contactVerified) {
       try {
         const chk = await fetch(API_BASE, { method:'POST', headers:{'Content-Type':'application/json'},
           body: JSON.stringify({ action:'contact_check' }), credentials:'include' }).then(r=>r.json());
@@ -516,7 +517,7 @@ export default function Detail() {
           ) : (
             <button onClick={revealContact}
               style={{ width:'100%', padding:'12px', background:'linear-gradient(135deg,#16a34a,#15803d)', color:'#fff', border:'none', borderRadius:10, fontSize:15.4, fontWeight:700, cursor:'pointer', letterSpacing:0.3 }}>
-              View Free Contact
+              {IS_CHENNAI_PROFILE ? `View Contact (${POINTS_PER_CONTACT} pts)` : 'View Free Contact'}
             </button>
           )}
         </div>

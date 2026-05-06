@@ -594,6 +594,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Kumbakonam keeps free access. Chennai Profile requires login + points
             // for EVERY contact view — anonymous users get no free quota here.
             if (defined('SITE_ID') && SITE_ID === 'chennaip') {
+                require_once __DIR__ . '/points.php'; // must come first — defines POINTS_PER_CONTACT
                 $viewerMob = $_SESSION['mobile'] ?? $_SESSION['contact_mobile'] ?? '';
                 if (!$viewerMob) {
                     // Not logged in — block and prompt to login/buy points
@@ -607,7 +608,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ]);
                     exit;
                 }
-                require_once __DIR__ . '/points.php';
                 $bal = pts_get_balance($db, $viewerMob);
                 if ($bal < POINTS_PER_CONTACT) {
                     http_response_code(402);
