@@ -11,7 +11,7 @@ export default function Footer() {
     }}>
       <div style={{ maxWidth: 600, margin: '0 auto', textAlign: 'center' }}>
         <div style={{ fontSize: 17.6, fontWeight: 700, color: '#fff', marginBottom: 4 }}>
-          Kumbakonam <span style={{ color: '#C41E3A' }}>Free Matrimony</span>
+          Chennai <span style={{ color: '#C41E3A' }}>Profile Matrimony</span>
         </div>
         <div style={{ fontSize: 12.1, color: '#888', marginBottom: 16, lineHeight: 1.5 }}>
           {t("footer.tagline") || "Find your perfect life partner with trust and tradition"}
@@ -30,7 +30,7 @@ export default function Footer() {
         </div>
 
         <div style={{ fontSize: 11, color: '#555', letterSpacing: 0.5 }}>
-          © {new Date().getFullYear()} Kumbakonam Free Matrimony. All rights reserved.
+          © {new Date().getFullYear()} Chennai Profile Matrimony. All rights reserved.
         </div>
       </div>
     </footer>

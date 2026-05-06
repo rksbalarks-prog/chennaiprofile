@@ -46,7 +46,7 @@ export default function PrivacyPolicy() {
         <Section title="8. Contact Us">
           <p>For privacy-related queries, contact us at:</p>
           <p style={{ marginTop:6 }}>
-            Email: <strong>info@kumbakonamfreematrimony.com</strong><br/>
+            Email: <strong>info@chennaiprofile.in</strong><br/>
             Phone: <strong>+91 90253 16833</strong>
           </p>
         </Section>

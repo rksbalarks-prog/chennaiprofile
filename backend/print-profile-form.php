@@ -359,7 +359,7 @@ body {
 
   <!-- HEADER -->
   <div class="form-header">
-    <h1>Kumbakonam Free Matrimony</h1>
+    <h1>Chennai Profile Matrimony</h1>
     <p>Profile Registration Form</p>
   </div>
 
@@ -487,7 +487,7 @@ body {
 
   <!-- HEADER (repeated) -->
   <div class="form-header">
-    <h1>Kumbakonam Free Matrimony</h1>
+    <h1>Chennai Profile Matrimony</h1>
     <p>Profile Registration Form</p>
   </div>
 

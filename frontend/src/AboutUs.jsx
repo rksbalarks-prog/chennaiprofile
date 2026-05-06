@@ -14,14 +14,14 @@ export default function AboutUs() {
     <div style={{ background:'#f5f5f5', minHeight:'100vh', paddingBottom:70 }}>
       <div style={{ background:'#fff', padding:'20px 16px', borderBottom:'1px solid #f0f0f0', textAlign:'center' }}>
         <h1 style={{ fontSize:22, fontWeight:700, color:'#222', margin:0 }}>About Us</h1>
-        <p style={{ fontSize:14.3, color:'#999', marginTop:4 }}>Kumbakonam Free Matrimony</p>
+        <p style={{ fontSize:14.3, color:'#999', marginTop:4 }}>Chennai Profile Matrimony</p>
       </div>
 
       <div style={{ maxWidth:600, margin:'0 auto', padding:'12px' }}>
 
         <Section title="Who We Are">
           <p style={{ fontSize:15.4, color:'#444', lineHeight:1.8 }}>
-            Kumbakonam Free Matrimony is a trusted matrimonial platform dedicated to helping individuals find their perfect life partner. Based in the culturally rich town of Kumbakonam, Tamil Nadu, we understand the importance of tradition, values, and compatibility in building lasting relationships.
+            Chennai Profile Matrimony is a trusted matrimonial platform dedicated to helping individuals find their perfect life partner. Based in the culturally rich town of Chennai, Tamil Nadu, we understand the importance of tradition, values, and compatibility in building lasting relationships.
           </p>
         </Section>
 
@@ -67,8 +67,8 @@ export default function AboutUs() {
         <Section title="Contact Information">
           <div style={{ fontSize:15.4, color:'#444', lineHeight:2 }}>
             <div>Phone: <strong>+91 90253 16833</strong></div>
-            <div>Email: <strong>info@kumbakonamfreematrimony.com</strong></div>
-            <div>Address: <strong>No. 45, Big Street, Near Mahamaham Tank, Kumbakonam - 612001, Tamil Nadu</strong></div>
+            <div>Email: <strong>info@chennaiprofile.in</strong></div>
+            <div>Address: <strong>No. 45, Big Street, Chennai - 600001, Tamil Nadu</strong></div>
           </div>
         </Section>
       </div>

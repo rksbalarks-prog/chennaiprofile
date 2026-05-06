@@ -16,7 +16,7 @@ export default function TermsAndConditions() {
       <div style={{ maxWidth:600, margin:'0 auto', padding:'12px' }}>
 
         <Section title="1. Acceptance of Terms">
-          <p>By accessing and using Kumbakonam Free Matrimony, you agree to be bound by these Terms and Conditions. If you do not agree to these terms, please do not use our services.</p>
+          <p>By accessing and using Chennai Profile Matrimony, you agree to be bound by these Terms and Conditions. If you do not agree to these terms, please do not use our services.</p>
         </Section>
 
         <Section title="2. Eligibility">
@@ -40,7 +40,7 @@ export default function TermsAndConditions() {
         </Section>
 
         <Section title="5. Free Service">
-          <p>Kumbakonam Free Matrimony is a free service. We do not charge any fees for registration, profile creation, searching, or viewing contact details. Premium features, if introduced in the future, will be clearly marked and optional.</p>
+          <p>Chennai Profile Matrimony is a free service. We do not charge any fees for registration, profile creation, searching, or viewing contact details. Premium features, if introduced in the future, will be clearly marked and optional.</p>
         </Section>
 
         <Section title="6. Profile Verification">
@@ -52,7 +52,7 @@ export default function TermsAndConditions() {
         </Section>
 
         <Section title="8. Limitation of Liability">
-          <p>Kumbakonam Free Matrimony acts as a platform to connect individuals. We are not responsible for the actions, behavior, or statements of any user. We do not guarantee the accuracy of information provided by users.</p>
+          <p>Chennai Profile Matrimony acts as a platform to connect individuals. We are not responsible for the actions, behavior, or statements of any user. We do not guarantee the accuracy of information provided by users.</p>
         </Section>
 
         <Section title="9. Account Termination">
@@ -62,7 +62,7 @@ export default function TermsAndConditions() {
         <Section title="10. Contact">
           <p>For questions about these terms, contact us at:</p>
           <p style={{ marginTop:6 }}>
-            Email: <strong>info@kumbakonamfreematrimony.com</strong><br/>
+            Email: <strong>info@chennaiprofile.in</strong><br/>
             Phone: <strong>+91 90253 16833</strong>
           </p>
         </Section>

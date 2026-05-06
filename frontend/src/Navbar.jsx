@@ -363,12 +363,12 @@ export default function Navbar() {
         )}
         <Link to="/" className="top-bar-brand">
           <div className="top-bar-logo">
-            <img src="/assets/kumbakonam_logo.svg" alt="Logo"
-              onError={(e) => { e.target.parentElement.innerHTML = '<span style="font-size:18px;font-weight:900;color:#8B0000">KM</span>'; }} />
+            <img src="/assets/chennaiprofile_logo.svg" alt="Logo"
+              onError={(e) => { e.target.parentElement.innerHTML = '<span style="font-size:18px;font-weight:900;color:#8B0000">CP</span>'; }} />
           </div>
           <div>
-            <div className="top-bar-title">Kumbakonam</div>
-            <div className="top-bar-subtitle">Free Matrimony</div>
+            <div className="top-bar-title">Chennai Profile</div>
+            <div className="top-bar-subtitle">Matrimony</div>
           </div>
         </Link>
 
@@ -457,7 +457,7 @@ export default function Navbar() {
           )}
         </div>
         <div className="slide-menu-footer">
-          <div style={{ fontSize: 12.1, color: '#999', textAlign: 'center' }}>Kumbakonam Free Matrimony</div>
+          <div style={{ fontSize: 12.1, color: '#999', textAlign: 'center' }}>Chennai Profile Matrimony</div>
         </div>
       </div>
 

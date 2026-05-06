@@ -220,9 +220,9 @@ export default function MobileGate({ children }) {
         {/* Form */}
         <div style={S.right}>
           <div className="mg-mobile-brand" style={S.mobileBrand}>
-            <div style={S.mobileBrandBadge}>KM</div>
+            <div style={S.mobileBrandBadge}>CP</div>
             <div>
-              <div style={S.mobileBrandTitle}>Kumbakonam Free Matrimony</div>
+              <div style={S.mobileBrandTitle}>Chennai Profile Matrimony</div>
               <div style={S.mobileBrandSub}>Verified · Safe · Free</div>
             </div>
           </div>

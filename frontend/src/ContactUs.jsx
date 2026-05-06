@@ -91,13 +91,13 @@ export default function Contact() {
           </a>
 
           {/* Email */}
-          <a href="mailto:info@kumbakonamfreematrimony.com" style={{ display:'flex', alignItems:'center', gap:14, background:'#fff', borderRadius:12, padding:'16px 18px', border:'1px solid #f0f0f0', boxShadow:'0 1px 4px rgba(0,0,0,0.04)', textDecoration:'none' }}>
+          <a href="mailto:info@chennaiprofile.in" style={{ display:'flex', alignItems:'center', gap:14, background:'#fff', borderRadius:12, padding:'16px 18px', border:'1px solid #f0f0f0', boxShadow:'0 1px 4px rgba(0,0,0,0.04)', textDecoration:'none' }}>
             <div style={{ width:44, height:44, borderRadius:10, background:'#eff6ff', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
             </div>
             <div>
               <div style={{ fontSize:12.1, fontWeight:700, color:'#999', textTransform:'uppercase', letterSpacing:0.5 }}>Email</div>
-              <div style={{ fontSize:15.4, fontWeight:600, color:'#2563eb' }}>info@kumbakonamfreematrimony.com</div>
+              <div style={{ fontSize:15.4, fontWeight:600, color:'#2563eb' }}>info@chennaiprofile.in</div>
             </div>
           </a>
 
@@ -111,7 +111,7 @@ export default function Contact() {
               <div style={{ fontSize:15.4, fontWeight:600, color:'#333', lineHeight:1.6 }}>
                 No. 45, Big Street,<br/>
                 Near Mahamaham Tank,<br/>
-                Kumbakonam - 612001,<br/>
+                Chennai - 600001,<br/>
                 Thanjavur District, Tamil Nadu
               </div>
             </div>

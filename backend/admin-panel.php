@@ -1130,7 +1130,7 @@ input[type="date"].filter-select { padding:8px 10px; cursor:pointer; }
 <div id="loginPage" class="login-page" style="display:none">
   <div class="login-card">
     <div class="login-logo">
-      <h1>Kumbakonam</h1>
+      <h1>Chennai Profile</h1>
       <p>Free Matrimony — Admin Console</p>
     </div>
 
@@ -1223,8 +1223,8 @@ input[type="date"].filter-select { padding:8px 10px; cursor:pointer; }
 <nav class="sidebar" id="sidebar">
   <div class="sidebar-header">
     <div class="sidebar-logo">
-      Kumbakonam
-      <span>Free Matrimony</span>
+      Chennai Profile
+      <span>Matrimony</span>
     </div>
     <a href="print-profile-form.php" target="_blank" style="display:flex;align-items:center;gap:6px;margin-top:12px;padding:7px 12px;background:rgba(232,98,74,0.15);border:1px solid rgba(232,98,74,0.3);border-radius:8px;color:#e8624a;font-size:11.5px;font-weight:600;text-decoration:none;transition:all 0.2s" onmouseover="this.style.background='rgba(232,98,74,0.25)'" onmouseout="this.style.background='rgba(232,98,74,0.15)'">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -1366,7 +1366,7 @@ input[type="date"].filter-select { padding:8px 10px; cursor:pointer; }
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       Sign Out
     </button>
-    <div style="text-align:center;margin-top:10px;font-size:10.5px;color:rgba(255,255,255,0.2)">Kumbakonam Free Matrimony v2.0</div>
+    <div style="text-align:center;margin-top:10px;font-size:10.5px;color:rgba(255,255,255,0.2)">Chennai Profile Matrimony v2.0</div>
   </div>
 </nav>
 
@@ -7631,7 +7631,7 @@ function printProfile(i) {
     <html><head><title>Profile - ${p.cpId}</title>
     <style>body{font-family:sans-serif;padding:30px;color:#1a1a2e}h2{margin-bottom:4px}table{border-collapse:collapse;width:100%;margin-top:16px}td{padding:8px 12px;border:1px solid #e5e0d8;font-size:14px}tr:nth-child(even){background:#f8f7f5}.label{font-weight:600;width:35%;background:#f0ede8}</style>
     </head><body>
-    <h2>Kumbakonam Free Matrimony — Member Profile</h2>
+    <h2>Chennai Profile Matrimony — Member Profile</h2>
     <p style="color:#6b7280;font-size:13px">Printed on ${new Date().toLocaleDateString()}</p>
     ${photoSrc(p.photo1) ? `<div style="text-align:center;margin:16px 0"><img src="${location.origin+'/matrimony/backend/'+photoSrc(p.photo1)}" style="width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid #e5e7eb" onerror="this.style.display='none'"></div>` : ''}
     <table>

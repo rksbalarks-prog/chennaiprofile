@@ -302,7 +302,7 @@
     "phoneLabel": "Call Us",
     "addressLabel": "Visit Us",
     "hoursLabel": "Working Hours",
-    "emailValue": "support@kumbakonammatrimony.in",
+    "emailValue": "support@chennaiprofile.in",
     "phoneValue": "+91-9876543210",
     "addressValue": "No. 12, Anna Salai, Chennai – 600002",
     "hoursValue": "Mon–Sat · 9:00 AM to 6:00 PM IST",
@@ -322,20 +322,20 @@
     "addressText": "Chennai, Tamil Nadu, India"
   },
   "footer": {
-    "brand": "Kumbakonam Free Matrimony",
-    "copyright": "© 2026 Kumbakonam Free Matrimony · All rights reserved",
+    "brand": "Chennai Profile Matrimony",
+    "copyright": "© 2026 Chennai Profile Matrimony · All rights reserved",
     "tagline": "Your trusted platform for finding love and companionship. We believe in bringing hearts together with trust, respect, and authenticity.",
     "contactUs": "Contact Us",
     "addressSection": "Address",
     "quickLinks": "Quick Links",
     "phone": "+91 98765 43210",
     "whatsapp": "WhatsApp: +91 98765 43210",
-    "email": "info@kumbakonammatrimony.com",
-    "fullAddress": "Kumbakonam Free Matrimony\nKumbakonam, Tamil Nadu,\nIndia",
+    "email": "info@chennaiprofile.in",
+    "fullAddress": "Chennai Profile Matrimony\nChennai, Tamil Nadu,\nIndia",
     "terms": "Terms & Conditions",
     "privacy": "Privacy Policy",
     "aboutUs": "About Us",
-    "bottomText": "© 2026 Kumbakonam Free Matrimony · All Rights Reserved · Designed with ❤️ for Love"
+    "bottomText": "© 2026 Chennai Profile Matrimony · All Rights Reserved · Designed with ❤️ for Love"
   },
   "search": {
     "filterTitle": "🔍 Search Filters",
@@ -415,14 +415,14 @@
   },
   "about": {
     "whyUsLabel": "✦ Why Us",
-    "whyUsTitle": "Why Choose Kumbakonam Free Matrimony?",
+    "whyUsTitle": "Why Choose Chennai Profile Matrimony?",
     "whyUsSubtitle": "We combine cutting-edge technology with deep cultural understanding to deliver an experience unlike any other matrimonial platform.",
     "servicesLabel": "✦ What We Offer",
     "servicesTitle": "Our Services",
     "servicesSubtitle": "From free profile creation to premium membership, we offer a suite of services designed to maximize your chances of finding the right match.",
     "storiesLabel": "✦ Happy Couples",
     "storiesTitle": "Success Stories",
-    "storiesSubtitle": "Over 18,500 couples have found their perfect match through Kumbakonam Free Matrimony. Here are a few of their beautiful stories.",
+    "storiesSubtitle": "Over 18,500 couples have found their perfect match through Chennai Profile Matrimony. Here are a few of their beautiful stories.",
     "whyChoose": [
       { "icon": "✅", "title": "Verified Profiles", "desc": "Every profile on our platform undergoes a thorough manual and document-based verification process to ensure authenticity and build trust among our members." },
       { "icon": "📱", "title": "Easy-to-Use Platform", "desc": "Our intuitive, clutter-free interface makes it simple to create a profile, search for matches, and connect — whether you're on mobile, tablet, or desktop." },
@@ -528,7 +528,7 @@
     "agreementText": "I have read, understood, and agree to the Terms & Conditions of MatrimonyConnect. I confirm that all information I provide will be accurate and truthful, and I will use this platform responsibly and in accordance with the stated guidelines.",
     "acceptBtn": "✔ I Accept These Terms",
     "declineBtn": "✕ Decline",
-    "acceptedBanner": "✅ Terms Accepted — Welcome to Kumbakonam Free Matrimony Connect!",
+    "acceptedBanner": "✅ Terms Accepted — Welcome to Chennai Profile Matrimony Connect!",
     "lastUpdated": "This Terms & Conditions document was last reviewed on",
     "sections": [
       { "id": "intro", "icon": "📜", "title": "1. Introduction", "content": "Welcome to MatrimonyConnect, India's trusted matrimonial platform dedicated to helping individuals find their life partners. By accessing or using our website, mobile application, or any related services (collectively referred to as the \"Platform\"), you agree to be bound by these Terms & Conditions.\n\nThese Terms constitute a legally binding agreement between you (\"User,\" \"you,\" or \"your\") and MatrimonyConnect (\"we,\" \"us,\" or \"our\"). Please read these terms carefully before registering, browsing, or using any features of our Platform. If you do not agree with any part of these terms, you must discontinue use of the Platform immediately.", "bullets": [] },

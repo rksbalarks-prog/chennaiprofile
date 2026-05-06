@@ -63,7 +63,7 @@ $_impersonationMsLeft = $_impersonation
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Kumbakonam Free Matrimony - Member Portal</title>
+<title>Chennai Profile Matrimony - Member Portal</title>
 <style>
 :root{
   --accent:#c2553d;--accent2:#a84330;--accent-bg:#fdf0ed;
@@ -379,7 +379,7 @@ input,select,textarea{outline:none}
 <div id="loginPage" class="login-page" style="display:none">
   <div class="login-card">
     <div class="login-top">
-      <div class="login-brand">Kumbakonam</div>
+      <div class="login-brand">Chennai Profile</div>
       <div class="login-subb">Free Matrimony</div>
     </div>
     <div class="login-body">
@@ -426,14 +426,14 @@ input,select,textarea{outline:none}
     <button class="mob-hamburger" onclick="document.querySelector('.sidebar').classList.add('mob-open');document.getElementById('mobOverlay').classList.add('open')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </button>
-    <div style="flex:1"><div class="mob-topbar-title">Kumbakonam</div><div class="mob-topbar-sub">FREE MATRIMONY</div></div>
+    <div style="flex:1"><div class="mob-topbar-title">Chennai Profile</div><div class="mob-topbar-sub">FREE MATRIMONY</div></div>
     <button onclick="location.href='/search'" aria-label="Search" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:#fff;width:34px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     </button>
   </div>
   <div class="mob-overlay" id="mobOverlay" onclick="document.querySelector('.sidebar').classList.remove('mob-open');this.classList.remove('open')"></div>
   <nav class="sidebar">
-    <div class="sb-brand"><h1>Kumbakonam</h1><span>Free Matrimony</span></div>
+    <div class="sb-brand"><h1>Chennai Profile</h1><span>Free Matrimony</span></div>
     <div class="sb-user">
       <div class="sb-av" id="sbAv">?</div>
       <div><div class="sb-name" id="sbName">-</div><div class="sb-mob" id="sbMob">-</div></div>
