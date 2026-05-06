@@ -14,6 +14,12 @@ export const PHOTO_BASE_OLD = `${PREFIX}/uploads/`;
 export const UPLOADS_PREFIX = `${PREFIX}/backend/api/`;
 export const USER_PANEL_URL = `${PREFIX}/backend/user-panel.php`;
 
+// Chennai Profile uses a points system (10 pts per contact view).
+// Kumbakonam (same DB, different domain) keeps free access — no points check.
+export const IS_CHENNAI_PROFILE = !isLocal && host.includes('chennaiprofile');
+export const POINTS_PER_CONTACT = 10;
+export const POINTS_API = `${PREFIX}/backend/api/points.php`;
+
 // Resolve variants of a photo path coming from the DB.
 // Handles S3 URLs (https://...) and legacy local paths (uploads/abc.jpg).
 export const getPhotoUrls = (raw) => {

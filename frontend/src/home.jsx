@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { API_BASE, PHOTO_BASE, PHOTO_BASE_OLD, UPLOADS_PREFIX, USER_PANEL_URL, getPhotoUrls } from './config';
+import { API_BASE, PHOTO_BASE, PHOTO_BASE_OLD, UPLOADS_PREFIX, USER_PANEL_URL, getPhotoUrls, IS_CHENNAI_PROFILE, POINTS_PER_CONTACT, POINTS_API } from './config';
 import { buildSummary } from './profileSummary';
 
 const mapP = (p) => ({
@@ -61,6 +61,8 @@ export default function Home() {
   // exist purely to drive UI hints ("4 of 5 free views used"). Updated from
   // the bootstrap response and from each track_view response.
   const [gateState, setGateState] = useState({ returning:false, anonViewsUsed:0, anonViewsLimit:5, gateRequired:false, anonWindowSec:24*3600, anonWindowStart:0 });
+  const [pointsBalance, setPointsBalance] = useState(null);
+  const [showPointsModal, setShowPointsModal] = useState(false);
   // Banner text shown at the top of the OTP modal when it was opened because
   // of the gate (free-limit reached or returning user). Keeps the styling
   // separate from otpMsg, which is wired to the success/error indicator.
@@ -345,11 +347,17 @@ export default function Home() {
         }));
       }
 
+      if (res.status === 402 && tv && tv.need_points) {
+        setPointsBalance(tv.balance ?? 0);
+        setShowPointsModal(true);
+        return;
+      }
       if (!res.ok && tv && tv.gate_required) {
         openGateModal(profileId, tv.gate_reason, tv.anon_views_limit);
         return;
       }
       if (tv && tv.mobile) setRevealedPhones(prev => ({ ...prev, [profileId]: tv.mobile }));
+      if (tv && tv.points_balance != null) setPointsBalance(tv.points_balance);
     } catch(e) {}
     setRevealedContactId(profileId);
   };
@@ -528,7 +536,7 @@ export default function Home() {
             );
           })() : (
             <button onClick={e=>{e.stopPropagation();handleViewContact(p.id);}} style={{ flex:'1 1 0', minWidth:0, padding:'5px 4px', background:'linear-gradient(135deg,#16a34a,#15803d)', color:'#fff', border:'none', borderRadius:6, fontSize:12.1, fontWeight:700, cursor:'pointer', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-              View Free Contact
+              {IS_CHENNAI_PROFILE ? `View Contact (${POINTS_PER_CONTACT} pts)` : 'View Free Contact'}
             </button>
           )}
         </div>
@@ -935,6 +943,43 @@ export default function Home() {
                   setShowReportModal(false); setReportReason(''); setReportProfileId(null);
                 }} style={{ flex:1, padding:10, background: reportReason ? 'linear-gradient(135deg,#8B0000,#C41E3A)' : '#ddd', color:'#fff', border:'none', borderRadius:8, fontSize:14.3, fontWeight:700, cursor: reportReason ? 'pointer' : 'not-allowed' }}>Submit Report</button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Points modal */}
+      {showPointsModal && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.55)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:3100, backdropFilter:'blur(4px)' }}
+          onClick={() => setShowPointsModal(false)}>
+          <div style={{ background:'#fff', borderRadius:20, overflow:'hidden', maxWidth:360, width:'92%', boxShadow:'0 24px 64px rgba(0,0,0,0.28)' }}
+            onClick={e => e.stopPropagation()}>
+            <div style={{ background:'linear-gradient(135deg,#8B0000,#C41E3A)', padding:'20px 22px', textAlign:'center' }}>
+              <div style={{ fontSize:32 }}>🪙</div>
+              <div style={{ color:'#fff', fontSize:17, fontWeight:700, marginTop:6 }}>Points Required</div>
+              <div style={{ color:'rgba(255,255,255,0.8)', fontSize:13, marginTop:4 }}>Each contact view costs {POINTS_PER_CONTACT} points</div>
+            </div>
+            <div style={{ padding:'20px 22px' }}>
+              <div style={{ background:'#fef3f2', borderRadius:10, padding:'12px 16px', marginBottom:16, textAlign:'center' }}>
+                <div style={{ fontSize:13, color:'#888' }}>Your balance</div>
+                <div style={{ fontSize:28, fontWeight:900, color:'#8B0000' }}>{pointsBalance ?? 0} pts</div>
+                <div style={{ fontSize:12, color:'#aaa', marginTop:2 }}>Need {POINTS_PER_CONTACT} pts to reveal contact</div>
+              </div>
+              <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+                {[{pts:100,price:100,badge:''},{pts:500,price:500,badge:'Popular'},{pts:1000,price:1000,badge:'Best Value'}].map(pkg => (
+                  <a key={pkg.pts} href={`/backend/user-panel.php?buy_pts=${pkg.pts}`}
+                    style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 16px', border:'2px solid #8B0000', borderRadius:10, background:'#fff', textDecoration:'none', cursor:'pointer' }}>
+                    <div>
+                      <span style={{ fontWeight:700, color:'#8B0000', fontSize:15 }}>{pkg.pts} Points</span>
+                      {pkg.badge ? <span style={{ marginLeft:8, fontSize:10, background:'#8B0000', color:'#fff', borderRadius:6, padding:'1px 6px' }}>{pkg.badge}</span> : null}
+                    </div>
+                    <span style={{ background:'#8B0000', color:'#fff', borderRadius:8, padding:'4px 14px', fontSize:13.5, fontWeight:600 }}>₹{pkg.price}</span>
+                  </a>
+                ))}
+              </div>
+              <button onClick={() => setShowPointsModal(false)}
+                style={{ marginTop:14, width:'100%', padding:'10px', border:'1px solid #ddd', borderRadius:10, background:'#f5f5f5', color:'#666', fontSize:14, cursor:'pointer' }}>
+                Cancel
+              </button>
             </div>
           </div>
         </div>
