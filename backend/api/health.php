@@ -22,6 +22,7 @@
 
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../sms.php';
+require_once __DIR__ . '/../sms-helpers.php';
 
 $isCli = PHP_SAPI === 'cli';
 if (!$isCli) header('Content-Type: application/json; charset=utf-8');

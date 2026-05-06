@@ -3,6 +3,8 @@
 // Public endpoints (no auth required): register, search, detail
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../admin-config.php';
+require_once __DIR__ . '/../sms.php';
+require_once __DIR__ . '/../sms-helpers.php';
 cors();
 
 $db = getDB();
