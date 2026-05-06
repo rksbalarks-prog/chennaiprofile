@@ -592,25 +592,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!$verified) kfm_anon_record($targetCpId); // count this reveal toward the 5
 
             // ── Points gate (Chennai Profile only) ────────────────────────
-            // Only applies when SITE_ID = 'chennaip'. Kumbakonam keeps free access.
-            if (defined('SITE_ID') && SITE_ID === 'chennaip' && $verified) {
+            // Kumbakonam keeps free access. Chennai Profile requires login + points
+            // for EVERY contact view — anonymous users get no free quota here.
+            if (defined('SITE_ID') && SITE_ID === 'chennaip') {
                 $viewerMob = $_SESSION['mobile'] ?? $_SESSION['contact_mobile'] ?? '';
-                if ($viewerMob) {
-                    require_once __DIR__ . '/points.php';
-                    $bal = pts_get_balance($db, $viewerMob);
-                    if ($bal < POINTS_PER_CONTACT) {
-                        http_response_code(402);
-                        echo json_encode([
-                            'ok'          => false,
-                            'need_points' => true,
-                            'balance'     => $bal,
-                            'required'    => POINTS_PER_CONTACT,
-                            'error'       => 'Insufficient points to view contact.',
-                        ]);
-                        exit;
-                    }
-                    pts_deduct($db, $viewerMob, POINTS_PER_CONTACT, 'Contact view: ' . $targetCpId, $targetCpId);
+                if (!$viewerMob) {
+                    // Not logged in — block and prompt to login/buy points
+                    http_response_code(402);
+                    echo json_encode([
+                        'ok'          => false,
+                        'need_points' => true,
+                        'balance'     => 0,
+                        'required'    => POINTS_PER_CONTACT,
+                        'error'       => 'Login and points required to view contact.',
+                    ]);
+                    exit;
                 }
+                require_once __DIR__ . '/points.php';
+                $bal = pts_get_balance($db, $viewerMob);
+                if ($bal < POINTS_PER_CONTACT) {
+                    http_response_code(402);
+                    echo json_encode([
+                        'ok'          => false,
+                        'need_points' => true,
+                        'balance'     => $bal,
+                        'required'    => POINTS_PER_CONTACT,
+                        'error'       => 'Insufficient points to view contact.',
+                    ]);
+                    exit;
+                }
+                pts_deduct($db, $viewerMob, POINTS_PER_CONTACT, 'Contact view: ' . $targetCpId, $targetCpId);
             }
             // ─────────────────────────────────────────────────────────────
 
