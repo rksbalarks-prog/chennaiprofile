@@ -3,7 +3,9 @@
 // Public endpoints (no auth required): register, search, detail
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../admin-config.php';
-require_once __DIR__ . '/../sms.php';
+$_smsFile = __DIR__ . '/../sms.php';
+if (is_file($_smsFile)) require_once $_smsFile;
+if (!defined('SMS_ENABLED')) define('SMS_ENABLED', false);
 require_once __DIR__ . '/../sms-helpers.php';
 cors();
 
@@ -324,7 +326,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                verified         = IF(verified = 'verified', verified, 'otp_request')"
         )->execute([':m' => $mobile, ':c' => $prof['cp_id'] ?? null, ':n' => $prof['name'] ?? null]);
 
-        require_once __DIR__ . '/../sms.php';
         $sent = sendOTP($mobile, $otp);
 
         $resp = ['message' => 'OTP sent to ' . substr($mobile, 0, 3) . '****' . substr($mobile, -3)];

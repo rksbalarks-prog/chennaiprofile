@@ -2,7 +2,9 @@
 // matrimony/api/auth.php
 
 require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../sms.php';
+$_smsFile = __DIR__ . '/../sms.php';
+if (is_file($_smsFile)) require_once $_smsFile;
+if (!defined('SMS_ENABLED')) define('SMS_ENABLED', false);
 require_once __DIR__ . '/../sms-helpers.php';
 
 cors();
