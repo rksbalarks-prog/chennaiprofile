@@ -1487,8 +1487,6 @@ async function launchApp() {
   fillSidebar();
   renderMyProfile();
   setActions('myProfile');
-  showWelcomeBalance();
-
   // Auto-open Create Profile modal when arriving via homepage "Register" link (?create=1)
   const launchParams = new URLSearchParams(window.location.search);
   if (launchParams.get('create') === '1' && !profile && upAllowed('feat_create_profile')) {
