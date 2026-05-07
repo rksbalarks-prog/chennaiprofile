@@ -97,12 +97,17 @@ jobs:
             -e "s|%%SMS_SENDER_ID%%|$SMS_SENDER_ID|g" \
             -e "s|%%SMS_DLT_TE_ID%%|$SMS_DLT_TE_ID|g" \
             backend/sms.template.php > payload/backend/sms.php
-          # Generate payu-config.php from template + GitHub Secrets
-          sed \
-            -e "s|%%PAYU_KEY%%|$PAYU_KEY|g" \
-            -e "s|%%PAYU_SALT%%|$PAYU_SALT|g" \
-            -e "s|%%PAYU_MID%%|$PAYU_MID|g" \
-            backend/payu-config.template.php > payload/backend/payu-config.php
+          # Generate payu-config.php only when secrets are present.
+          # If PAYU_KEY is empty the existing file on the server is kept (deploy.php will reject the overwrite).
+          if [ -n "$PAYU_KEY" ] && [ -n "$PAYU_SALT" ]; then
+            sed \
+              -e "s|%%PAYU_KEY%%|$PAYU_KEY|g" \
+              -e "s|%%PAYU_SALT%%|$PAYU_SALT|g" \
+              -e "s|%%PAYU_MID%%|$PAYU_MID|g" \
+              backend/payu-config.template.php > payload/backend/payu-config.php
+          else
+            echo "PAYU_KEY not set — skipping payu-config.php (existing server file kept)"
+          fi
           # frontend/API (PHP helpers referenced by the app), excluding its db.php
           if [ -d frontend/API ]; then
             mkdir -p payload/frontend/API

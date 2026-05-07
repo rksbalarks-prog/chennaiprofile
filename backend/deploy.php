@@ -110,6 +110,8 @@ $protected = [
     'backend/config.production.php',
     'backend/.deploy-secret',
     'frontend/API/db.php',
+    // payu-config.php: only accepted when CI sends it (PAYU_KEY secret is set).
+    // Guarded on the CI side; listed here as a last-resort safety net.
 ];
 // Path prefixes under which every write is refused (user content, runtime).
 $protectedPrefixes = [
