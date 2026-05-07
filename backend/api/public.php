@@ -591,54 +591,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!$verified && !$isChennai) kfm_anon_record($targetCpId);
 
             // ── Points gate (Chennai Profile only) ────────────────────────
-            // Kumbakonam keeps free access. Chennai Profile requires login + points
-            // for EVERY contact view — anonymous users get no free quota here.
-            if (defined('SITE_ID') && SITE_ID === 'chennaip') {
-                require_once __DIR__ . '/points.php'; // must come first — defines POINTS_PER_CONTACT
+            if ($isChennai) {
+                require_once __DIR__ . '/points.php';
+
+                // Fetch contact info FIRST — only charge if there's something to reveal.
+                $tgt = $db->prepare("SELECT mobile, alt_mobile, email, contact_person FROM profiles WHERE cp_id = :c AND status = 'Approved' LIMIT 1");
+                $tgt->execute([':c' => $targetCpId]);
+                $row = $tgt->fetch();
+                $hasContact = $row && (!empty($row['mobile']) || !empty($row['alt_mobile']) || !empty($row['email']));
+
                 $viewerMob = $_SESSION['mobile'] ?? $_SESSION['contact_mobile'] ?? '';
                 if (!$viewerMob) {
-                    // Not logged in — block and prompt to login/buy points
                     http_response_code(402);
-                    echo json_encode([
-                        'ok'          => false,
-                        'need_points' => true,
-                        'balance'     => 0,
-                        'required'    => POINTS_PER_CONTACT,
-                        'error'       => 'Login and points required to view contact.',
-                    ]);
+                    echo json_encode(['ok' => false, 'need_points' => true, 'balance' => 0, 'required' => POINTS_PER_CONTACT, 'error' => 'Login and points required to view contact.']);
                     exit;
                 }
-                $bal = pts_get_balance($db, $viewerMob);
-                if ($bal < POINTS_PER_CONTACT) {
-                    http_response_code(402);
-                    echo json_encode([
-                        'ok'          => false,
-                        'need_points' => true,
-                        'balance'     => $bal,
-                        'required'    => POINTS_PER_CONTACT,
-                        'error'       => 'Insufficient points to view contact.',
-                    ]);
-                    exit;
+                if ($hasContact) {
+                    $bal = pts_get_balance($db, $viewerMob);
+                    if ($bal < POINTS_PER_CONTACT) {
+                        http_response_code(402);
+                        echo json_encode(['ok' => false, 'need_points' => true, 'balance' => $bal, 'required' => POINTS_PER_CONTACT, 'error' => 'Insufficient points to view contact.']);
+                        exit;
+                    }
+                    $alreadyPaid = $db->prepare("SELECT 1 FROM point_transactions WHERE mobile = :m AND ref_id = :r AND type = 'deduct' LIMIT 1");
+                    $alreadyPaid->execute([':m' => $viewerMob, ':r' => $targetCpId]);
+                    if (!$alreadyPaid->fetchColumn()) {
+                        $result = pts_deduct($db, $viewerMob, POINTS_PER_CONTACT, 'Contact view: ' . $targetCpId, $targetCpId);
+                        if ($result === false) {
+                            http_response_code(402);
+                            echo json_encode(['ok' => false, 'need_points' => true, 'balance' => pts_get_balance($db, $viewerMob), 'required' => POINTS_PER_CONTACT, 'error' => 'Insufficient points to view contact.']);
+                            exit;
+                        }
+                    }
                 }
-                pts_deduct($db, $viewerMob, POINTS_PER_CONTACT, 'Contact view: ' . $targetCpId, $targetCpId);
+                json_ok(array_merge([
+                    'tracked'        => true,
+                    'mobile'         => $row['mobile'] ?? '',
+                    'alt_mobile'     => $row['alt_mobile'] ?? '',
+                    'email'          => $row['email'] ?? '',
+                    'contact_person' => $row['contact_person'] ?? '',
+                    'points_balance' => pts_get_balance($db, $viewerMob),
+                ], kfm_gate_snapshot()));
             }
             // ─────────────────────────────────────────────────────────────
 
             $tgt = $db->prepare("SELECT mobile, alt_mobile, email, contact_person FROM profiles WHERE cp_id = :c AND status = 'Approved' LIMIT 1");
             $tgt->execute([':c' => $targetCpId]);
             $row = $tgt->fetch();
-            $extra = [];
-            if (defined('SITE_ID') && SITE_ID === 'chennaip') {
-                $viewerMob2 = $_SESSION['mobile'] ?? $_SESSION['contact_mobile'] ?? '';
-                if ($viewerMob2) $extra['points_balance'] = pts_get_balance($db, $viewerMob2);
-            }
             json_ok(array_merge([
                 'tracked'        => true,
                 'mobile'         => $row['mobile'] ?? '',
                 'alt_mobile'     => $row['alt_mobile'] ?? '',
                 'email'          => $row['email'] ?? '',
                 'contact_person' => $row['contact_person'] ?? '',
-            ], kfm_gate_snapshot(), $extra));
+            ], kfm_gate_snapshot()));
         }
         json_ok(['tracked' => true]);
     }
@@ -1352,7 +1358,8 @@ switch ($action) {
                 $s = $db->prepare("SELECT p.cp_id, p.name, p.age, p.gender, p.caste, p.mother_tongue,
                                           p.marital, p.height, p.qualification, p.job, p.star, p.raasi,
                                           p.religion, p.photo1,
-                                          p.present_area, p.present_city, p.present_district, p.present_state
+                                          p.present_area, p.present_city, p.present_district, p.present_state,
+                                          IF(p.mobile IS NOT NULL AND p.mobile != '', 1, 0) AS has_phone
                                    FROM profiles p
                                    WHERE $w
                                    ORDER BY $orderBy
@@ -1474,7 +1481,8 @@ switch ($action) {
         $sql = "SELECT p.cp_id, p.name, p.age, p.gender, p.caste, p.mother_tongue,
                        p.marital, p.height, p.qualification, p.job, p.star, p.raasi,
                        p.religion, p.photo1,
-                       p.present_area, p.present_city, p.present_district, p.present_state
+                       p.present_area, p.present_city, p.present_district, p.present_state,
+                       IF(p.mobile IS NOT NULL AND p.mobile != '', 1, 0) AS has_phone
                 FROM profiles p
                 WHERE $whereStr
                 ORDER BY $orderClause
@@ -1507,17 +1515,12 @@ switch ($action) {
         // Remove sensitive fields
         unset($profile['pending_plan'], $profile['pending_amount'], $profile['pending_pay_opt_id'], $profile['payment_status']);
 
-        // Chennai Profile: strip contact fields from public detail response.
-        // Contact is only returned by track_view after points are deducted.
+        // Chennai Profile: always strip contact — revealed only via track_view (points gate).
         if (defined('SITE_ID') && SITE_ID === 'chennaip') {
-            secureSession();
-            $authed = !empty($_SESSION['mobile']) || !empty($_SESSION['contact_mobile']);
-            if (!$authed) {
-                $profile['mobile'] = '';
-                $profile['alt_mobile'] = '';
-                $profile['email'] = '';
-                $profile['contact_person'] = '';
-            }
+            $profile['mobile'] = '';
+            $profile['alt_mobile'] = '';
+            $profile['email'] = '';
+            $profile['contact_person'] = '';
         }
 
         json_ok(['profile' => $profile]);

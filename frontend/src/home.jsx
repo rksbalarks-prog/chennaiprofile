@@ -9,7 +9,8 @@ const mapP = (p) => ({
   caste: p.caste || '', gender: p.gender || '',
   language: p.mother_tongue || '', religion: p.religion || '',
   marital: p.marital || '', age: p.age || '',
-  phone: p.mobile || '', qualification: p.qualification || '',
+  phone: p.mobile || '', hasPhone: p.has_phone == null ? true : !!+p.has_phone,
+  qualification: p.qualification || '',
   job: p.job || '', height: p.height || '', star: p.star || '', raasi: p.raasi || '',
   area: p.present_area || '', city: p.present_city || '', district: p.present_district || '', state: p.present_state || '',
   permAddress: p.perm_address || '',
@@ -518,28 +519,30 @@ export default function Home() {
 
         {/* Contact button — always visible across both slides */}
         <div style={{ display:'flex', marginTop:4, minWidth:0, width:'100%' }}>
-          {revealedContactId === p.id ? (() => {
-            const num = revealedPhones[p.id] || p.phone || '';
-            if (num) {
-              return (
+          {(() => {
+            const unavailableBtn = (
+              <button disabled onClick={e=>e.stopPropagation()}
+                style={{ flex:'1 1 0', minWidth:0, padding:'5px 4px', background:'#94a3b8', color:'#fff', border:'none', borderRadius:6, fontSize:12.1, fontWeight:700, cursor:'default', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                Number unavailable
+              </button>
+            );
+            if (revealedContactId === p.id) {
+              const num = revealedPhones[p.id] || p.phone || '';
+              if (num) return (
                 <a href={`tel:${num}`} onClick={e=>e.stopPropagation()} style={{ flex:'1 1 0', minWidth:0, padding:'5px 0', background:'#1a6ea8', color:'#fff', borderRadius:6, fontSize:12.1, fontWeight:700, textAlign:'center', textDecoration:'none', display:'block', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
                   Call: {num}
                 </a>
               );
+              return unavailableBtn;
             }
-            // Number genuinely unavailable for this contact — open the OTP modal so
-            // the visitor can verify and reach support, instead of a dead button.
+            if (IS_CHENNAI_PROFILE && !p.hasPhone) return unavailableBtn;
             return (
-              <button onClick={e => { e.stopPropagation(); openGateModal(p.id, 'number_unavailable', gateState.anonViewsLimit); }}
-                style={{ flex:'1 1 0', minWidth:0, padding:'5px 4px', background:'#1a6ea8', color:'#fff', border:'none', borderRadius:6, fontSize:12.1, fontWeight:700, cursor:'pointer', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                Number unavailable
+              <button onClick={e=>{e.stopPropagation(); handleViewContact(p.id);}}
+                style={{ flex:'1 1 0', minWidth:0, padding:'5px 4px', background:'linear-gradient(135deg,#16a34a,#15803d)', color:'#fff', border:'none', borderRadius:6, fontSize:12.1, fontWeight:700, cursor:'pointer', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                {IS_CHENNAI_PROFILE ? `View Contact (${POINTS_PER_CONTACT} pts)` : 'View Free Contact'}
               </button>
             );
-          })() : (
-            <button onClick={e=>{e.stopPropagation();handleViewContact(p.id);}} style={{ flex:'1 1 0', minWidth:0, padding:'5px 4px', background:'linear-gradient(135deg,#16a34a,#15803d)', color:'#fff', border:'none', borderRadius:6, fontSize:12.1, fontWeight:700, cursor:'pointer', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-              {IS_CHENNAI_PROFILE ? `View Contact (${POINTS_PER_CONTACT} pts)` : 'View Free Contact'}
-            </button>
-          )}
+          })()}
         </div>
       </div>
     </div>

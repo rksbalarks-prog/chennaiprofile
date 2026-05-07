@@ -51,6 +51,10 @@ function pts_deduct(PDO $db, string $mobile, int $points, string $desc, string $
 }
 
 // ── Router ────────────────────────────────────────────────────────────────────
+// Guard: only run the HTTP router when points.php is the entry-point script.
+// When required from public.php as a helper library, bail out here so the
+// router code doesn't execute (it would fall through to json_err + exit).
+if (basename(realpath($_SERVER['SCRIPT_FILENAME'] ?? '')) !== 'points.php') return;
 
 $method = $_SERVER['REQUEST_METHOD'];
 $act    = $_GET['action'] ?? '';
