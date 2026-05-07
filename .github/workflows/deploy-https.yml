@@ -55,6 +55,9 @@ jobs:
           SMS_API_KEY: ${{ secrets.SMS_API_KEY }}
           SMS_SENDER_ID: ${{ secrets.SMS_SENDER_ID }}
           SMS_DLT_TE_ID: ${{ secrets.SMS_DLT_TE_ID }}
+          PAYU_KEY: ${{ secrets.PAYU_KEY }}
+          PAYU_SALT: ${{ secrets.PAYU_SALT }}
+          PAYU_MID: ${{ secrets.PAYU_MID }}
         run: |
           set -euo pipefail
           mkdir -p payload/backend
@@ -66,6 +69,7 @@ jobs:
             --exclude='config.production.php' \
             --exclude='sms.php' \
             --exclude='payu-config.php' \
+            --exclude='payu-config.template.php' \
             --exclude='.deploy-secret' \
             --exclude='api/uploads/' \
             --exclude='logs/' \
@@ -86,13 +90,19 @@ jobs:
             printf "define('SITE_ID', 'chennaip');\n"
             printf "require_once __DIR__ . '/config-helpers.php';\n"
           } > payload/backend/config.php
-          # Generate sms.php from template + GitHub Secrets (credentials never in the public repo)
+          # Generate sms.php from template + GitHub Secrets
           sed \
             -e "s|%%SMS_USERNAME%%|$SMS_USERNAME|g" \
             -e "s|%%SMS_API_KEY%%|$SMS_API_KEY|g" \
             -e "s|%%SMS_SENDER_ID%%|$SMS_SENDER_ID|g" \
             -e "s|%%SMS_DLT_TE_ID%%|$SMS_DLT_TE_ID|g" \
             backend/sms.template.php > payload/backend/sms.php
+          # Generate payu-config.php from template + GitHub Secrets
+          sed \
+            -e "s|%%PAYU_KEY%%|$PAYU_KEY|g" \
+            -e "s|%%PAYU_SALT%%|$PAYU_SALT|g" \
+            -e "s|%%PAYU_MID%%|$PAYU_MID|g" \
+            backend/payu-config.template.php > payload/backend/payu-config.php
           # frontend/API (PHP helpers referenced by the app), excluding its db.php
           if [ -d frontend/API ]; then
             mkdir -p payload/frontend/API
