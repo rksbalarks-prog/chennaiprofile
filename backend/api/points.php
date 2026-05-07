@@ -112,9 +112,9 @@ if ($act === 'buy_init' && $method === 'POST') {
        ->execute([':m' => $mobile, ':t' => $txnId, ':pk' => $pkgId, ':pts' => $pkg['points'], ':a' => $pkg['price']]);
 
     // If PayU config available, build redirect params
-    $payuAvail = is_file(__DIR__ . '/../payu-config.php');
+    @include_once __DIR__ . '/../payu-config.php';
+    $payuAvail = defined('PAYU_KEY') && PAYU_KEY !== '';
     if ($payuAvail) {
-        require_once __DIR__ . '/../payu-config.php';
         $base = payuBaseUrl();
         $firstname = preg_replace('/[^A-Za-z0-9 ]/', '', $profile['name'] ?? 'User') ?: 'User';
         $email     = $profile['email'] ?? ($mobile . '@chennaiprofile.in');
@@ -146,10 +146,9 @@ json_err('Unknown action.');
 
 // ── PayU return handler ───────────────────────────────────────────────────────
 function _handle_buy_return(): void {
-    $payuAvail = is_file(__DIR__ . '/../payu-config.php');
-    if (!$payuAvail) { header('Location: /backend/user-panel.php?pay=pts_fail'); exit; }
     require_once __DIR__ . '/../config.php';
-    require_once __DIR__ . '/../payu-config.php';
+    @include_once __DIR__ . '/../payu-config.php';
+    if (!defined('PAYU_KEY') || PAYU_KEY === '') { header('Location: /backend/user-panel.php?pay=pts_fail'); exit; }
 
     $status  = $_POST['status']  ?? '';
     $txnId   = $_POST['udf1']    ?? '';
