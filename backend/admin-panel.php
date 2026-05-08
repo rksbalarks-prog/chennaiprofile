@@ -2406,51 +2406,170 @@ input[type="date"].filter-select { padding:8px 10px; cursor:pointer; }
 
       <!-- ══ POINTS PANEL ══ -->
       <div class="stab-panel" id="pointsPanel">
-        <div style="padding:20px;max-width:900px">
-          <h3 style="margin:0 0 4px;font-size:16px">🪙 Points System — Chennai Profile</h3>
-          <p style="color:#888;font-size:13px;margin:0 0 18px">Manage user point balances. 10 pts per contact view. Only applies to Chennai Profile.</p>
+        <div style="padding:24px;margin-left:260px">
+
+          <!-- Header -->
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:22px">
+            <div style="width:44px;height:44px;background:linear-gradient(135deg,#8B0000,#c0392b);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🪙</div>
+            <div>
+              <div style="font-size:16px;font-weight:700;color:#1a1a2e">Points System — Chennai Profile</div>
+              <div style="font-size:12px;color:#888;margin-top:2px">10 points per contact view. Applies to Chennai Profile only.</div>
+            </div>
+            <button onclick="loadPtsStats();loadPtsUsers();" style="margin-left:auto;background:#f5f3ef;border:1px solid #e0ddd8;border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;color:#555;font-weight:500">↻ Refresh</button>
+          </div>
 
           <!-- Stats row -->
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px" id="ptsStatsRow">
-            <div style="background:#fff;border:1px solid #e5;border-radius:10px;padding:14px;text-align:center"><div style="font-size:22px;font-weight:800;color:#8B0000" id="aPtsUsers">—</div><div style="font-size:11px;color:#aaa">Users with Points</div></div>
-            <div style="background:#fff;border:1px solid #e5;border-radius:10px;padding:14px;text-align:center"><div style="font-size:22px;font-weight:800;color:#166534" id="aPtsBought">—</div><div style="font-size:11px;color:#aaa">Total Purchased</div></div>
-            <div style="background:#fff;border:1px solid #e5;border-radius:10px;padding:14px;text-align:center"><div style="font-size:22px;font-weight:800;color:#1e40af" id="aPtsUsed">—</div><div style="font-size:11px;color:#aaa">Total Used</div></div>
-            <div style="background:#fff;border:1px solid #e5;border-radius:10px;padding:14px;text-align:center"><div style="font-size:22px;font-weight:800;color:#78350f" id="aPtsBalance">—</div><div style="font-size:11px;color:#aaa">Total Balance</div></div>
-          </div>
-
-          <!-- Manual credit/debit -->
-          <div style="background:#fff;border:1px solid #e5;border-radius:10px;padding:16px;margin-bottom:20px">
-            <div style="font-weight:700;margin-bottom:12px;font-size:14px">Credit / Debit Points Manually</div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
-              <div><label style="font-size:12px;color:#666">Mobile</label><br><input id="aPtsMobile" type="text" placeholder="10-digit mobile" style="border:1px solid #ddd;border-radius:6px;padding:7px 10px;font-size:13px;width:160px"></div>
-              <div><label style="font-size:12px;color:#666">Points</label><br><input id="aPtsAmount" type="number" min="1" placeholder="e.g. 100" style="border:1px solid #ddd;border-radius:6px;padding:7px 10px;font-size:13px;width:100px"></div>
-              <div style="flex:1;min-width:160px"><label style="font-size:12px;color:#666">Note</label><br><input id="aPtsNote" type="text" placeholder="Reason" style="border:1px solid #ddd;border-radius:6px;padding:7px 10px;font-size:13px;width:100%"></div>
-              <button onclick="adminPtsCredit()" style="background:#166534;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:13px;cursor:pointer;font-weight:600">+ Credit</button>
-              <button onclick="adminPtsDebit()" style="background:#991b1b;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:13px;cursor:pointer;font-weight:600">− Debit</button>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px">
+            <div style="background:linear-gradient(135deg,#fff5f5,#fff);border:1px solid #fecaca;border-radius:12px;padding:18px 16px">
+              <div style="font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#ef4444;margin-bottom:10px">👥 Users</div>
+              <div style="font-size:30px;font-weight:800;color:#8B0000;line-height:1" id="aPtsUsers">…</div>
+              <div style="font-size:11px;color:#aaa;margin-top:5px">with points</div>
             </div>
-            <div id="aPtsMsgBox" style="margin-top:10px;font-size:13px;display:none"></div>
+            <div style="background:linear-gradient(135deg,#f0fdf4,#fff);border:1px solid #bbf7d0;border-radius:12px;padding:18px 16px">
+              <div style="font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#16a34a;margin-bottom:10px">💰 Purchased</div>
+              <div style="font-size:30px;font-weight:800;color:#166534;line-height:1" id="aPtsBought">…</div>
+              <div style="font-size:11px;color:#aaa;margin-top:5px">total points</div>
+            </div>
+            <div style="background:linear-gradient(135deg,#eff6ff,#fff);border:1px solid #bfdbfe;border-radius:12px;padding:18px 16px">
+              <div style="font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#3b82f6;margin-bottom:10px">📞 Used</div>
+              <div style="font-size:30px;font-weight:800;color:#1e40af;line-height:1" id="aPtsUsed">…</div>
+              <div style="font-size:11px;color:#aaa;margin-top:5px">total points</div>
+            </div>
+            <div style="background:linear-gradient(135deg,#fffbeb,#fff);border:1px solid #fde68a;border-radius:12px;padding:18px 16px">
+              <div style="font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#d97706;margin-bottom:10px">💎 Balance</div>
+              <div style="font-size:30px;font-weight:800;color:#78350f;line-height:1" id="aPtsBalance">…</div>
+              <div style="font-size:11px;color:#aaa;margin-top:5px">remaining</div>
+            </div>
           </div>
 
-          <!-- Recent transactions -->
-          <div style="background:#fff;border:1px solid #e5;border-radius:10px;overflow:hidden;margin-bottom:20px">
-            <div style="padding:12px 16px;border-bottom:1px solid #f0f0f0;font-weight:700;font-size:14px">Recent Transactions</div>
+          <!-- Point Packages -->
+          <div style="background:#fff;border:1px solid #e8e5e0;border-radius:12px;overflow:hidden;margin-bottom:16px">
+            <div style="padding:14px 18px;border-bottom:1px solid #f0ede8;display:flex;align-items:center;gap:10px">
+              <span style="background:#fdf4ff;color:#9333ea;border-radius:6px;padding:3px 9px;font-size:12px;font-weight:700">📦</span>
+              <span style="font-weight:700;font-size:13px;color:#1a1a2e">Point Packages</span>
+              <span style="font-size:11.5px;color:#888;margin-left:4px">— manage buyable packages shown to users</span>
+              <button onclick="openAddPtsPackage()" style="margin-left:auto;background:#8B0000;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;font-weight:600">+ Add Package</button>
+            </div>
+            <!-- Add/Edit form (hidden) -->
+            <div id="pkgForm" style="display:none;padding:18px 20px;background:#faf9f7;border-bottom:1px solid #f0ede8">
+              <div style="font-weight:700;font-size:13px;margin-bottom:14px" id="pkgFormTitle">Add Package</div>
+              <input type="hidden" id="pkgEditId">
+              <div style="display:grid;grid-template-columns:1fr 1.6fr 1fr 100px 100px;gap:10px;margin-bottom:12px">
+                <div>
+                  <label style="font-size:11.5px;font-weight:600;color:#555;display:block;margin-bottom:4px">Package ID</label>
+                  <input id="pkgId" placeholder="e.g. p500" style="border:1px solid #e0ddd8;border-radius:7px;padding:7px 10px;font-size:13px;width:100%;box-sizing:border-box">
+                </div>
+                <div>
+                  <label style="font-size:11.5px;font-weight:600;color:#555;display:block;margin-bottom:4px">Label</label>
+                  <input id="pkgLabel" placeholder="e.g. 500 Points" style="border:1px solid #e0ddd8;border-radius:7px;padding:7px 10px;font-size:13px;width:100%;box-sizing:border-box">
+                </div>
+                <div>
+                  <label style="font-size:11.5px;font-weight:600;color:#555;display:block;margin-bottom:4px">Badge</label>
+                  <input id="pkgBadge" placeholder="Popular (optional)" style="border:1px solid #e0ddd8;border-radius:7px;padding:7px 10px;font-size:13px;width:100%;box-sizing:border-box">
+                </div>
+                <div>
+                  <label style="font-size:11.5px;font-weight:600;color:#555;display:block;margin-bottom:4px">Points</label>
+                  <input id="pkgPoints" type="number" min="1" placeholder="500" style="border:1px solid #e0ddd8;border-radius:7px;padding:7px 10px;font-size:13px;width:100%;box-sizing:border-box">
+                </div>
+                <div>
+                  <label style="font-size:11.5px;font-weight:600;color:#555;display:block;margin-bottom:4px">Price (₹)</label>
+                  <input id="pkgPrice" type="number" min="1" step="0.01" placeholder="500" style="border:1px solid #e0ddd8;border-radius:7px;padding:7px 10px;font-size:13px;width:100%;box-sizing:border-box">
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <button onclick="savePtsPackage()" style="background:#166534;color:#fff;border:none;border-radius:8px;padding:8px 20px;font-size:13px;cursor:pointer;font-weight:600">💾 Save</button>
+                <button onclick="closePkgForm()" style="background:#f5f3ef;border:1px solid #e0ddd8;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer;color:#555">Cancel</button>
+                <span id="pkgFormMsg" style="font-size:12.5px;display:none;border-radius:6px;padding:6px 12px;margin-left:4px"></span>
+              </div>
+            </div>
+            <!-- Packages table -->
             <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px">
-              <thead><tr style="background:#f9f9f9"><th style="padding:8px 12px;text-align:left">Mobile</th><th>Name</th><th>Type</th><th>Points</th><th>Balance After</th><th>Description</th><th>Date</th></tr></thead>
-              <tbody id="aPtsTxnTbody"><tr><td colspan="7" style="padding:16px;text-align:center;color:#aaa">Loading…</td></tr></tbody>
+              <thead><tr style="background:#fafaf9">
+                <th style="padding:9px 14px;text-align:left;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0ede8">ID</th>
+                <th style="padding:9px 10px;text-align:left;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0ede8">Label</th>
+                <th style="padding:9px 10px;text-align:right;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0ede8">Points</th>
+                <th style="padding:9px 10px;text-align:right;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0ede8">Price (₹)</th>
+                <th style="padding:9px 10px;text-align:left;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0ede8">Badge</th>
+                <th style="padding:9px 10px;text-align:center;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0ede8">Status</th>
+                <th style="padding:9px 14px;text-align:left;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0ede8">Actions</th>
+              </tr></thead>
+              <tbody id="pkgTbody"><tr><td colspan="7" style="padding:20px;text-align:center;color:#aaa">Loading…</td></tr></tbody>
             </table></div>
+          </div>
+
+          <!-- Two-column: credit/debit form + recent transactions -->
+          <div style="display:grid;grid-template-columns:320px 1fr;gap:16px;margin-bottom:16px;align-items:start">
+
+            <!-- Credit/Debit form -->
+            <div style="background:#fff;border:1px solid #e8e5e0;border-radius:12px;padding:20px">
+              <div style="font-weight:700;font-size:13px;color:#1a1a2e;margin-bottom:16px;display:flex;align-items:center;gap:8px">
+                <span style="background:#fef2f2;color:#dc2626;border-radius:6px;padding:3px 9px;font-size:12px">⚡</span>
+                Credit / Debit Manually
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <div>
+                  <label style="font-size:11.5px;font-weight:600;color:#555;display:block;margin-bottom:5px">Mobile Number</label>
+                  <input id="aPtsMobile" type="text" placeholder="10-digit mobile" style="border:1px solid #e0ddd8;border-radius:8px;padding:8px 12px;font-size:13px;width:100%;box-sizing:border-box">
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                  <div>
+                    <label style="font-size:11.5px;font-weight:600;color:#555;display:block;margin-bottom:5px">Points</label>
+                    <input id="aPtsAmount" type="number" min="1" placeholder="e.g. 100" style="border:1px solid #e0ddd8;border-radius:8px;padding:8px 12px;font-size:13px;width:100%;box-sizing:border-box">
+                  </div>
+                  <div>
+                    <label style="font-size:11.5px;font-weight:600;color:#555;display:block;margin-bottom:5px">Note</label>
+                    <input id="aPtsNote" type="text" placeholder="Reason" style="border:1px solid #e0ddd8;border-radius:8px;padding:8px 12px;font-size:13px;width:100%;box-sizing:border-box">
+                  </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding-top:2px">
+                  <button onclick="adminPtsCredit()" style="background:#166534;color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;cursor:pointer;font-weight:600">+ Credit</button>
+                  <button onclick="adminPtsDebit()" style="background:#991b1b;color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;cursor:pointer;font-weight:600">− Debit</button>
+                </div>
+              </div>
+              <div id="aPtsMsgBox" style="margin-top:12px;font-size:12.5px;display:none;border-radius:7px;padding:9px 12px"></div>
+            </div>
+
+            <!-- Recent transactions -->
+            <div style="background:#fff;border:1px solid #e8e5e0;border-radius:12px;overflow:hidden">
+              <div style="padding:14px 18px;border-bottom:1px solid #f0ede8;font-weight:700;font-size:13px;color:#1a1a2e;display:flex;align-items:center;gap:8px">
+                <span style="background:#eff6ff;color:#2563eb;border-radius:6px;padding:3px 9px;font-size:12px">📋</span>
+                Recent Transactions
+              </div>
+              <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px">
+                <thead><tr style="background:#fafaf9">
+                  <th style="padding:9px 14px;text-align:left;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;border-bottom:1px solid #f0ede8">Mobile</th>
+                  <th style="padding:9px 10px;text-align:left;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0ede8">Name</th>
+                  <th style="padding:9px 10px;text-align:left;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0ede8">Type</th>
+                  <th style="padding:9px 10px;text-align:right;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0ede8">Points</th>
+                  <th style="padding:9px 10px;text-align:right;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0ede8">After</th>
+                  <th style="padding:9px 10px;text-align:left;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0ede8">Note</th>
+                  <th style="padding:9px 14px;text-align:left;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0ede8;white-space:nowrap">Date</th>
+                </tr></thead>
+                <tbody id="aPtsTxnTbody"><tr><td colspan="7" style="padding:24px;text-align:center;color:#aaa">Loading…</td></tr></tbody>
+              </table></div>
+            </div>
           </div>
 
           <!-- User balances -->
-          <div style="background:#fff;border:1px solid #e5;border-radius:10px;overflow:hidden">
-            <div style="padding:12px 16px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:10px">
-              <span style="font-weight:700;font-size:14px">User Balances</span>
-              <input id="aPtsSearch" type="text" placeholder="Search mobile or name…" style="margin-left:auto;border:1px solid #ddd;border-radius:6px;padding:5px 10px;font-size:12px;width:200px" oninput="loadPtsUsers()">
+          <div style="background:#fff;border:1px solid #e8e5e0;border-radius:12px;overflow:hidden">
+            <div style="padding:14px 18px;border-bottom:1px solid #f0ede8;display:flex;align-items:center;gap:10px">
+              <span style="background:#f0fdf4;color:#16a34a;border-radius:6px;padding:3px 9px;font-size:12px;font-weight:700">👥</span>
+              <span style="font-weight:700;font-size:13px;color:#1a1a2e">User Balances</span>
+              <input id="aPtsSearch" type="text" placeholder="Search mobile or name…" style="margin-left:auto;border:1px solid #e0ddd8;border-radius:8px;padding:7px 12px;font-size:12px;width:210px" oninput="loadPtsUsers()">
             </div>
             <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px">
-              <thead><tr style="background:#f9f9f9"><th style="padding:8px 12px;text-align:left">Mobile</th><th>Name</th><th>Balance</th><th>Purchased</th><th>Used</th><th>Last Update</th></tr></thead>
-              <tbody id="aPtsUserTbody"><tr><td colspan="6" style="padding:16px;text-align:center;color:#aaa">Loading…</td></tr></tbody>
+              <thead><tr style="background:#fafaf9">
+                <th style="padding:9px 14px;text-align:left;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0ede8">Mobile</th>
+                <th style="padding:9px 10px;text-align:left;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0ede8">Name</th>
+                <th style="padding:9px 10px;text-align:right;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0ede8">Balance</th>
+                <th style="padding:9px 10px;text-align:right;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0ede8">Purchased</th>
+                <th style="padding:9px 10px;text-align:right;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0ede8">Used</th>
+                <th style="padding:9px 14px;text-align:left;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0ede8;white-space:nowrap">Last Update</th>
+              </tr></thead>
+              <tbody id="aPtsUserTbody"><tr><td colspan="6" style="padding:24px;text-align:center;color:#aaa">Loading…</td></tr></tbody>
             </table></div>
           </div>
+
         </div>
       </div>
 
@@ -7344,26 +7463,35 @@ function switchStab(id, btn) {
   if (id === 'mobileReqPanel') { renderMobileReqs(); }
   if (id === 'paymentPanel')   { renderPaymentOptions(); }
   if (id === 'userCtrlPanel')  { renderUserCtrlPanel(); renderUPCtrlHistory(); }
-  if (id === 'pointsPanel')    { loadPtsStats(); loadPtsUsers(); }
+  if (id === 'pointsPanel')    { loadPtsStats(); loadPtsUsers(); loadPtsPackages(); }
 }
 
 // ─── POINTS MANAGEMENT ─────────────────────────────────────────────────────
 async function loadPtsStats() {
   try {
-    const d = await apiFetch('/backend/api/admin/points.php?action=stats');
+    const d = await fetch('api/admin/points.php?action=stats', { credentials:'same-origin' }).then(r => r.json());
     if (!d.ok) return;
-    document.getElementById('aPtsUsers').textContent   = d.total_users   || 0;
-    document.getElementById('aPtsBought').textContent  = d.total_bought  || 0;
-    document.getElementById('aPtsUsed').textContent    = d.total_used    || 0;
-    document.getElementById('aPtsBalance').textContent = d.total_balance || 0;
+    document.getElementById('aPtsUsers').textContent   = d.total_users   ?? 0;
+    document.getElementById('aPtsBought').textContent  = d.total_bought  ?? 0;
+    document.getElementById('aPtsUsed').textContent    = d.total_used    ?? 0;
+    document.getElementById('aPtsBalance').textContent = d.total_balance ?? 0;
     const tb = document.getElementById('aPtsTxnTbody');
     if (!tb) return;
-    if (!d.recent?.length) { tb.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:12px">No transactions.</td></tr>'; return; }
+    if (!d.recent?.length) { tb.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:16px">No transactions yet.</td></tr>'; return; }
     tb.innerHTML = d.recent.map(t => {
       const sign = t.points > 0 ? '+' : '';
       const col  = t.points > 0 ? '#166534' : '#991b1b';
+      const bg   = t.points > 0 ? '#f0fdf4' : '#fef2f2';
       const tl   = {purchase:'Purchase',deduct:'Contact View',admin_credit:'Admin Credit',admin_debit:'Admin Debit'}[t.type]||t.type;
-      return `<tr style="border-bottom:1px solid #f5f5f5"><td style="padding:7px 12px">${t.mobile}</td><td>${t.name||'-'}</td><td>${tl}</td><td style="color:${col};font-weight:700">${sign}${t.points}</td><td>${t.balance_after}</td><td>${t.description||'-'}</td><td>${(t.created_at||'').slice(0,16)}</td></tr>`;
+      return `<tr style="border-bottom:1px solid #f5f4f2">
+        <td style="padding:8px 14px;font-family:monospace;font-size:12px">${t.mobile}</td>
+        <td style="padding:8px 10px;color:#555">${t.name||'—'}</td>
+        <td style="padding:8px 10px"><span style="background:#f5f3ef;border-radius:5px;padding:2px 8px;font-size:11.5px;font-weight:600;color:#555">${tl}</span></td>
+        <td style="padding:8px 10px;text-align:right"><span style="background:${bg};color:${col};font-weight:700;border-radius:5px;padding:2px 8px;font-size:12px">${sign}${t.points}</span></td>
+        <td style="padding:8px 10px;text-align:right;color:#888">${t.balance_after}</td>
+        <td style="padding:8px 10px;color:#666;font-size:12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.description||'—'}</td>
+        <td style="padding:8px 14px;color:#aaa;font-size:11.5px;white-space:nowrap">${(t.created_at||'').slice(0,16)}</td>
+      </tr>`;
     }).join('');
   } catch(e) {}
 }
@@ -7371,12 +7499,19 @@ async function loadPtsStats() {
 async function loadPtsUsers() {
   const q = document.getElementById('aPtsSearch')?.value || '';
   try {
-    const d = await apiFetch('/backend/api/admin/points.php?action=users&q=' + encodeURIComponent(q));
+    const d = await fetch('api/admin/points.php?action=users&q=' + encodeURIComponent(q), { credentials:'same-origin' }).then(r => r.json());
     const tb = document.getElementById('aPtsUserTbody');
     if (!tb) return;
-    if (!d.ok || !d.users?.length) { tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:#aaa;padding:12px">No users found.</td></tr>'; return; }
+    if (!d.ok || !d.users?.length) { tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:#aaa;padding:16px">No users found.</td></tr>'; return; }
     tb.innerHTML = d.users.map(u =>
-      `<tr style="border-bottom:1px solid #f5f5f5"><td style="padding:7px 12px;font-family:monospace">${u.mobile}</td><td>${u.name||'-'}</td><td style="font-weight:700;color:#8B0000">${u.balance}</td><td>${u.total_bought}</td><td>${u.total_used}</td><td>${(u.updated_at||'').slice(0,16)}</td></tr>`
+      `<tr style="border-bottom:1px solid #f5f4f2">
+        <td style="padding:8px 14px;font-family:monospace;font-size:12px">${u.mobile}</td>
+        <td style="padding:8px 10px;color:#555">${u.name||'—'}</td>
+        <td style="padding:8px 10px;text-align:right"><span style="font-weight:800;font-size:14px;color:#8B0000">${u.balance}</span></td>
+        <td style="padding:8px 10px;text-align:right;color:#166534;font-weight:600">${u.total_bought}</td>
+        <td style="padding:8px 10px;text-align:right;color:#1e40af;font-weight:600">${u.total_used}</td>
+        <td style="padding:8px 14px;color:#aaa;font-size:11.5px;white-space:nowrap">${(u.updated_at||'').slice(0,16)}</td>
+      </tr>`
     ).join('');
   } catch(e) {}
 }
@@ -7388,7 +7523,11 @@ async function adminPtsCredit() {
   const msg    = document.getElementById('aPtsMsgBox');
   if (!mobile || pts <= 0) { showMsg(msg, '⚠️ Mobile and points required.', 'warn'); return; }
   try {
-    const d = await apiFetch('/backend/api/admin/points.php?action=credit', { method:'POST', body: JSON.stringify({mobile, points:pts, note}) });
+    const d = await fetch('api/admin/points.php?action=credit', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mobile, points: pts, note })
+    }).then(r => r.json());
     showMsg(msg, d.ok ? '✅ ' + d.msg : '❌ ' + (d.error||'Error'), d.ok ? 'ok' : 'err');
     if (d.ok) { loadPtsStats(); loadPtsUsers(); }
   } catch(e) { showMsg(msg, '❌ Network error', 'err'); }
@@ -7401,7 +7540,11 @@ async function adminPtsDebit() {
   const msg    = document.getElementById('aPtsMsgBox');
   if (!mobile || pts <= 0) { showMsg(msg, '⚠️ Mobile and points required.', 'warn'); return; }
   try {
-    const d = await apiFetch('/backend/api/admin/points.php?action=debit', { method:'POST', body: JSON.stringify({mobile, points:pts, note}) });
+    const d = await fetch('api/admin/points.php?action=debit', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mobile, points: pts, note })
+    }).then(r => r.json());
     showMsg(msg, d.ok ? '✅ ' + d.msg : '❌ ' + (d.error||'Error'), d.ok ? 'ok' : 'err');
     if (d.ok) { loadPtsStats(); loadPtsUsers(); }
   } catch(e) { showMsg(msg, '❌ Network error', 'err'); }
@@ -7417,6 +7560,106 @@ function showMsg(el, text, type) {
   el.style.padding = '8px 12px';
   el.style.borderRadius = '6px';
   el.textContent   = text;
+}
+
+// ─── POINT PACKAGES ──────────────────────────────────────────────────────────
+let _pkgList = [];
+
+function _esc(s) { return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+async function loadPtsPackages() {
+  try {
+    const d = await fetch('api/admin/points.php?action=packages', { credentials:'same-origin' }).then(r => r.json());
+    _pkgList = d.packages || [];
+    const tb = document.getElementById('pkgTbody');
+    if (!tb) return;
+    if (!_pkgList.length) {
+      tb.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:18px">No packages yet. Click "+ Add Package" to create one.</td></tr>';
+      return;
+    }
+    tb.innerHTML = _pkgList.map(p => `
+      <tr style="border-bottom:1px solid #f5f4f2">
+        <td style="padding:8px 14px;font-family:monospace;font-size:12px;color:#8B0000;font-weight:700">${_esc(p.pkg_id)}</td>
+        <td style="padding:8px 10px;color:#333;font-weight:500">${_esc(p.label)}</td>
+        <td style="padding:8px 10px;text-align:right;font-weight:700;color:#1a1a2e">${p.points}</td>
+        <td style="padding:8px 10px;text-align:right;color:#16a34a;font-weight:600">₹${parseFloat(p.price).toFixed(2)}</td>
+        <td style="padding:8px 10px;color:#666">${p.badge ? `<span style="background:#fdf4ff;color:#9333ea;border-radius:5px;padding:2px 8px;font-size:11.5px;font-weight:600">${_esc(p.badge)}</span>` : '<span style="color:#ccc">—</span>'}</td>
+        <td style="padding:8px 10px;text-align:center">${p.active==1
+          ? '<span style="background:#f0fdf4;color:#16a34a;border-radius:5px;padding:2px 8px;font-size:11.5px;font-weight:600">✓ Active</span>'
+          : '<span style="background:#fef2f2;color:#dc2626;border-radius:5px;padding:2px 8px;font-size:11.5px;font-weight:600">Off</span>'}</td>
+        <td style="padding:8px 14px">
+          <div style="display:flex;gap:6px">
+            <button onclick="editPtsPackage('${_esc(p.pkg_id)}')" style="background:#eff6ff;color:#2563eb;border:none;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;font-weight:600">Edit</button>
+            <button onclick="deletePtsPackage('${_esc(p.pkg_id)}')" style="background:#fef2f2;color:#dc2626;border:none;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;font-weight:600">Delete</button>
+          </div>
+        </td>
+      </tr>`).join('');
+  } catch(e) {}
+}
+
+function openAddPtsPackage() {
+  document.getElementById('pkgFormTitle').textContent = 'Add Package';
+  document.getElementById('pkgEditId').value = '';
+  document.getElementById('pkgId').value = '';
+  document.getElementById('pkgId').readOnly = false;
+  document.getElementById('pkgLabel').value = '';
+  document.getElementById('pkgBadge').value = '';
+  document.getElementById('pkgPoints').value = '';
+  document.getElementById('pkgPrice').value = '';
+  document.getElementById('pkgFormMsg').style.display = 'none';
+  document.getElementById('pkgForm').style.display = '';
+  document.getElementById('pkgId').focus();
+}
+
+function editPtsPackage(pkgId) {
+  const p = _pkgList.find(x => x.pkg_id === pkgId);
+  if (!p) return;
+  document.getElementById('pkgFormTitle').textContent = 'Edit Package';
+  document.getElementById('pkgEditId').value = p.pkg_id;
+  document.getElementById('pkgId').value = p.pkg_id;
+  document.getElementById('pkgId').readOnly = true;
+  document.getElementById('pkgLabel').value = p.label;
+  document.getElementById('pkgBadge').value = p.badge || '';
+  document.getElementById('pkgPoints').value = p.points;
+  document.getElementById('pkgPrice').value = parseFloat(p.price).toFixed(2);
+  document.getElementById('pkgFormMsg').style.display = 'none';
+  document.getElementById('pkgForm').style.display = '';
+}
+
+function closePkgForm() {
+  document.getElementById('pkgForm').style.display = 'none';
+}
+
+async function savePtsPackage() {
+  const pkgId  = document.getElementById('pkgId').value.trim();
+  const label  = document.getElementById('pkgLabel').value.trim();
+  const badge  = document.getElementById('pkgBadge').value.trim();
+  const points = parseInt(document.getElementById('pkgPoints').value) || 0;
+  const price  = parseFloat(document.getElementById('pkgPrice').value) || 0;
+  const msg    = document.getElementById('pkgFormMsg');
+  if (!pkgId || !label || points <= 0 || price <= 0) { showMsg(msg, '⚠️ ID, label, points and price are required.', 'warn'); return; }
+  try {
+    const d = await fetch('api/admin/points.php?action=save_package', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pkg_id: pkgId, label, badge, points, price, sort_order: 0, active: 1 })
+    }).then(r => r.json());
+    if (d.ok) { closePkgForm(); loadPtsPackages(); }
+    else showMsg(msg, '❌ ' + (d.error || 'Save failed'), 'err');
+  } catch(e) { showMsg(msg, '❌ Network error', 'err'); }
+}
+
+async function deletePtsPackage(pkgId) {
+  if (!confirm('Delete package "' + pkgId + '"? This cannot be undone.')) return;
+  try {
+    const d = await fetch('api/admin/points.php?action=delete_package', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pkg_id: pkgId })
+    }).then(r => r.json());
+    if (d.ok) loadPtsPackages();
+    else alert('Error: ' + (d.error || 'Unknown error'));
+  } catch(e) { alert('Network error'); }
 }
 
 // ADMIN DATA

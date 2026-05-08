@@ -57,6 +57,18 @@ $_impersonation = !empty($_SESSION['admin_impersonation']);
 $_impersonationMsLeft = $_impersonation
     ? max(0, ($_SESSION['admin_impersonation_expires_at'] - time()) * 1000)
     : 0;
+
+// Load point packages from DB (fall back to hardcoded defaults)
+$_pointPackages = [
+    ['pkg_id'=>'p100',  'points'=>100,  'price'=>100.00, 'label'=>'100 Points',  'badge'=>''],
+    ['pkg_id'=>'p500',  'points'=>500,  'price'=>500.00, 'label'=>'500 Points',  'badge'=>'Popular'],
+    ['pkg_id'=>'p1000', 'points'=>1000, 'price'=>1000.00,'label'=>'1000 Points', 'badge'=>'Best Value'],
+];
+try {
+    $_updb = getDB();
+    $_pkgRows = $_updb->query("SELECT pkg_id, points, price, label, badge FROM point_packages WHERE active=1 ORDER BY sort_order ASC, id ASC")->fetchAll();
+    if ($_pkgRows) $_pointPackages = $_pkgRows;
+} catch (Exception $_e) {}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -684,13 +696,13 @@ input,select,textarea{outline:none}
           <div class="u-card-head"><span class="u-card-title">Buy Points</span></div>
           <div class="u-card-body" style="padding:16px">
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px">
-              <?php foreach([['pts'=>100,'price'=>100,'badge'=>''],['pts'=>500,'price'=>500,'badge'=>'Popular'],['pts'=>1000,'price'=>1000,'badge'=>'Best Value']] as $pkg): ?>
-              <div style="border:2px solid <?= $pkg['badge'] ? '#8B0000' : '#e5e7eb' ?>;border-radius:12px;padding:14px;text-align:center;cursor:pointer;position:relative;transition:all .2s"
-                onclick="initPointsBuy(<?= $pkg['pts'] ?>)">
-                <?php if($pkg['badge']): ?><div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#8B0000;color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap"><?= $pkg['badge'] ?></div><?php endif; ?>
-                <div style="font-size:22px;font-weight:900;color:#8B0000"><?= $pkg['pts'] ?></div>
+              <?php foreach($_pointPackages as $pkg): $pkgId = htmlspecialchars($pkg['pkg_id']); $badge = htmlspecialchars($pkg['badge']); ?>
+              <div style="border:2px solid <?= $badge ? '#8B0000' : '#e5e7eb' ?>;border-radius:12px;padding:14px;text-align:center;cursor:pointer;position:relative;transition:all .2s"
+                onclick="initPointsBuy('<?= $pkgId ?>')">
+                <?php if($badge): ?><div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#8B0000;color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap"><?= $badge ?></div><?php endif; ?>
+                <div style="font-size:22px;font-weight:900;color:#8B0000"><?= (int)$pkg['points'] ?></div>
                 <div style="font-size:11px;color:#888;margin:2px 0">points</div>
-                <div style="background:#8B0000;color:#fff;border-radius:8px;padding:5px 12px;font-size:13px;font-weight:700;margin-top:8px;display:inline-block">₹<?= $pkg['price'] ?></div>
+                <div style="background:#8B0000;color:#fff;border-radius:8px;padding:5px 12px;font-size:13px;font-weight:700;margin-top:8px;display:inline-block">₹<?= number_format((float)$pkg['price'], 0) ?></div>
               </div>
               <?php endforeach; ?>
             </div>
@@ -3553,8 +3565,8 @@ async function renderMyPoints() {
   } catch(e) {}
 }
 
-async function initPointsBuy(pts) {
-  const pkg = {100:'p100',500:'p500',1000:'p1000'}[pts];
+async function initPointsBuy(pkgId) {
+  const pkg = pkgId;
   if (!pkg) return;
   const msg = document.getElementById('ptsPayMsg');
   if (msg) { msg.style.display=''; msg.textContent = 'Initiating payment…'; }
@@ -3592,18 +3604,16 @@ async function initPointsBuy(pts) {
   } catch(e) {}
 })();
 
-// Handle ?buy_pts= redirect from detail page
+// Handle ?buy_pkg= (or legacy ?buy_pts=) redirect from detail page
 (function() {
   const p = new URLSearchParams(location.search);
-  if (p.has('buy_pts')) {
-    const pts = parseInt(p.get('buy_pts')) || 0;
-    if ([100,500,1000].includes(pts)) {
-      document.addEventListener('DOMContentLoaded', () => {
-        const btns = document.querySelectorAll('[data-page="page_points"]');
-        if (btns[0]) btns[0].click();
-        setTimeout(() => initPointsBuy(pts), 400);
-      });
-    }
+  const pkgId = p.get('buy_pkg') || {100:'p100',500:'p500',1000:'p1000'}[parseInt(p.get('buy_pts')||'0')] || null;
+  if (pkgId) {
+    document.addEventListener('DOMContentLoaded', () => {
+      const btns = document.querySelectorAll('[data-page="page_points"]');
+      if (btns[0]) btns[0].click();
+      setTimeout(() => initPointsBuy(pkgId), 400);
+    });
   }
   // Handle PayU return
   if (p.get('pay') === 'pts_ok') {

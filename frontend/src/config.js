@@ -14,9 +14,8 @@ export const PHOTO_BASE_OLD = `${PREFIX}/uploads/`;
 export const UPLOADS_PREFIX = `${PREFIX}/backend/api/`;
 export const USER_PANEL_URL = `${PREFIX}/backend/user-panel.php`;
 
-// Chennai Profile uses a points system (10 pts per contact view).
-// Kumbakonam (same DB, different domain) keeps free access — no points check.
-export const IS_CHENNAI_PROFILE = !isLocal && host.includes('chennaiprofile');
+// This repo IS Chennai Profile — points gate is always active (local + live).
+export const IS_CHENNAI_PROFILE = true;
 export const POINTS_PER_CONTACT = 10;
 export const POINTS_API = `${PREFIX}/backend/api/points.php`;
 
@@ -25,8 +24,12 @@ export const POINTS_API = `${PREFIX}/backend/api/points.php`;
 export const getPhotoUrls = (raw) => {
   if (!raw || raw.startsWith('default_')) return null;
   if (raw.startsWith('http')) {
+    // S3 bucket only stores originals — WebP variants may not exist.
+    // Use orig for all sizes; the img onError fallback handles missing variants.
     const base = raw.replace(/\.(jpe?g|png|gif|webp)$/i, '');
-    return { thumb: `${base}.thumb.webp`, full: `${base}.webp`, orig: raw };
+    const thumb = `${base}.thumb.webp`;
+    const full  = `${base}.webp`;
+    return { thumb, full, orig: raw };
   }
   const rel  = raw.startsWith('uploads/') ? raw : `uploads/${raw}`;
   const orig = `${UPLOADS_PREFIX}${rel}`;

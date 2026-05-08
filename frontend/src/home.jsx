@@ -64,6 +64,11 @@ export default function Home() {
   const [gateState, setGateState] = useState({ returning:false, anonViewsUsed:0, anonViewsLimit:5, gateRequired:false, anonWindowSec:24*3600, anonWindowStart:0 });
   const [pointsBalance, setPointsBalance] = useState(null);
   const [showPointsModal, setShowPointsModal] = useState(false);
+  const [buyPackages, setBuyPackages] = useState([
+    {id:'p100', pts:100, price:100, badge:''},
+    {id:'p500', pts:500, price:500, badge:'Popular'},
+    {id:'p1000',pts:1000,price:1000,badge:'Best Value'},
+  ]);
   // Banner text shown at the top of the OTP modal when it was opened because
   // of the gate (free-limit reached or returning user). Keeps the styling
   // separate from otpMsg, which is wired to the success/error indicator.
@@ -106,6 +111,10 @@ export default function Home() {
         setContactVerified(true);
         setUserMobile(boot.contact.mobile || '');
       }
+      try {
+        const pd = await fetch(`${POINTS_API}?action=packages`, { credentials:'include' }).then(r=>r.json());
+        if (pd?.ok && pd.packages?.length) setBuyPackages(pd.packages.map(p=>({ id:p.id||p.pkg_id, pts:p.points, price:parseFloat(p.price), badge:p.badge||'' })));
+      } catch(e) {}
       if (boot?.ok && boot.contact) {
         setGateState({
           returning:        !!boot.contact.returning,
@@ -358,10 +367,11 @@ export default function Home() {
         openGateModal(profileId, tv.gate_reason, tv.anon_views_limit);
         return;
       }
+      if (!res.ok) return;
       if (tv && tv.mobile) setRevealedPhones(prev => ({ ...prev, [profileId]: tv.mobile }));
       if (tv && tv.points_balance != null) setPointsBalance(tv.points_balance);
+      setRevealedContactId(profileId);
     } catch(e) {}
-    setRevealedContactId(profileId);
   };
 
   // Get profiles for active tab AND search filter.
@@ -969,8 +979,8 @@ export default function Home() {
                 <div style={{ fontSize:12, color:'#aaa', marginTop:2 }}>Need {POINTS_PER_CONTACT} pts to reveal contact</div>
               </div>
               <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-                {[{pts:100,price:100,badge:''},{pts:500,price:500,badge:'Popular'},{pts:1000,price:1000,badge:'Best Value'}].map(pkg => (
-                  <a key={pkg.pts} href={`/backend/user-panel.php?buy_pts=${pkg.pts}`}
+                {buyPackages.map(pkg => (
+                  <a key={pkg.id} href={`${USER_PANEL_URL}?buy_pkg=${pkg.id}`}
                     style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 16px', border:'2px solid #8B0000', borderRadius:10, background:'#fff', textDecoration:'none', cursor:'pointer' }}>
                     <div>
                       <span style={{ fontWeight:700, color:'#8B0000', fontSize:15 }}>{pkg.pts} Points</span>
@@ -980,8 +990,12 @@ export default function Home() {
                   </a>
                 ))}
               </div>
+              <a href={USER_PANEL_URL}
+                style={{ marginTop:4, display:'block', textAlign:'center', fontSize:12.5, color:'#8B0000', textDecoration:'underline', cursor:'pointer' }}>
+                Already have an account? Login to User Panel
+              </a>
               <button onClick={() => setShowPointsModal(false)}
-                style={{ marginTop:14, width:'100%', padding:'10px', border:'1px solid #ddd', borderRadius:10, background:'#f5f5f5', color:'#666', fontSize:14, cursor:'pointer' }}>
+                style={{ marginTop:10, width:'100%', padding:'10px', border:'1px solid #ddd', borderRadius:10, background:'#f5f5f5', color:'#666', fontSize:14, cursor:'pointer' }}>
                 Cancel
               </button>
             </div>

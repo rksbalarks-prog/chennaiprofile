@@ -20,7 +20,15 @@ export default defineConfig({
       '/matrimony/backend': {
         target: 'http://localhost',
         changeOrigin: true,
-      }
+      },
+      // user-panel.php JS uses root-relative paths (/backend/api/...) which
+      // resolve to localhost:3001 when the page is served via Vite proxy.
+      // Rewrite them to the correct XAMPP sub-folder path.
+      '/backend': {
+        target: 'http://localhost',
+        changeOrigin: true,
+        rewrite: (path) => '/ChennaiMatrimony' + path,
+      },
     }
   },
   build: {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { API_BASE, PHOTO_BASE, UPLOADS_PREFIX, getPhotoUrls, IS_CHENNAI_PROFILE, POINTS_PER_CONTACT } from "./config";
+import { API_BASE, PHOTO_BASE, UPLOADS_PREFIX, getPhotoUrls, IS_CHENNAI_PROFILE, POINTS_PER_CONTACT, USER_PANEL_URL, POINTS_API } from "./config";
 import { buildSummary } from "./profileSummary";
 
 function mapProfile(p) {
@@ -108,6 +108,11 @@ export default function Detail() {
   const [gatePromptMsg, setGatePromptMsg] = useState('');
   const [pointsBalance, setPointsBalance] = useState(null);
   const [showPointsModal, setShowPointsModal] = useState(false);
+  const [buyPackages, setBuyPackages] = useState([
+    {id:'p100', pts:100, price:100, badge:''},
+    {id:'p500', pts:500, price:500, badge:'Popular'},
+    {id:'p1000',pts:1000,price:1000,badge:'Best Value'},
+  ]);
   // 24-hour "to get your 5 free contacts" countdown. The window starts the
   // first time the gate modal opens and persists in localStorage. The user
   // can dismiss the popup; if they try another contact before the timer
@@ -147,6 +152,10 @@ export default function Detail() {
         });
       })
       .catch(() => {});
+    fetch(`${POINTS_API}?action=packages`, { credentials:'include' })
+      .then(r => r.json()).then(d => {
+        if (d?.ok && d.packages?.length) setBuyPackages(d.packages.map(p => ({ id:p.id||p.pkg_id, pts:p.points, price:parseFloat(p.price), badge:p.badge||'' })));
+      }).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -235,6 +244,7 @@ export default function Detail() {
         openGateModal(tv.gate_reason, tv.anon_views_limit);
         return;
       }
+      if (!res.ok) return;
       if (tv && tv.points_balance != null) setPointsBalance(tv.points_balance);
       setRevealedContact({
         phone: tv?.mobile || '',
@@ -242,8 +252,8 @@ export default function Detail() {
         email: tv?.email || '',
         contactPerson: tv?.contact_person || '',
       });
+      setShowContact(true);
     } catch(e) {}
-    setShowContact(true);
   };
 
   const sendOtp = async () => {
@@ -815,16 +825,23 @@ export default function Detail() {
                 Purchase points to view contact details. Each contact reveal costs <strong>10 points</strong>.
               </div>
               <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-                {[{pts:100,price:100},{pts:500,price:500},{pts:1000,price:1000}].map(pkg => (
-                  <a key={pkg.pts} href={`/backend/user-panel.php?buy_pts=${pkg.pts}`}
+                {buyPackages.map(pkg => (
+                  <a key={pkg.id} href={`${USER_PANEL_URL}?buy_pkg=${pkg.id}`}
                     style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 16px', border:'2px solid #8B0000', borderRadius:10, background:'#fff', textDecoration:'none', cursor:'pointer' }}>
-                    <span style={{ fontWeight:700, color:'#8B0000', fontSize:15 }}>{pkg.pts} Points</span>
+                    <div>
+                      <span style={{ fontWeight:700, color:'#8B0000', fontSize:15 }}>{pkg.pts} Points</span>
+                      {pkg.badge ? <span style={{ marginLeft:8, fontSize:10, background:'#8B0000', color:'#fff', borderRadius:6, padding:'1px 6px' }}>{pkg.badge}</span> : null}
+                    </div>
                     <span style={{ background:'#8B0000', color:'#fff', borderRadius:8, padding:'4px 14px', fontSize:13.5, fontWeight:600 }}>₹{pkg.price}</span>
                   </a>
                 ))}
               </div>
+              <a href={USER_PANEL_URL}
+                style={{ marginTop:8, display:'block', textAlign:'center', fontSize:12.5, color:'#8B0000', textDecoration:'underline', cursor:'pointer' }}>
+                Already have an account? Login to User Panel
+              </a>
               <button onClick={() => setShowPointsModal(false)}
-                style={{ marginTop:16, width:'100%', padding:'10px', border:'1px solid #ddd', borderRadius:10, background:'#f5f5f5', color:'#666', fontSize:14, cursor:'pointer' }}>
+                style={{ marginTop:10, width:'100%', padding:'10px', border:'1px solid #ddd', borderRadius:10, background:'#f5f5f5', color:'#666', fontSize:14, cursor:'pointer' }}>
                 Cancel
               </button>
             </div>

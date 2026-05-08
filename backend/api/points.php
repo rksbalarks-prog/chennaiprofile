@@ -16,6 +16,21 @@ $PACKAGES = [
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
+function pts_get_packages(PDO $db): array {
+    global $PACKAGES;
+    try {
+        $rows = $db->query("SELECT pkg_id, points, price, label, badge FROM point_packages WHERE active=1 ORDER BY sort_order ASC, id ASC")->fetchAll();
+        if ($rows) {
+            $out = [];
+            foreach ($rows as $r) {
+                $out[$r['pkg_id']] = ['id'=>$r['pkg_id'], 'points'=>(int)$r['points'], 'price'=>(float)$r['price'], 'label'=>$r['label'], 'badge'=>$r['badge']];
+            }
+            return $out;
+        }
+    } catch (Exception $e) {}
+    return $PACKAGES;
+}
+
 function pts_get_balance(PDO $db, string $mobile): int {
     $r = $db->prepare("SELECT balance FROM user_points WHERE mobile = :m");
     $r->execute([':m' => $mobile]);
@@ -41,8 +56,8 @@ function pts_credit(PDO $db, string $mobile, int $points, string $type, string $
 // Returns new balance on success, false on insufficient funds
 function pts_deduct(PDO $db, string $mobile, int $points, string $desc, string $refId = '') {
     pts_ensure_row($db, $mobile);
-    $upd = $db->prepare("UPDATE user_points SET balance = balance - :p, total_used = total_used + :p, updated_at = NOW() WHERE mobile = :m AND balance >= :p");
-    $upd->execute([':p' => $points, ':m' => $mobile]);
+    $upd = $db->prepare("UPDATE user_points SET balance = balance - :p, total_used = total_used + :p2, updated_at = NOW() WHERE mobile = :m AND balance >= :p3");
+    $upd->execute([':p' => $points, ':p2' => $points, ':p3' => $points, ':m' => $mobile]);
     if ($upd->rowCount() === 0) return false;
     $bal = pts_get_balance($db, $mobile);
     $db->prepare("INSERT INTO point_transactions (mobile, type, points, balance_after, description, ref_id) VALUES (:m, 'deduct', :p, :b, :d, :r)")
@@ -51,10 +66,12 @@ function pts_deduct(PDO $db, string $mobile, int $points, string $desc, string $
 }
 
 // ── Router ────────────────────────────────────────────────────────────────────
-// Guard: only run the HTTP router when points.php is the entry-point script.
-// When required from public.php as a helper library, bail out here so the
-// router code doesn't execute (it would fall through to json_err + exit).
-if (basename(realpath($_SERVER['SCRIPT_FILENAME'] ?? '')) !== 'points.php') return;
+// Guard: only run the HTTP router when THIS file (api/points.php) is the
+// entry-point. When included from public.php or admin/points.php as a helper
+// library, bail out so the router's json_err + exit doesn't fire.
+$_sf = realpath($_SERVER['SCRIPT_FILENAME'] ?? '');
+if (!$_sf || basename($_sf) !== 'points.php' || basename(dirname($_sf)) !== 'api') { unset($_sf); return; }
+unset($_sf);
 
 $method = $_SERVER['REQUEST_METHOD'];
 $act    = $_GET['action'] ?? '';
@@ -69,8 +86,7 @@ secureSession();
 $db = getDB();
 
 if ($act === 'packages') {
-    global $PACKAGES;
-    json_ok(['packages' => array_values($PACKAGES), 'per_contact' => POINTS_PER_CONTACT]);
+    json_ok(['packages' => array_values(pts_get_packages($db)), 'per_contact' => POINTS_PER_CONTACT]);
 }
 
 if ($act === 'balance') {
@@ -93,12 +109,12 @@ if ($act === 'history') {
 if ($act === 'buy_init' && $method === 'POST') {
     $mobile = $_SESSION['mobile'] ?? '';
     if (!$mobile) json_err('Not logged in.', 401);
-    global $PACKAGES;
     $b     = body();
     $pkgId = $b['pkg_id'] ?? '';
-    if (!isset($PACKAGES[$pkgId])) json_err('Invalid package.');
+    $pkgs  = pts_get_packages($db);
+    if (!isset($pkgs[$pkgId])) json_err('Invalid package.');
 
-    $pkg    = $PACKAGES[$pkgId];
+    $pkg    = $pkgs[$pkgId];
     $amount = number_format($pkg['price'], 2, '.', '');
     $txnId  = 'PTS' . time() . '_' . bin2hex(random_bytes(4));
 
@@ -148,7 +164,8 @@ json_err('Unknown action.');
 function _handle_buy_return(): void {
     require_once __DIR__ . '/../config.php';
     @include_once __DIR__ . '/../payu-config.php';
-    if (!defined('PAYU_KEY') || PAYU_KEY === '') { header('Location: /backend/user-panel.php?pay=pts_fail'); exit; }
+    $base = function_exists('payuBaseUrl') ? str_replace('/backend', '', payuBaseUrl()) : '';
+    if (!defined('PAYU_KEY') || PAYU_KEY === '') { header('Location: ' . $base . '/backend/user-panel.php?pay=pts_fail'); exit; }
 
     $status  = $_POST['status']  ?? '';
     $txnId   = $_POST['udf1']    ?? '';
@@ -157,11 +174,11 @@ function _handle_buy_return(): void {
     $payuTxn = $_POST['mihpayid'] ?? '';
     $hash    = $_POST['hash']    ?? '';
 
-    if (!$txnId || !$mobile || !$pkgId) { header('Location: /backend/user-panel.php?pay=pts_fail'); exit; }
+    if (!$txnId || !$mobile || !$pkgId) { header('Location: ' . $base . '/backend/user-panel.php?pay=pts_fail'); exit; }
 
     // Verify hash
     $expected = payuResponseHash($_POST);
-    if (!hash_equals($expected, $hash)) { header('Location: /backend/user-panel.php?pay=pts_fail'); exit; }
+    if (!hash_equals($expected, $hash)) { header('Location: ' . $base . '/backend/user-panel.php?pay=pts_fail'); exit; }
 
     $db = getDB();
 
@@ -169,16 +186,16 @@ function _handle_buy_return(): void {
     $ord = $db->prepare("SELECT id, points, status FROM point_orders WHERE txn_id = :t AND mobile = :m LIMIT 1");
     $ord->execute([':t' => $txnId, ':m' => $mobile]);
     $order = $ord->fetch();
-    if (!$order || $order['status'] !== 'pending') { header('Location: /backend/user-panel.php?pay=pts_done'); exit; }
+    if (!$order || $order['status'] !== 'pending') { header('Location: ' . $base . '/backend/user-panel.php?pay=pts_done'); exit; }
 
     if ($status === 'success') {
-        $db->prepare("UPDATE point_orders SET status='success', payu_txn_id=:p, updated_at=NOW() WHERE txn_id=:t")
-           ->execute([':p' => $payuTxn, ':t' => $txnId]);
-        pts_credit($db, $mobile, (int)$order['points'], 'purchase', 'Purchased ' . $order['points'] . ' pts', $txnId);
-        header('Location: /backend/user-panel.php?pay=pts_ok&pts=' . $order['points']); exit;
+        $db->prepare("UPDATE point_orders SET status='success', updated_at=NOW() WHERE txn_id=:t")
+           ->execute([':t' => $txnId]);
+        pts_credit($db, $mobile, (int)$order['points'], 'purchase', 'Purchased ' . $order['points'] . ' pts', $payuTxn ?: $txnId);
+        header('Location: ' . $base . '/backend/user-panel.php?pay=pts_ok&pts=' . $order['points']); exit;
     }
 
     $db->prepare("UPDATE point_orders SET status='failed', updated_at=NOW() WHERE txn_id=:t")
        ->execute([':t' => $txnId]);
-    header('Location: /backend/user-panel.php?pay=pts_fail'); exit;
+    header('Location: ' . $base . '/backend/user-panel.php?pay=pts_fail'); exit;
 }

@@ -83,4 +83,60 @@ if ($act === 'confirm_order' && $method === 'POST') {
     json_ok(['balance' => $newBal, 'msg' => 'Order confirmed. ' . $order['points'] . ' pts credited.']);
 }
 
+// ── Point Packages CRUD ───────────────────────────────────────────────────────
+
+function ensurePackagesTable(PDO $db): void {
+    $db->exec("CREATE TABLE IF NOT EXISTS point_packages (
+        id         INT AUTO_INCREMENT PRIMARY KEY,
+        pkg_id     VARCHAR(20) NOT NULL UNIQUE,
+        points     INT NOT NULL,
+        price      DECIMAL(10,2) NOT NULL,
+        label      VARCHAR(100) NOT NULL,
+        badge      VARCHAR(50) NOT NULL DEFAULT '',
+        sort_order INT NOT NULL DEFAULT 0,
+        active     TINYINT NOT NULL DEFAULT 1,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )");
+    $db->exec("INSERT IGNORE INTO point_packages (pkg_id, points, price, label, badge, sort_order, active) VALUES
+        ('p100',  100,  100.00, '100 Points',  '',           1, 1),
+        ('p500',  500,  500.00, '500 Points',  'Popular',    2, 1),
+        ('p1000', 1000, 1000.00,'1000 Points', 'Best Value', 3, 1)");
+}
+
+if ($act === 'packages') {
+    ensurePackagesTable($db);
+    $rows = $db->query("SELECT * FROM point_packages ORDER BY sort_order ASC, id ASC")->fetchAll();
+    json_ok(['packages' => $rows]);
+}
+
+if ($act === 'save_package' && $method === 'POST') {
+    ensurePackagesTable($db);
+    $b      = body();
+    $pkgId  = preg_replace('/[^a-z0-9_]/i', '', $b['pkg_id'] ?? '');
+    $points = (int)($b['points'] ?? 0);
+    $price  = round((float)($b['price'] ?? 0), 2);
+    $label  = str_clean($b['label'] ?? '', 100);
+    $badge  = str_clean($b['badge'] ?? '', 50);
+    $sort   = (int)($b['sort_order'] ?? 0);
+    $active = (int)!empty($b['active']);
+    if (!$pkgId || $points <= 0 || $price <= 0 || !$label) json_err('pkg_id, points, price and label are required.');
+
+    $db->prepare("INSERT INTO point_packages (pkg_id, points, price, label, badge, sort_order, active)
+        VALUES (:id, :pts, :pr, :lbl, :bdg, :srt, :act)
+        ON DUPLICATE KEY UPDATE points=:pts2, price=:pr2, label=:lbl2, badge=:bdg2, sort_order=:srt2, active=:act2")
+       ->execute([':id'=>$pkgId, ':pts'=>$points, ':pr'=>$price, ':lbl'=>$label, ':bdg'=>$badge, ':srt'=>$sort, ':act'=>$active,
+                  ':pts2'=>$points, ':pr2'=>$price, ':lbl2'=>$label, ':bdg2'=>$badge, ':srt2'=>$sort, ':act2'=>$active]);
+    pushAdminLog('Point Package Saved', "pkg:{$pkgId} {$points}pts ₹{$price}", 'setting', $admin);
+    json_ok(['msg' => "Package '{$pkgId}' saved."]);
+}
+
+if ($act === 'delete_package' && $method === 'POST') {
+    ensurePackagesTable($db);
+    $pkgId = preg_replace('/[^a-z0-9_]/i', '', body()['pkg_id'] ?? '');
+    if (!$pkgId) json_err('pkg_id required.');
+    $db->prepare("DELETE FROM point_packages WHERE pkg_id = :id")->execute([':id' => $pkgId]);
+    pushAdminLog('Point Package Deleted', "pkg:{$pkgId}", 'setting', $admin);
+    json_ok(['msg' => "Package deleted."]);
+}
+
 json_err('Unknown action.');

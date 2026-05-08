@@ -597,8 +597,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Fetch contact info FIRST — only charge if there's something to reveal.
                 $tgt = $db->prepare("SELECT mobile, alt_mobile, email, contact_person FROM profiles WHERE cp_id = :c AND status = 'Approved' LIMIT 1");
                 $tgt->execute([':c' => $targetCpId]);
-                $row = $tgt->fetch();
-                $hasContact = $row && (!empty($row['mobile']) || !empty($row['alt_mobile']) || !empty($row['email']));
+                $row = $tgt->fetch() ?: [];
+                $hasContact = !empty($row['mobile']) || !empty($row['alt_mobile']) || !empty($row['email']);
 
                 $viewerMob = $_SESSION['mobile'] ?? $_SESSION['contact_mobile'] ?? '';
                 if (!$viewerMob) {
