@@ -2105,7 +2105,7 @@ function renderMyProfile() {
   }
 
   // Profile photo
-  const ph1 = p.photo1 && !p.photo1.startsWith('default_') ? (p.photo1.startsWith('uploads/') ? 'api/'+p.photo1 : 'api/uploads/'+p.photo1) : '';
+  const ph1 = p.photo1 && !p.photo1.startsWith('default_') ? (p.photo1.startsWith('http') ? p.photo1 : p.photo1.startsWith('uploads/') ? 'api/'+p.photo1 : 'api/uploads/'+p.photo1) : '';
   const avHtml = ph1
     ? '<img src="'+ph1+'" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,0.5)" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="p-av" style="display:none">'+esc(initials(p.name))+'</div>'
     : '<div class="p-av">'+esc(initials(p.name))+'</div>';
@@ -2725,7 +2725,7 @@ function renderSuggestionsUI() {
 
   const card = (p) => {
     const src = p.photo1 && !p.photo1.startsWith('default_')
-      ? (p.photo1.startsWith('uploads/') ? 'api/' + p.photo1 : photoBase + p.photo1) : '';
+      ? (p.photo1.startsWith('http') ? p.photo1 : p.photo1.startsWith('uploads/') ? 'api/' + p.photo1 : photoBase + p.photo1) : '';
     const imgHtml = src
       ? `<img src="${src}" style="width:54px;height:54px;border-radius:50%;object-fit:cover;border:2px solid #e5e7eb" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
       : '';
@@ -2825,7 +2825,7 @@ function _viewToggleHtml(countLabel, onToggle) {
 function _profileTableRow(p, i) {
   const photoBase = 'api/uploads/';
   const src = p.photo1 && !p.photo1.startsWith('default_')
-    ? (p.photo1.startsWith('uploads/') ? 'api/' + p.photo1 : photoBase + p.photo1) : '';
+    ? (p.photo1.startsWith('http') ? p.photo1 : p.photo1.startsWith('uploads/') ? 'api/' + p.photo1 : photoBase + p.photo1) : '';
   const thumb = src
     ? `<img src="${src}" style="width:40px;height:48px;object-fit:cover;border-radius:6px;display:block" onerror="this.style.display='none'">`
     : `<div style="width:40px;height:48px;border-radius:6px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#9ca3af">${esc((p.name||'?').charAt(0))}</div>`;
@@ -2857,7 +2857,7 @@ function _profileCardHtml(list) {
   const photoBase = 'api/uploads/';
   return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px">${list.map(p => {
     const src = p.photo1 && !p.photo1.startsWith('default_')
-      ? (p.photo1.startsWith('uploads/') ? 'api/' + p.photo1 : photoBase + p.photo1) : '';
+      ? (p.photo1.startsWith('http') ? p.photo1 : p.photo1.startsWith('uploads/') ? 'api/' + p.photo1 : photoBase + p.photo1) : '';
     const imgHtml = src ? `<img src="${src}" style="width:54px;height:54px;border-radius:50%;object-fit:cover;border:2px solid #e5e7eb" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : '';
     const fallback = `<div style="${src?'display:none;':'display:flex;'}width:54px;height:54px;border-radius:50%;background:var(--bg);align-items:center;justify-content:center;font-size:16px;color:var(--ink3);font-weight:700;border:2px solid #e5e7eb">${esc((p.name||'?').charAt(0))}</div>`;
     const where = [p.present_city, p.present_district].filter(Boolean).join(', ');
@@ -2939,7 +2939,7 @@ async function renderAllProfiles() {
     const photoBase = 'api/uploads/';
     const card = (p) => {
       const src = p.photo1 && !p.photo1.startsWith('default_')
-        ? (p.photo1.startsWith('uploads/') ? 'api/' + p.photo1 : photoBase + p.photo1) : '';
+        ? (p.photo1.startsWith('http') ? p.photo1 : p.photo1.startsWith('uploads/') ? 'api/' + p.photo1 : photoBase + p.photo1) : '';
       const imgHtml = src
         ? `<img src="${src}" style="width:60px;height:72px;object-fit:cover;border-radius:8px;flex-shrink:0" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
         : '';

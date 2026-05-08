@@ -13,6 +13,10 @@ export default defineConfig({
     port: 3000,
     open: true,
     proxy: {
+      '/ChennaiMatrimony/backend': {
+        target: 'http://localhost',
+        changeOrigin: true,
+      },
       '/matrimony/backend': {
         target: 'http://localhost',
         changeOrigin: true,
