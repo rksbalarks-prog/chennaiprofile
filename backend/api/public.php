@@ -911,6 +911,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $addScore($allProfiles);
         }
 
+        foreach ($interest as &$r)    resolve_profile_photos($r);
+        foreach ($preference as &$r)  resolve_profile_photos($r);
+        foreach ($notViewed as &$r)   resolve_profile_photos($r);
+        foreach ($viewed as &$r)      resolve_profile_photos($r);
+        foreach ($withPhotos as &$r)  resolve_profile_photos($r);
+        foreach ($allProfiles as &$r) resolve_profile_photos($r);
+        unset($r);
         json_ok(['interest' => $interest, 'preference' => $preference, 'notViewed' => $notViewed, 'viewed' => $viewed, 'withPhotos' => $withPhotos, 'allProfiles' => $allProfiles]);
     }
 
@@ -1039,7 +1046,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             FROM profile_tags pt LEFT JOIN profiles p ON p.cp_id = pt.target_cp_id
             WHERE pt.mobile = :m ORDER BY pt.updated_at DESC");
         $stmt->execute([':m' => $mobile]);
-        json_ok(['tags' => $stmt->fetchAll()]);
+        $tags = $stmt->fetchAll();
+        foreach ($tags as &$t) resolve_profile_photos($t);
+        unset($t);
+        json_ok(['tags' => $tags]);
     }
 
     if ($act === 'my_orders') {
@@ -1367,7 +1377,10 @@ switch ($action) {
                 $params = [':g' => $gender];
                 if ($useRandom) $params[':seed'] = $seed;
                 $s->execute($params);
-                return ['profiles' => $s->fetchAll(), 'total' => $total];
+                $profiles = $s->fetchAll();
+                foreach ($profiles as &$p) resolve_profile_photos($p);
+                unset($p);
+                return ['profiles' => $profiles, 'total' => $total];
             };
             if ($useRandom) return $runQuery();
             $key = "bootstrap:g=$gender:l=$limit";
@@ -1498,7 +1511,10 @@ switch ($action) {
             header('Cache-Control: public, max-age=60, stale-while-revalidate=120');
         }
 
-        $resp = ['profiles' => $stmt->fetchAll(), 'limit' => $limit, 'offset' => $offset];
+        $profiles = $stmt->fetchAll();
+        foreach ($profiles as &$p) resolve_profile_photos($p);
+        unset($p);
+        $resp = ['profiles' => $profiles, 'limit' => $limit, 'offset' => $offset];
         if ($total !== null) $resp['total'] = $total;
         json_ok($resp);
     }
@@ -1514,6 +1530,7 @@ switch ($action) {
 
         // Remove sensitive fields
         unset($profile['pending_plan'], $profile['pending_amount'], $profile['pending_pay_opt_id'], $profile['payment_status']);
+        resolve_profile_photos($profile);
 
         // Chennai Profile: always strip contact — revealed only via track_view (points gate).
         if (defined('SITE_ID') && SITE_ID === 'chennaip') {

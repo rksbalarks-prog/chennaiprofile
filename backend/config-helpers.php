@@ -216,6 +216,19 @@ function nextCpId(PDO $db): string {
     return 'CM2011001';
 }
 
+function resolve_photo_url(?string $val): ?string {
+    if (!$val || str_starts_with($val, 'default_') || str_starts_with($val, 'http')) return $val;
+    if (!defined('S3_ENABLED') || !S3_ENABLED) return $val;
+    $bare = ltrim(preg_replace('#^uploads[/\\\\]#i', '', trim($val)), '/\\');
+    return 'https://' . S3_BUCKET . '.s3.' . S3_REGION . '.amazonaws.com/photos/' . $bare;
+}
+
+function resolve_profile_photos(array &$row): void {
+    foreach (['photo1', 'photo2', 'photo3', 'rasi_photo', 'amsam_photo'] as $col) {
+        if (isset($row[$col])) $row[$col] = resolve_photo_url($row[$col]);
+    }
+}
+
 function secureSession(): void {
     if (session_status() === PHP_SESSION_NONE) {
         $lifetime = 12 * 60 * 60;
