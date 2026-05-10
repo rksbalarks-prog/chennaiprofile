@@ -535,6 +535,10 @@ input,select,textarea{outline:none}
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
         My Bills
       </button>
+      <button class="sb-btn" data-page="page_payupay" onclick="showSec('payuPayments',this)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/><line x1="5" y1="15" x2="9" y2="15"/><line x1="13" y1="15" x2="16" y2="15"/></svg>
+        PayU Payments <span id="sbPayuBadge" style="margin-left:auto;background:#6B3FA0;color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;display:none"></span>
+      </button>
       <button class="sb-btn" data-page="page_addorder" onclick="showSec('addOrder',this)">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
         Pay Later
@@ -671,6 +675,40 @@ input,select,textarea{outline:none}
           <div class="u-tw"><table class="u-tbl"><thead><tr><th>#</th><th>Plan</th><th>Amount</th><th>Payment</th><th>Date</th><th>Expiry</th><th>By</th><th>Status</th></tr></thead><tbody id="billTbody"></tbody></table></div>
         </div>
       </div>
+      <!-- ── PayU Payments ─────────────────────────────────────────── -->
+      <div class="u-section" id="payuPaymentsSection">
+        <div class="stats-row" id="payuStats"></div>
+
+        <!-- Plan / subscription payments -->
+        <div class="u-card" style="margin-bottom:14px">
+          <div class="u-card-head" style="background:linear-gradient(135deg,#0D7B6A,#6B3FA0)">
+            <span class="u-card-title" style="color:#fff">💳 Plan Payments</span>
+            <span id="payuPayBadge" class="badge" style="background:rgba(255,255,255,.2);color:#fff">0</span>
+          </div>
+          <div class="u-tw">
+            <table class="u-tbl">
+              <thead><tr><th>#</th><th>Date</th><th>Plan</th><th>Amount</th><th>Txn&nbsp;ID</th><th>Mode</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody id="payuPlanTbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Points purchases -->
+        <div class="u-card">
+          <div class="u-card-head" style="background:linear-gradient(135deg,#6B3FA0,#0D7B6A)">
+            <span class="u-card-title" style="color:#fff">🪙 Points Purchases</span>
+            <span id="payuPtsBadge" class="badge" style="background:rgba(255,255,255,.2);color:#fff">0</span>
+          </div>
+          <div class="u-tw">
+            <table class="u-tbl">
+              <thead><tr><th>#</th><th>Date</th><th>Description</th><th>Points</th><th>Balance After</th><th>Ref&nbsp;ID</th><th>Status</th></tr></thead>
+              <tbody id="payuPtsTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- ── end PayU Payments ──────────────────────────────────────── -->
+
       <div class="u-section" id="myActivitySection">
         <div class="stats-row" id="actStats"></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
@@ -1645,8 +1683,8 @@ function fillSidebar() {
 }
 
 // ===== NAVIGATION =====
-const TITLES = { myProfile: 'My Profile', suggestions: 'Suggestions', basicMatches: 'Basic Matches', mutualMatches: 'Mutual Matches', allProfiles: 'All Profiles', myBills: 'My Bills', myActivity: 'My Activity', loginHistory: 'Login History', myReports: 'My Reports', profileViewLog: 'Profile View Log', contactLog: 'Contact View Log', mySettings: 'Settings', addProfile: 'Add Profile', addOrder: 'Pay Later', myPoints: 'My Points' };
-const SEC_TO_PAGE = { myProfile: 'page_profile', suggestions: 'page_suggestions', basicMatches: 'page_matches', mutualMatches: 'page_matches', allProfiles: 'page_allprofiles', myBills: 'page_bills', myActivity: 'page_activity', loginHistory: 'page_loginhistory', myReports: 'page_myreports', profileViewLog: 'page_profileviewlog', contactLog: 'page_contactlog', mySettings: 'page_settings', addProfile: '', addOrder: 'page_addorder', myPoints: 'page_points' };
+const TITLES = { myProfile: 'My Profile', suggestions: 'Suggestions', basicMatches: 'Basic Matches', mutualMatches: 'Mutual Matches', allProfiles: 'All Profiles', myBills: 'My Bills', payuPayments: 'PayU Payments', myActivity: 'My Activity', loginHistory: 'Login History', myReports: 'My Reports', profileViewLog: 'Profile View Log', contactLog: 'Contact View Log', mySettings: 'Settings', addProfile: 'Add Profile', addOrder: 'Pay Later', myPoints: 'My Points' };
+const SEC_TO_PAGE = { myProfile: 'page_profile', suggestions: 'page_suggestions', basicMatches: 'page_matches', mutualMatches: 'page_matches', allProfiles: 'page_allprofiles', myBills: 'page_bills', payuPayments: 'page_payupay', myActivity: 'page_activity', loginHistory: 'page_loginhistory', myReports: 'page_myreports', profileViewLog: 'page_profileviewlog', contactLog: 'page_contactlog', mySettings: 'page_settings', addProfile: '', addOrder: 'page_addorder', myPoints: 'page_points' };
 
 // ===== ADD PROFILE (USER PANEL) =====
 let upApSelectedPlan = 'free';
@@ -2007,7 +2045,7 @@ function showSec(name, btn) {
   document.querySelector('.sidebar')?.classList.remove('mob-open');
   document.getElementById('mobOverlay')?.classList.remove('open');
   setActions(name);
-  const renderers = { myProfile: renderMyProfile, suggestions: renderSuggestions, basicMatches: () => renderMatches('basic'), mutualMatches: () => renderMatches('mutual'), allProfiles: renderAllProfiles, myBills: renderMyBills, addOrder: renderMyOrders, myActivity: renderMyActivity, loginHistory: renderLoginHistory, myReports: renderMyReports, profileViewLog: renderUserProfileViewLog, contactLog: renderUserContactLog, mySettings: renderSettings, myPoints: renderMyPoints };
+  const renderers = { myProfile: renderMyProfile, suggestions: renderSuggestions, basicMatches: () => renderMatches('basic'), mutualMatches: () => renderMatches('mutual'), allProfiles: renderAllProfiles, myBills: renderMyBills, payuPayments: renderPayuPayments, addOrder: renderMyOrders, myActivity: renderMyActivity, loginHistory: renderLoginHistory, myReports: renderMyReports, profileViewLog: renderUserProfileViewLog, contactLog: renderUserContactLog, mySettings: renderSettings, myPoints: renderMyPoints };
   if (renderers[name]) renderers[name]();
   // Show autosave restore banner for add profile section
   if (name === 'addProfile') FormAutoSave.showRestoreBanner('up_quick_create', '#addProfileSection .profile-card > div:nth-child(2)', () => toast('Draft restored'));
@@ -2615,6 +2653,128 @@ async function submitCreate() {
 }
 
 // ===== MY BILLS =====
+// ===== PAYU PAYMENTS =====
+async function renderPayuPayments() {
+  // --- Plan orders ---
+  let planOrders = [];
+  try {
+    const resp = await fetch('api/public.php', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'my_orders', mobile: mob }),
+      credentials:'same-origin'
+    }).then(r => r.json());
+    if (resp.ok) planOrders = resp.orders || [];
+  } catch(e) {}
+
+  // --- Points purchase history ---
+  let ptsHistory = [];
+  try {
+    const resp = await fetch('api/points.php?action=history', { credentials:'include' }).then(r => r.json());
+    if (resp.ok) ptsHistory = (resp.history || []).filter(t => t.type === 'purchase' && t.points > 0);
+  } catch(e) {}
+
+  // --- Stats ---
+  const approvedOrders = planOrders.filter(o => o.status === 'approved');
+  const pendingOrders  = planOrders.filter(o => o.status === 'pending');
+  const failedOrders   = planOrders.filter(o => o.status === 'rejected');
+  const totalPaid      = approvedOrders.reduce((s, o) => s + parseFloat(o.amount || 0), 0);
+
+  document.getElementById('payuStats').innerHTML =
+    `<div class="stat-card" style="border-color:var(--accent)"><div class="stat-num">${planOrders.length + ptsHistory.length}</div><div class="stat-lbl">Total Transactions</div></div>`
+  + `<div class="stat-card" style="border-color:var(--green)"><div class="stat-num">₹${totalPaid.toLocaleString('en-IN')}</div><div class="stat-lbl">Total Paid (Plans)</div></div>`
+  + `<div class="stat-card" style="border-color:#d97706"><div class="stat-num">${pendingOrders.length}</div><div class="stat-lbl">Pending</div></div>`
+  + `<div class="stat-card" style="border-color:#dc2626"><div class="stat-num">${failedOrders.length}</div><div class="stat-lbl">Failed / Rejected</div></div>`;
+
+  // Update sidebar badge for pending
+  const sbBadge = document.getElementById('sbPayuBadge');
+  if (sbBadge) { if (pendingOrders.length > 0) { sbBadge.textContent = pendingOrders.length; sbBadge.style.display=''; } else sbBadge.style.display='none'; }
+
+  // --- Plan orders table ---
+  const statusBadge = (s, method) => {
+    if (s === 'approved') return `<span style="background:#dcfce7;color:#16a34a;padding:3px 10px;border-radius:20px;font-size:13px;font-weight:700">✅ Success</span>`;
+    if (s === 'rejected') return `<span style="background:#fee2e2;color:#dc2626;padding:3px 10px;border-radius:20px;font-size:13px;font-weight:700">❌ Failed</span>`;
+    if (s === 'cancelled') return `<span style="background:#f3f4f6;color:#6b7280;padding:3px 10px;border-radius:20px;font-size:13px;font-weight:700">🚫 Cancelled</span>`;
+    const isPayLater = !method || method === '' || method.toLowerCase().includes('pay') || method.toLowerCase().includes('upi') || method.toLowerCase().includes('bank');
+    return isPayLater
+      ? `<span style="background:#fef3c7;color:#d97706;padding:3px 10px;border-radius:20px;font-size:13px;font-weight:700">🕐 Pay Later</span>`
+      : `<span style="background:#fef3c7;color:#d97706;padding:3px 10px;border-radius:20px;font-size:13px;font-weight:700">⏳ Pending</span>`;
+  };
+
+  document.getElementById('payuPayBadge').textContent = planOrders.length;
+  document.getElementById('payuPlanTbody').innerHTML = planOrders.length === 0
+    ? `<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--ink3)">No payment records yet</td></tr>`
+    : planOrders.map((o, i) => {
+        const actionBtn = o.status === 'approved'
+          ? `<button onclick="payuShowReceipt(${JSON.stringify(o)})" style="background:linear-gradient(135deg,#0D7B6A,#6B3FA0);color:#fff;border:none;padding:5px 12px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">📄 Receipt</button>`
+          : o.status === 'pending'
+          ? `<button onclick="showSec('addOrder');toast('Complete your payment below','info')" style="background:linear-gradient(135deg,#d97706,#b45309);color:#fff;border:none;padding:5px 12px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">💳 Pay Now</button>`
+          : `<button onclick="openPaymentPage()" style="background:linear-gradient(135deg,#6B3FA0,#4c2882);color:#fff;border:none;padding:5px 12px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">🔄 Retry</button>`;
+        return `<tr>
+          <td style="color:var(--ink4);font-size:13px">${i+1}</td>
+          <td style="font-size:13px;white-space:nowrap">${esc((o.created_at||'-').slice(0,16))}</td>
+          <td style="font-weight:700;color:var(--ink)">${esc(o.plan||'-')}</td>
+          <td style="font-family:var(--mono);font-weight:700;color:#0D7B6A">₹${parseFloat(o.amount||0).toLocaleString('en-IN')}</td>
+          <td style="font-size:11px;color:var(--ink3);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(o.txn_ref||'')}">${esc(o.txn_ref||'—')}</td>
+          <td style="font-size:13px">${esc(o.method||'—')}</td>
+          <td>${statusBadge(o.status, o.method)}</td>
+          <td>${actionBtn}</td>
+        </tr>`;
+      }).join('');
+
+  // --- Points table ---
+  document.getElementById('payuPtsBadge').textContent = ptsHistory.length;
+  document.getElementById('payuPtsTbody').innerHTML = ptsHistory.length === 0
+    ? `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--ink3)">No points purchases yet</td></tr>`
+    : ptsHistory.map((t, i) => `<tr>
+        <td style="color:var(--ink4);font-size:13px">${i+1}</td>
+        <td style="font-size:13px;white-space:nowrap">${esc((t.created_at||'-').slice(0,16))}</td>
+        <td style="font-size:14px">${esc(t.description||'-')}</td>
+        <td style="font-weight:700;color:#6B3FA0;font-size:15px">+${t.points} pts</td>
+        <td style="font-weight:700;color:#0D7B6A">${t.balance_after} pts</td>
+        <td style="font-size:11px;color:var(--ink3);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(t.ref_id||'')}">${esc(t.ref_id||'—')}</td>
+        <td><span style="background:#dcfce7;color:#16a34a;padding:3px 10px;border-radius:20px;font-size:13px;font-weight:700">✅ Success</span></td>
+      </tr>`).join('');
+}
+
+function payuShowReceipt(o) {
+  const billDate   = (o.processed_at || o.created_at || '').slice(0,10);
+  const amount     = '₹' + parseFloat(o.amount||0).toLocaleString('en-IN', {minimumFractionDigits:0});
+  const shareText  = encodeURIComponent(`✅ Payment Successful!\nChennai Profile Matrimony\n\nOrder #${o.id}\nPlan: ${o.plan}\nAmount: ${amount}\nDate: ${billDate}\nTxn ID: ${o.txn_ref||'-'}`);
+  document.getElementById('rcptOverlay2')?.remove();
+  const html = `<div class="rcpt-overlay" id="rcptOverlay2" onclick="if(event.target===this)this.remove()">
+  <div class="rcpt-box">
+    <div class="rcpt-head">
+      <div class="rcpt-check">✅</div>
+      <div class="rcpt-title">Payment Receipt</div>
+      <div class="rcpt-sub">Order #${o.id}</div>
+    </div>
+    <div class="rcpt-body">
+      <div class="rcpt-row"><span class="rcpt-label">Date</span><span class="rcpt-val">${esc(billDate)}</span></div>
+      <div class="rcpt-row"><span class="rcpt-label">Name</span><span class="rcpt-val">${esc(o.name||'—')}</span></div>
+      <div class="rcpt-row"><span class="rcpt-label">Profile ID</span><span class="rcpt-val">${esc(o.cp_id||'—')}</span></div>
+      <div class="rcpt-row"><span class="rcpt-label">Plan</span><span class="rcpt-val">${esc(o.plan||'—')}</span></div>
+      <div class="rcpt-row"><span class="rcpt-label">Amount</span><span class="rcpt-val" style="color:#0D7B6A;font-size:17px">${amount}</span></div>
+      <div class="rcpt-row"><span class="rcpt-label">Payment Mode</span><span class="rcpt-val">${esc(o.method||'PayU')}</span></div>
+      <div class="rcpt-row"><span class="rcpt-label">Transaction ID</span><span class="rcpt-val" style="font-size:12px;word-break:break-all">${esc(o.txn_ref||'—')}</span></div>
+      <div class="rcpt-row"><span class="rcpt-label">Status</span><span class="rcpt-val"><span class="rcpt-badge">✅ Approved</span></span></div>
+      ${o.admin_note ? `<div class="rcpt-row"><span class="rcpt-label">Note</span><span class="rcpt-val" style="font-size:12px">${esc(o.admin_note)}</span></div>` : ''}
+    </div>
+    <div class="rcpt-actions">
+      <button class="rcpt-btn rcpt-btn-share" onclick="window.open('https://wa.me/?text=${shareText}','_blank')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/></svg>
+        Share
+      </button>
+      <button class="rcpt-btn rcpt-btn-print" onclick="window.print()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Print / PDF
+      </button>
+      <button class="rcpt-btn rcpt-btn-close" onclick="document.getElementById('rcptOverlay2').remove()">✕ Close</button>
+    </div>
+  </div>
+</div>`;
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
 async function renderMyBills() {
   try {
     const data = await apiGet('bills.php');
