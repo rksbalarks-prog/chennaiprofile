@@ -9513,12 +9513,20 @@ paymentOptions = [
 // ── USER PANEL CONTROL ──────────────────────────────────────
 // Defines what pages/features each member sees in the user panel
 const UP_PAGES = [
-  { id:'page_profile',      label:'My Profile',      icon:'👤', desc:'View profile details page' },
-  { id:'page_bills',        label:'My Bills',         icon:'💳', desc:'Bill history and active plan' },
-  { id:'page_addorder',     label:'Add Order',        icon:'🛒', desc:'Place new subscription order' },
-  { id:'page_activity',     label:'My Activity',      icon:'📊', desc:'Profile views and contact requests' },
-  { id:'page_loginhistory', label:'Login History',    icon:'🔐', desc:'OTP log and session history' },
-  { id:'page_settings',     label:'Settings',         icon:'⚙️', desc:'Mobile number change requests' },
+  { id:'page_profile',        label:'My Profile',         icon:'👤', desc:'View profile details page' },
+  { id:'page_suggestions',    label:'Suggestions',        icon:'💡', desc:'AI-suggested matches' },
+  { id:'page_matches',        label:'Matches',            icon:'🤝', desc:'Basic and mutual matches' },
+  { id:'page_allprofiles',    label:'All Profiles',       icon:'👥', desc:'Browse all member profiles' },
+  { id:'page_bills',          label:'My Bills',           icon:'💳', desc:'Bill history and active plan' },
+  { id:'page_payupay',        label:'PayU Payments',      icon:'💸', desc:'PayU payment history and receipts' },
+  { id:'page_addorder',       label:'Pay Later / Orders', icon:'🛒', desc:'Place new subscription order' },
+  { id:'page_activity',       label:'My Activity',        icon:'📊', desc:'Profile views and contact requests' },
+  { id:'page_loginhistory',   label:'Login History',      icon:'🔐', desc:'OTP log and session history' },
+  { id:'page_myreports',      label:'My Reports',         icon:'⚠️', desc:'Reports filed by the member' },
+  { id:'page_profileviewlog', label:'Profile View Log',   icon:'👁', desc:'Who viewed this member\'s profile' },
+  { id:'page_contactlog',     label:'Contact View Log',   icon:'📞', desc:'Contact requests made by member' },
+  { id:'page_points',         label:'My Points',          icon:'⭐', desc:'Points balance and purchase history' },
+  { id:'page_settings',       label:'Settings',           icon:'⚙️', desc:'Mobile number change requests' },
 ];
 const UP_FEATURES = [
   { id:'feat_create_profile',label:'Create New Profile', icon:'➕', desc:'Allow unregistered users to create profile' },

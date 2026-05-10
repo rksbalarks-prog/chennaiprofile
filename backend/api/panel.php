@@ -13,22 +13,33 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 $db = getDB();
 
 // ── Default control structure ────────────────────────────────────────────────
+// Only keys listed here are emitted; DB values can only override these.
+// New pages MUST be added here with true so they're visible by default even
+// if an older DB settings row doesn't mention them.
 $defaults = [
-    'page_profile'        => true,
-    'page_bills'          => true,
-    'page_addorder'       => true,
-    'page_activity'       => true,
-    'page_loginhistory'   => true,
-    'page_settings'       => true,
-    'feat_create_profile' => true,
-    'feat_edit_profile'   => true,
-    'feat_delete_profile' => true,
-    'feat_pay_now'        => true,
-    'feat_view_contact'   => true,
-    'feat_view_bill'      => true,
-    'feat_req_mobile'     => true,
-    'feat_print_profile'  => true,
-    'feat_sign_out'       => true,
+    'page_profile'         => true,
+    'page_suggestions'     => true,
+    'page_matches'         => true,
+    'page_allprofiles'     => true,
+    'page_bills'           => true,
+    'page_payupay'         => true,   // PayU Payments history
+    'page_addorder'        => true,
+    'page_activity'        => true,
+    'page_loginhistory'    => true,
+    'page_myreports'       => true,
+    'page_profileviewlog'  => true,
+    'page_contactlog'      => true,
+    'page_points'          => true,
+    'page_settings'        => true,
+    'feat_create_profile'  => true,
+    'feat_edit_profile'    => true,
+    'feat_delete_profile'  => true,
+    'feat_pay_now'         => true,
+    'feat_view_contact'    => true,
+    'feat_view_bill'       => true,
+    'feat_req_mobile'      => true,
+    'feat_print_profile'   => true,
+    'feat_sign_out'        => true,
 ];
 
 // ── Load global settings row ─────────────────────────────────────────────────
@@ -41,11 +52,17 @@ $globalStmt = $db->prepare(
 $globalStmt->execute();
 $globalRow = $globalStmt->fetch();
 
+// Only allow DB to override keys that are explicitly in $defaults.
+// This prevents stale/unknown keys in the DB from hiding new pages.
 $globalSettings = $defaults;
 if ($globalRow) {
     $decoded = json_decode($globalRow['settings'], true);
     if (is_array($decoded)) {
-        $globalSettings = array_merge($defaults, $decoded);
+        foreach ($defaults as $key => $defaultVal) {
+            if (array_key_exists($key, $decoded)) {
+                $globalSettings[$key] = (bool) $decoded[$key];
+            }
+        }
     }
 }
 
