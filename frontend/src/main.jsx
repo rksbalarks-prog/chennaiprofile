@@ -35,8 +35,8 @@ const RouteFallback = () => (
     minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center'
   }}>
     <div style={{
-      width: 32, height: 32, border: '3px solid #f0e0e0',
-      borderTopColor: '#8B0000', borderRadius: '50%',
+      width: 32, height: 32, border: '3px solid #C8EDE6',
+      borderTopColor: '#0D7B6A', borderRadius: '50%',
       animation: 'spin 0.8s linear infinite',
     }} />
     <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
@@ -66,9 +66,17 @@ function App() {
   )
 }
 
+// Detect base path so React Router works both at root (production)
+// and in a subdirectory (local XAMPP at /ChennaiMatrimony/frontend/dist/).
+const getBasename = () => {
+  const path = window.location.pathname;
+  const match = path.match(/^(\/.*?\/frontend\/dist)/);
+  return match ? match[1] : '/';
+};
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <Router>
+    <Router basename={getBasename()}>
       <App />
     </Router>
   </React.StrictMode>,

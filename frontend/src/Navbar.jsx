@@ -100,10 +100,10 @@ export default function Navbar() {
         .top-bar {
           position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
           background: #fff;
-          border-bottom: 1px solid #f0f0f0;
-          box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+          border-bottom: 2px solid #C8EDE6;
+          box-shadow: 0 2px 12px rgba(13,123,106,0.08);
           display: flex; align-items: center; justify-content: space-between;
-          padding: 0 16px; height: 56px;
+          padding: 0 16px; height: 60px;
         }
 
         .top-bar-brand {
@@ -112,21 +112,21 @@ export default function Navbar() {
         }
 
         .mobile-back-btn {
-          width: 36px; height: 36px; border-radius: 50%;
-          background: #f5f5f5; border: none; cursor: pointer;
+          width: 40px; height: 40px; border-radius: 50%;
+          background: #F4FAF8; border: none; cursor: pointer;
           display: flex; align-items: center; justify-content: center;
-          margin-right: 6px; color: #333; flex-shrink: 0;
+          margin-right: 6px; color: #1A1A2E; flex-shrink: 0;
           transition: background 0.15s;
         }
-        .mobile-back-btn:active { background: #e8e8e8; }
-        .mobile-back-btn svg { width: 20px; height: 20px; }
+        .mobile-back-btn:active { background: #C8EDE6; }
+        .mobile-back-btn svg { width: 22px; height: 22px; }
         @media (min-width: 769px) {
           .mobile-back-btn { display: none; }
         }
 
         .top-bar-logo {
-          width: 40px; height: 40px; border-radius: 50%;
-          border: 2px solid #8B0000; overflow: hidden;
+          width: 42px; height: 42px; border-radius: 50%;
+          border: 2px solid #0D7B6A; overflow: hidden;
           display: flex; align-items: center; justify-content: center;
           flex-shrink: 0;
         }
@@ -136,12 +136,12 @@ export default function Navbar() {
         }
 
         .top-bar-title {
-          font-size: 16px; font-weight: 800; color: #8B0000;
+          font-size: 18px; font-weight: 800; color: #0D7B6A;
           letter-spacing: -0.3px; line-height: 1.1;
         }
 
         .top-bar-subtitle {
-          font-size: 11px; font-weight: 500; color: #999;
+          font-size: 13px; font-weight: 500; color: #6B3FA0;
           letter-spacing: 0.5px;
         }
 
@@ -150,42 +150,41 @@ export default function Navbar() {
         }
 
         .lang-toggle {
-          display: flex; background: #f5f5f5; border-radius: 20px;
-          overflow: hidden; border: 1px solid #e8e8e8;
+          display: flex; background: #F4FAF8; border-radius: 20px;
+          overflow: hidden; border: 1px solid #C8EDE6;
         }
 
         .lang-btn {
-          padding: 6px 12px; font-size: 11px; font-weight: 600;
+          padding: 7px 14px; font-size: 13px; font-weight: 600;
           border: none; cursor: pointer; transition: all 0.2s;
           background: transparent; color: #888;
         }
 
         .lang-btn.active {
-          background: #8B0000; color: #fff;
+          background: #0D7B6A; color: #fff;
         }
 
-        /* Single-button toggle: shows the OTHER language as its label
-           (English → "தமிழ்", Tamil → "EN"). Click swaps. */
+        /* Single-button toggle: shows the OTHER language as its label */
         .lang-toggle-single {
-          padding: 6px 12px; font-size: 12px; font-weight: 700;
-          background: #8B0000; color: #fff;
+          padding: 7px 14px; font-size: 14px; font-weight: 700;
+          background: linear-gradient(135deg, #0D7B6A, #6B3FA0); color: #fff;
           border: none; border-radius: 20px;
-          cursor: pointer; transition: background 0.15s, transform 0.05s;
-          line-height: 1; min-width: 48px; text-align: center;
+          cursor: pointer; transition: opacity 0.15s, transform 0.05s;
+          line-height: 1; min-width: 52px; text-align: center;
         }
-        .lang-toggle-single:hover { background: #6f0000; }
+        .lang-toggle-single:hover { opacity: 0.88; }
         .lang-toggle-single:active { transform: scale(0.97); }
 
         .hamburger-btn {
-          width: 36px; height: 36px; border-radius: 50%;
-          background: #f5f5f5; border: none; cursor: pointer;
+          width: 40px; height: 40px; border-radius: 50%;
+          background: #F4FAF8; border: none; cursor: pointer;
           display: flex; align-items: center; justify-content: center;
           transition: all 0.2s;
         }
 
-        .hamburger-btn:active { background: #e8e8e8; }
+        .hamburger-btn:active { background: #C8EDE6; }
 
-        .hamburger-btn svg { width: 20px; height: 20px; color: #333; }
+        .hamburger-btn svg { width: 22px; height: 22px; color: #1A1A2E; }
 
         /* ── SLIDE MENU ── */
         .slide-overlay {
@@ -197,8 +196,8 @@ export default function Navbar() {
         .slide-overlay.open { opacity: 1; pointer-events: auto; }
 
         .slide-menu {
-          position: fixed; top: 0; right: -280px; bottom: 0;
-          width: 280px; background: #fff; z-index: 2001;
+          position: fixed; top: 0; right: -290px; bottom: 0;
+          width: 290px; background: #fff; z-index: 2001;
           box-shadow: -4px 0 20px rgba(0,0,0,0.15);
           transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           display: flex; flex-direction: column;
@@ -208,19 +207,19 @@ export default function Navbar() {
         .slide-menu.open { right: 0; }
 
         .slide-menu-header {
-          background: linear-gradient(135deg, #8B0000, #C41E3A);
-          padding: 24px 20px 20px; color: #fff;
+          background: linear-gradient(135deg, #0D7B6A, #6B3FA0);
+          padding: 26px 22px 22px; color: #fff;
           display: flex; align-items: center; justify-content: space-between;
         }
 
         .slide-menu-header h3 {
-          font-size: 18px; font-weight: 700; margin: 0;
+          font-size: 20px; font-weight: 700; margin: 0;
         }
 
         .slide-close {
-          width: 32px; height: 32px; border-radius: 50%;
+          width: 34px; height: 34px; border-radius: 50%;
           background: rgba(255,255,255,0.2); border: none;
-          color: #fff; font-size: 18px; cursor: pointer;
+          color: #fff; font-size: 19px; cursor: pointer;
           display: flex; align-items: center; justify-content: center;
         }
 
@@ -228,35 +227,35 @@ export default function Navbar() {
 
         .slide-link {
           display: flex; align-items: center; gap: 14px;
-          padding: 14px 20px; color: #333; text-decoration: none;
-          font-size: 15px; font-weight: 500; transition: all 0.2s;
-          border-bottom: 1px solid #f5f5f5;
+          padding: 16px 22px; color: #1A1A2E; text-decoration: none;
+          font-size: 17px; font-weight: 500; transition: all 0.2s;
+          border-bottom: 1px solid #F4FAF8;
         }
 
-        .slide-link:hover, .slide-link:active { background: #fef2f2; color: #8B0000; }
+        .slide-link:hover, .slide-link:active { background: #E8F5F2; color: #0D7B6A; }
 
         .slide-link-icon {
-          width: 36px; height: 36px; border-radius: 10px;
-          background: #f8f8f8; display: flex; align-items: center;
-          justify-content: center; font-size: 18px; flex-shrink: 0;
+          width: 38px; height: 38px; border-radius: 10px;
+          background: #F4FAF8; display: flex; align-items: center;
+          justify-content: center; font-size: 20px; flex-shrink: 0;
         }
 
-        .slide-link.active { color: #8B0000; font-weight: 700; }
-        .slide-link.active .slide-link-icon { background: #fef2f2; }
+        .slide-link.active { color: #0D7B6A; font-weight: 700; }
+        .slide-link.active .slide-link-icon { background: #E8F5F2; }
 
         .slide-menu-footer {
-          padding: 16px 20px; border-top: 1px solid #f0f0f0;
-          background: #fafafa;
+          padding: 18px 22px; border-top: 1px solid #C8EDE6;
+          background: #F4FAF8;
         }
 
         /* ── BOTTOM NAV ── */
         .bottom-nav {
           position: fixed; bottom: 0; left: 0; right: 0;
           z-index: 1000; background: #fff;
-          border-top: 1px solid #f0f0f0;
-          box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
+          border-top: 2px solid #C8EDE6;
+          box-shadow: 0 -2px 12px rgba(13,123,106,0.08);
           display: flex; align-items: stretch; justify-content: space-around;
-          height: 60px; padding-bottom: env(safe-area-inset-bottom, 0);
+          height: 64px; padding-bottom: env(safe-area-inset-bottom, 0);
           transform: translateY(0);
           transition: transform 0.22s ease, opacity 0.22s ease;
           opacity: 1;
@@ -269,78 +268,76 @@ export default function Navbar() {
 
         .bottom-nav-item {
           flex: 1; display: flex; flex-direction: column;
-          align-items: center; justify-content: center; gap: 2px;
-          text-decoration: none; color: #999; font-size: 10px;
+          align-items: center; justify-content: center; gap: 3px;
+          text-decoration: none; color: #999; font-size: 12px;
           font-weight: 500; transition: all 0.2s; position: relative;
           padding: 4px 0;
         }
 
-        .bottom-nav-item.active { color: #8B0000; }
+        .bottom-nav-item.active { color: #0D7B6A; }
 
         .bottom-nav-item.active::after {
           content: ''; position: absolute; top: 0; left: 25%; right: 25%;
-          height: 2.5px; background: #8B0000; border-radius: 0 0 4px 4px;
+          height: 3px; background: #0D7B6A; border-radius: 0 0 4px 4px;
         }
 
         .bottom-nav-icon {
-          width: 24px; height: 24px; display: flex;
-          align-items: center; justify-content: center; font-size: 20px;
+          width: 26px; height: 26px; display: flex;
+          align-items: center; justify-content: center; font-size: 22px;
         }
 
-        .bottom-nav-label { font-size: 10px; letter-spacing: 0.2px; }
+        .bottom-nav-label { font-size: 12px; letter-spacing: 0.2px; }
 
         /* Center FAB */
         .bottom-nav-fab {
           position: relative; flex: 1; display: flex;
           flex-direction: column; align-items: center;
           justify-content: flex-end; padding-bottom: 6px;
-          text-decoration: none; color: #fff; font-size: 10px; font-weight: 600;
+          text-decoration: none; color: #fff; font-size: 12px; font-weight: 600;
         }
 
         .bottom-nav-fab-circle {
-          position: absolute; top: -18px;
-          width: 52px; height: 52px; border-radius: 50%;
-          background: linear-gradient(135deg, #8B0000, #C41E3A);
+          position: absolute; top: -20px;
+          width: 56px; height: 56px; border-radius: 50%;
+          background: linear-gradient(135deg, #0D7B6A, #6B3FA0);
           display: flex; align-items: center; justify-content: center;
-          box-shadow: 0 4px 16px rgba(139,0,0,0.35);
-          font-size: 24px; color: #fff;
+          box-shadow: 0 4px 16px rgba(13,123,106,0.4);
+          font-size: 26px; color: #fff;
           border: 3px solid #fff;
         }
 
         .bottom-nav-fab-label {
-          font-size: 10px; color: #8B0000; font-weight: 600; margin-top: 18px;
+          font-size: 12px; color: #0D7B6A; font-weight: 600; margin-top: 20px;
         }
 
         /* ── SPACERS ── */
-        .top-spacer { height: 56px; }
+        .top-spacer { height: 60px; }
         .bottom-spacer { height: 4px; }
 
-        /* ── DESKTOP: bottom nav stays — but only flashes in at the page top
-              and bottom (controlled by .is-hidden in JS). The desktop top
-              nav links remain available too. ── */
         @media (min-width: 769px) {
           .bottom-nav { max-width: 520px; left: 50%; right: auto; transform: translateX(-50%); border-radius: 14px 14px 0 0; bottom: 0; }
           .bottom-nav.is-hidden { transform: translate(-50%, 110%); }
           .bottom-spacer { display: none; }
-          .top-bar { height: 64px; padding: 0 24px; }
-          .top-spacer { height: 64px; }
-          .top-bar-title { font-size: 18px; }
+          .top-bar { height: 68px; padding: 0 24px; }
+          .top-spacer { height: 68px; }
+          .top-bar-title { font-size: 20px; }
           .desktop-links {
             display: flex !important; align-items: center; gap: 6px;
           }
           .desktop-link {
-            padding: 8px 14px; font-size: 14px; font-weight: 500;
+            padding: 9px 16px; font-size: 16px; font-weight: 500;
             color: #555; text-decoration: none; border-radius: 8px;
             transition: all 0.2s;
           }
-          .desktop-link:hover { background: #fef2f2; color: #8B0000; }
-          .desktop-link.active { color: #8B0000; font-weight: 700; background: #fef2f2; }
+          .desktop-link:hover { background: #E8F5F2; color: #0D7B6A; }
+          .desktop-link.active { color: #0D7B6A; font-weight: 700; background: #E8F5F2; }
           .desktop-login {
-            padding: 8px 18px; background: linear-gradient(135deg, #8B0000, #C41E3A);
-            color: #fff; border-radius: 8px; font-size: 13px; font-weight: 600;
+            padding: 9px 20px; background: linear-gradient(135deg, #0D7B6A, #6B3FA0);
+            color: #fff; border-radius: 8px; font-size: 15px; font-weight: 600;
             text-decoration: none; transition: all 0.2s; border: none; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(13,123,106,.25);
           }
-          .desktop-login:hover { box-shadow: 0 4px 12px rgba(139,0,0,0.3); transform: translateY(-1px); }
+          .desktop-login:hover { box-shadow: 0 6px 18px rgba(13,123,106,0.4); transform: translateY(-1px); }
           .hamburger-btn { display: none; }
         }
 
@@ -382,7 +379,7 @@ export default function Navbar() {
           {verified === null ? null : verified ? (
             <>
               <a href={USER_PANEL_URL} className="desktop-login">👤 My Profile</a>
-              <button onClick={handleLogout} style={{ padding:'8px 14px', background:'transparent', color:'#dc2626', border:'1.5px solid #dc2626', borderRadius:8, fontSize:14.3, fontWeight:600, cursor:'pointer' }}>
+              <button onClick={handleLogout} style={{ padding:'9px 16px', background:'transparent', color:'#dc2626', border:'1.5px solid #dc2626', borderRadius:8, fontSize:16, fontWeight:600, cursor:'pointer' }}>
                 Sign Out
               </button>
             </>
@@ -451,13 +448,13 @@ export default function Navbar() {
               </a>
             </>
           ) : (
-            <a href={USER_PANEL_URL} className="slide-link" style={{ color: '#8B0000', fontWeight: 700 }} onClick={() => setMenuOpen(false)}>
+            <a href={USER_PANEL_URL} className="slide-link" style={{ color: '#0D7B6A', fontWeight: 700 }} onClick={() => setMenuOpen(false)}>
               <div className="slide-link-icon">🔑</div> User Login
             </a>
           )}
         </div>
         <div className="slide-menu-footer">
-          <div style={{ fontSize: 12.1, color: '#999', textAlign: 'center' }}>Chennai Profile Matrimony</div>
+          <div style={{ fontSize: 15, color: '#999', textAlign: 'center' }}>Chennai Profile Matrimony</div>
         </div>
       </div>
 

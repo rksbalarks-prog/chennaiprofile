@@ -3,25 +3,25 @@ import { API_BASE } from './config';
 import { trackEvent } from './analytics.js';
 
 const C = {
-  maroon: '#7f1d1d',
-  maroon2: '#991b1b',
-  maroon3: '#b91c1c',
-  maroonDk: '#5b1313',
-  amber: '#f59e0b',
-  gold: '#fcd34d',
-  ink: '#111827',
+  maroon: '#0A5A4E',
+  maroon2: '#0D7B6A',
+  maroon3: '#6B3FA0',
+  maroonDk: '#075A4E',
+  amber: '#C9A84C',
+  gold: '#E8C96A',
+  ink: '#1A1A2E',
   ink2: '#374151',
   ink3: '#6b7280',
   ink4: '#9ca3af',
-  line: '#e5e7eb',
-  line2: '#d1d5db',
-  bgSoft: '#fafaf9',
-  red50: '#fef2f2',
-  red100: '#fee2e2',
+  line: '#C8EDE6',
+  line2: '#A8D9D0',
+  bgSoft: '#F4FAF8',
+  red50: '#E8F5F2',
+  red100: '#C8EDE6',
   green50: '#ecfdf5',
   green700: '#047857',
   green100: '#d1fae5',
-  amber50: '#fffbeb',
+  amber50: '#F4FAF8',
 };
 
 export default function MobileGate({ children }) {
@@ -212,7 +212,7 @@ export default function MobileGate({ children }) {
         {checking ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
             <div style={S.spinner} />
-            <div style={{ color: '#fff', fontSize: 15.4, textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}>Loading…</div>
+            <div style={{ color: '#fff', fontSize: 18, textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}>Loading…</div>
             <style>{spinnerKeyframes}</style>
           </div>
         ) : (
@@ -299,7 +299,7 @@ export default function MobileGate({ children }) {
                   ← Change number
                 </button>
                 {timer > 0 ? (
-                  <span style={{ color: C.ink3, fontSize: 14.3 }}>Resend in <b style={{ color: C.ink2 }}>{timer}s</b></span>
+                  <span style={{ color: C.ink3, fontSize: 17 }}>Resend in <b style={{ color: C.ink2 }}>{timer}s</b></span>
                 ) : (
                   <button onClick={sendOtp} disabled={loading} style={{ ...S.linkBtn, color: C.maroon2, fontWeight: 600 }}>Resend OTP</button>
                 )}
@@ -385,15 +385,15 @@ const S = {
     backdropFilter: 'blur(8px)',
   },
   brandTitle: {
-    marginTop: 24, fontSize: 33, fontWeight: 800, lineHeight: 1.15, color: '#fff',
+    marginTop: 24, fontSize: 36, fontWeight: 800, lineHeight: 1.15, color: '#fff',
   },
   brandSub: {
-    marginTop: 12, fontSize: 15.4, lineHeight: 1.6, color: 'rgba(255,255,255,0.85)', maxWidth: 320,
+    marginTop: 12, fontSize: 18, lineHeight: 1.6, color: 'rgba(255,255,255,0.85)', maxWidth: 320,
   },
   trustList: { listStyle: 'none', padding: 0, margin: '32px 0 0', position: 'relative', zIndex: 1 },
-  trustItem: { display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 15.4, color: 'rgba(255,255,255,0.92)', marginBottom: 10 },
+  trustItem: { display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 18, color: 'rgba(255,255,255,0.92)', marginBottom: 10 },
   tick: { color: C.gold, fontWeight: 700 },
-  footerNote: { fontSize: 13.2, color: 'rgba(255,255,255,0.6)', position: 'relative', zIndex: 1 },
+  footerNote: { fontSize: 16, color: 'rgba(255,255,255,0.6)', position: 'relative', zIndex: 1 },
   right: {
     flex: 1, padding: 32,
     display: 'flex', flexDirection: 'column',
@@ -407,43 +407,43 @@ const S = {
     width: 40, height: 40, borderRadius: 10, flexShrink: 0,
     background: `linear-gradient(135deg, ${C.maroon} 0%, ${C.maroon3} 100%)`,
     color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-    fontSize: 15.4, fontWeight: 800, letterSpacing: 1,
+    fontSize: 18, fontWeight: 800, letterSpacing: 1,
   },
-  mobileBrandTitle: { fontSize: 16.5, fontWeight: 700, color: C.ink, lineHeight: 1.2 },
-  mobileBrandSub: { fontSize: 12.1, fontWeight: 500, color: C.ink3, letterSpacing: 0.5, marginTop: 2 },
+  mobileBrandTitle: { fontSize: 19, fontWeight: 700, color: C.ink, lineHeight: 1.2 },
+  mobileBrandSub: { fontSize: 15, fontWeight: 500, color: C.ink3, letterSpacing: 0.5, marginTop: 2 },
   stepRow: { display: 'flex', alignItems: 'center', gap: 6, marginBottom: 14, flexShrink: 0 },
   stepPill: { height: 5, width: 32, borderRadius: 999, transition: 'background .2s' },
-  stepLabel: { marginLeft: 6, fontSize: 12.1, fontWeight: 600, letterSpacing: 1.5, color: C.ink3, textTransform: 'uppercase' },
-  title: { margin: 0, fontSize: 26.4, fontWeight: 800, color: C.ink },
-  subtitle: { margin: '6px 0 18px', fontSize: 14.3, color: C.ink3, lineHeight: 1.5, flexShrink: 0 },
-  label: { display: 'block', fontSize: 12.1, fontWeight: 700, letterSpacing: 1.5, color: C.ink3, marginBottom: 6, flexShrink: 0 },
+  stepLabel: { marginLeft: 6, fontSize: 15, fontWeight: 600, letterSpacing: 1.5, color: C.ink3, textTransform: 'uppercase' },
+  title: { margin: 0, fontSize: 29, fontWeight: 800, color: C.ink },
+  subtitle: { margin: '6px 0 18px', fontSize: 17, color: C.ink3, lineHeight: 1.5, flexShrink: 0 },
+  label: { display: 'block', fontSize: 15, fontWeight: 700, letterSpacing: 1.5, color: C.ink3, marginBottom: 6, flexShrink: 0 },
   inputRow: {
     display: 'flex', alignItems: 'stretch', flexShrink: 0,
     border: `1.5px solid ${C.line2}`, borderRadius: 12, overflow: 'hidden',
     transition: 'border-color .15s, box-shadow .15s',
   },
-  prefix: { padding: '12px 16px', background: '#f9fafb', color: C.ink2, fontWeight: 600, fontSize: 16.5, borderRight: `1px solid ${C.line}`, display: 'flex', alignItems: 'center', flexShrink: 0 },
-  input: { flex: 1, padding: '12px 16px', fontSize: 17.6, border: 'none', outline: 'none', background: '#fff', color: C.ink, minWidth: 0 },
+  prefix: { padding: '12px 16px', background: '#f9fafb', color: C.ink2, fontWeight: 600, fontSize: 19, borderRight: `1px solid ${C.line}`, display: 'flex', alignItems: 'center', flexShrink: 0 },
+  input: { flex: 1, padding: '12px 16px', fontSize: 20, border: 'none', outline: 'none', background: '#fff', color: C.ink, minWidth: 0 },
   primaryBtn: {
     width: '100%', marginTop: 20, flexShrink: 0,
     padding: '13px 16px', borderRadius: 12, border: 'none',
     background: C.maroon2, color: '#fff',
-    fontSize: 16.5, fontWeight: 700, letterSpacing: 0.2,
+    fontSize: 19, fontWeight: 700, letterSpacing: 0.2,
     cursor: 'pointer', transition: 'background .15s, transform .05s',
     boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
   },
-  termsNote: { marginTop: 20, fontSize: 13.2, color: C.ink4, textAlign: 'center', lineHeight: 1.6 },
+  termsNote: { marginTop: 20, fontSize: 16, color: C.ink4, textAlign: 'center', lineHeight: 1.6 },
   link: { color: C.maroon2, textDecoration: 'none', fontWeight: 500 },
   otpRow: { display: 'flex', justifyContent: 'center', gap: 12, marginBottom: 20 },
   otpBox: {
     width: 56, height: 56, textAlign: 'center',
-    fontSize: 26.4, fontWeight: 700,
+    fontSize: 29, fontWeight: 700,
     border: `2px solid ${C.line2}`, borderRadius: 12,
     outline: 'none', background: '#fff', color: C.ink,
     transition: 'border-color .15s, box-shadow .15s',
   },
-  backRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 18, fontSize: 14.3 },
-  linkBtn: { background: 'none', border: 'none', padding: 0, color: C.ink2, cursor: 'pointer', fontSize: 14.3, fontWeight: 500 },
-  msg: { marginTop: 18, padding: '10px 14px', borderRadius: 10, fontSize: 14.3, textAlign: 'center', border: '1px solid transparent' },
+  backRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 18, fontSize: 17 },
+  linkBtn: { background: 'none', border: 'none', padding: 0, color: C.ink2, cursor: 'pointer', fontSize: 17, fontWeight: 500 },
+  msg: { marginTop: 18, padding: '10px 14px', borderRadius: 10, fontSize: 17, textAlign: 'center', border: '1px solid transparent' },
   spinner: { width: 40, height: 40, borderRadius: '50%', border: `4px solid ${C.red100}`, borderTopColor: C.maroon2, animation: 'mg-spin 0.9s linear infinite' },
 };

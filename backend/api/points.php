@@ -153,9 +153,7 @@ if ($act === 'buy_init' && $method === 'POST') {
         json_ok(['payu' => true, 'endpoint' => PAYU_ENDPOINT, 'params' => $params]);
     }
 
-    // Fallback: admin-manual flow
-    json_ok(['payu' => false, 'txn_id' => $txnId, 'amount' => $pkg['price'], 'points' => $pkg['points'],
-             'msg' => 'Pay ₹' . $pkg['price'] . ' via UPI/bank and share this reference: ' . $txnId]);
+    json_err('Payment gateway not configured. Please contact admin.', 503);
 }
 
 json_err('Unknown action.');

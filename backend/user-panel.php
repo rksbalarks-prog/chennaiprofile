@@ -78,13 +78,14 @@ try {
 <title>Chennai Profile Matrimony - Member Portal</title>
 <style>
 :root{
-  --accent:#c2553d;--accent2:#a84330;--accent-bg:#fdf0ed;
-  --bg:#f7f5f1;--card:#fff;
-  --ink:#1c1917;--ink2:#44403c;--ink3:#78716c;--ink4:#a8a29e;
-  --border:#e7e1d9;--border2:#d4cdc4;
+  --accent:#0D7B6A;--accent2:#0A5A4E;--accent-bg:#E8F5F2;
+  --bg:#F4FAF8;--card:#fff;
+  --ink:#1A1A2E;--ink2:#44403c;--ink3:#6b7280;--ink4:#a8a29e;
+  --border:#C8EDE6;--border2:#A8D9D0;
   --green:#2d6a4f;--green-bg:#edf5f1;
   --amber:#92400e;--amber-bg:#fef9c3;
   --sidebar:#1a1a2e;
+  --purple:#6B3FA0;--gold:#C9A84C;
   --radius:12px;--radius2:18px;
   --shadow:0 1px 4px rgba(0,0,0,.05),0 4px 20px rgba(0,0,0,.08);
   --shadow2:0 8px 40px rgba(0,0,0,.14);
@@ -105,21 +106,21 @@ input,select,textarea{outline:none}
 @keyframes shake{0%,100%{transform:none}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
 @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
 
-.login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#1a1a2e 0%,#252550 55%,#3d1a14 100%);padding:20px;animation:fadeIn .5s}
+.login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#1a1a2e 0%,#0D7B6A 55%,#6B3FA0 100%);padding:20px;animation:fadeIn .5s}
 .login-card{background:var(--card);border-radius:var(--radius2);width:420px;max-width:100%;box-shadow:0 32px 80px rgba(0,0,0,.35);overflow:hidden}
 .login-top{background:var(--sidebar);padding:28px 32px 24px;text-align:center;position:relative}
 .login-top::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),#e8a87c,var(--accent))}
 .login-brand{font-family:var(--serif);font-size:26px;color:#fff;letter-spacing:.04em}
-.login-subb{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-top:5px}
+.login-subb{font-size:17px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-top:5px}
 .login-body{padding:26px 30px 30px}
-.lbl{display:block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
-.inp{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:9px;background:#fff;color:var(--ink);font-size:14px;transition:border .15s,box-shadow .15s}
-.inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(194,85,61,.1)}
+.lbl{display:block;font-size:17px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+.inp{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:9px;background:#fff;color:var(--ink);font-size:17px;transition:border .15s,box-shadow .15s}
+.inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(13,123,106,.1)}
 .inp::placeholder{color:var(--ink4)}
 .inp-row{margin-bottom:14px}
 .inp-flex{display:flex;gap:8px}
 .inp-flex .inp{flex:1}
-.send-btn{padding:11px 16px;background:var(--accent);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;opacity:.4;pointer-events:none}
+.send-btn{padding:11px 16px;background:var(--accent);color:#fff;border:none;border-radius:9px;font-size:16px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;opacity:.4;pointer-events:none}
 .send-btn.ready{opacity:1;pointer-events:auto}
 .send-btn:hover{background:var(--accent2)}
 .send-btn.sent{background:var(--green);opacity:1;pointer-events:none}
@@ -127,20 +128,20 @@ input,select,textarea{outline:none}
 .otp-div{display:flex;align-items:center;gap:10px;margin:14px 0 12px}
 .otp-div span{font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);white-space:nowrap}
 .otp-div hr{flex:1;border:none;border-top:1px solid var(--border)}
-.otp-lbl{font-size:13px;color:var(--ink3);margin-bottom:10px;line-height:1.5}
+.otp-lbl{font-size:16px;color:var(--ink3);margin-bottom:10px;line-height:1.5}
 .otp-boxes{display:flex;gap:8px;margin-bottom:10px;justify-content:center}
 .otp-box{width:42px;height:46px;text-align:center;font-size:20px;font-weight:700;font-family:var(--mono);border:1.5px solid var(--border);border-radius:8px;background:#fff;color:var(--ink);transition:border .12s;flex-shrink:0}
-.otp-box:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(194,85,61,.1)}
+.otp-box:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(13,123,106,.1)}
 .otp-boxes.shake{animation:shake .35s ease}
-.timer-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;font-size:12px}
+.timer-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;font-size:15px}
 .timer-txt{color:var(--ink4);font-family:var(--mono)}
-.resend-btn{color:var(--accent);cursor:pointer;font-weight:600;display:none;background:none;border:none;font-size:12px;text-decoration:underline}
-.main-btn{width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:7px}
+.resend-btn{color:var(--accent);cursor:pointer;font-weight:600;display:none;background:none;border:none;font-size:15px;text-decoration:underline}
+.main-btn{width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:9px;font-size:17px;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:7px}
 .main-btn:hover{background:var(--accent2)}
 .main-btn.g{background:var(--green)}.main-btn.g:hover{background:#235a3f}
-.back-lnk{text-align:center;margin-top:10px;font-size:12px;color:var(--ink3)}
+.back-lnk{text-align:center;margin-top:10px;font-size:15px;color:var(--ink3)}
 .back-lnk span{color:var(--accent);font-weight:600;text-decoration:underline;cursor:pointer}
-.msg{padding:9px 12px;border-radius:8px;font-size:13px;margin-bottom:11px;border-left:3px solid;display:none}
+.msg{padding:9px 12px;border-radius:8px;font-size:16px;margin-bottom:11px;border-left:3px solid;display:none}
 .msg-err{background:#fee2e2;color:#991b1b;border-color:#dc2626}
 .msg-ok{background:var(--green-bg);color:var(--green);border-color:var(--green)}
 
@@ -151,7 +152,7 @@ input,select,textarea{outline:none}
 .sb-brand h1{font-family:var(--serif);font-size:19px;color:#fff;letter-spacing:.03em}
 .sb-brand span{display:block;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-top:2px}
 .sb-user{margin:10px 9px 5px;background:rgba(255,255,255,.06);border-radius:9px;padding:9px 11px;display:flex;align-items:center;gap:8px}
-.sb-av{width:30px;height:30px;border-radius:50%;background:rgba(194,85,61,.4);border:1.5px solid rgba(194,85,61,.6);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.sb-av{width:30px;height:30px;border-radius:50%;background:rgba(13,123,106,.4);border:1.5px solid rgba(13,123,106,.6);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#fff;flex-shrink:0}
 .sb-name{font-size:12.5px;font-weight:600;color:rgba(255,255,255,.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sb-mob{font-size:10px;color:rgba(255,255,255,.32);font-family:var(--mono);margin-top:1px}
 .sb-nav{flex:1;padding:5px 7px}
@@ -164,12 +165,12 @@ input,select,textarea{outline:none}
 .sb-parent[aria-expanded="true"] .sb-caret{transform:rotate(180deg)}
 .sb-sub{display:flex;flex-direction:column;gap:1px;padding:1px 0 3px 6px;border-left:1.5px solid rgba(255,255,255,.07);margin:0 0 2px 14px}
 .sb-sub[hidden]{display:none}
-.sb-child{padding-left:14px;font-size:12px}
-.sb-bullet{color:rgba(255,255,255,.35);font-size:14px;line-height:1;margin-right:2px}
+.sb-child{padding-left:14px;font-size:15px}
+.sb-bullet{color:rgba(255,255,255,.35);font-size:17px;line-height:1;margin-right:2px}
 .sb-foot{padding:11px 15px;border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between}
 .sb-ver{font-size:10px;color:rgba(255,255,255,.16);font-family:var(--mono)}
 .sb-logout{background:none;border:none;color:rgba(255,255,255,.28);font-size:11.5px;cursor:pointer;display:flex;align-items:center;gap:4px;transition:color .13s;padding:3px 7px;border-radius:5px}
-.sb-logout:hover{color:#fff;background:rgba(194,85,61,.22)}
+.sb-logout:hover{color:#fff;background:rgba(13,123,106,.22)}
 
 .u-main{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
 .topbar{background:var(--card);border-bottom:1px solid var(--border);height:52px;display:flex;align-items:center;padding:0 26px;flex-shrink:0;justify-content:space-between;position:sticky;top:0;z-index:10}
@@ -184,7 +185,7 @@ input,select,textarea{outline:none}
 .btn-green{background:var(--green);color:#fff}.btn-green:hover{background:#235a3f}
 .btn-danger{background:#dc2626;color:#fff}.btn-danger:hover{background:#b91c1c}
 .btn-ghost{background:none;color:var(--ink3);border-color:transparent}.btn-ghost:hover{background:var(--bg)}
-.btn-sm{padding:6px 12px;font-size:12px}
+.btn-sm{padding:6px 12px;font-size:15px}
 /* Topbar actions — single row, horizontally scrollable when wider than the
    topbar can fit (mobile). nowrap so buttons don't drop under the title;
    webkit scroll-snap keeps each button aligned at its left edge after a swipe. */
@@ -206,13 +207,13 @@ input,select,textarea{outline:none}
 .u-spinner{display:inline-block;width:14px;height:14px;border:2.5px solid rgba(0,0,0,0.12);border-top-color:var(--accent);border-radius:50%;animation:uSpin .7s linear infinite;vertical-align:-3px}
 .u-spinner.lg{width:28px;height:28px;border-width:3px}
 .u-spinner.on-dark{border-color:rgba(255,255,255,0.35);border-top-color:#fff}
-.u-loading-overlay{position:absolute;inset:0;background:rgba(255,255,255,0.72);display:flex;align-items:center;justify-content:center;gap:10px;font-size:13px;font-weight:600;color:var(--ink2);z-index:5;border-radius:inherit;backdrop-filter:blur(2px)}
+.u-loading-overlay{position:absolute;inset:0;background:rgba(255,255,255,0.72);display:flex;align-items:center;justify-content:center;gap:10px;font-size:16px;font-weight:600;color:var(--ink2);z-index:5;border-radius:inherit;backdrop-filter:blur(2px)}
 @keyframes uShimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
 .u-skeleton{background:linear-gradient(90deg,#f0f0f0 0%,#fafafa 50%,#f0f0f0 100%);background-size:200% 100%;animation:uShimmer 1.4s ease-in-out infinite;border-radius:6px;color:transparent!important;display:inline-block}
 
 .no-profile-wrap{max-width:500px;margin:0 auto;text-align:center;padding:50px 24px;background:var(--card);border-radius:var(--radius2);box-shadow:var(--shadow);border:2px dashed var(--border2);animation:fadeUp .3s ease}
 .no-profile-icon{font-size:48px;opacity:.45;margin-bottom:14px}
-.no-profile-chip{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--accent);background:var(--accent-bg);padding:4px 14px;border-radius:7px;display:inline-block;margin-bottom:14px}
+.no-profile-chip{font-family:var(--mono);font-size:17px;font-weight:700;color:var(--accent);background:var(--accent-bg);padding:4px 14px;border-radius:7px;display:inline-block;margin-bottom:14px}
 
 .profile-card{background:var(--card);border-radius:var(--radius2);box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px}
 .p-banner{height:100px;background:linear-gradient(135deg,var(--sidebar) 0%,#2d2d5e 50%,#3d1a14 100%);position:relative}
@@ -222,7 +223,7 @@ input,select,textarea{outline:none}
 .p-name{font-family:var(--serif);font-size:1.4rem;color:var(--ink)}
 .p-meta{font-size:12.5px;color:var(--ink3);margin-top:3px}
 .p-badges{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
-.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:17px;font-weight:600}
 .badge-green{background:var(--green-bg);color:var(--green)}
 .badge-amber{background:var(--amber-bg);color:var(--amber)}
 .badge-accent{background:var(--accent-bg);color:var(--accent)}
@@ -234,11 +235,11 @@ input,select,textarea{outline:none}
 .det-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:10px}
 .det-item{background:var(--bg);border-radius:8px;padding:10px 13px;border:1px solid var(--border)}
 .det-lbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:2px}
-.det-val{font-size:13px;font-weight:600;color:var(--ink)}
+.det-val{font-size:16px;font-weight:600;color:var(--ink)}
 
 .u-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px}
 .u-card-head{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.u-card-title{font-weight:700;font-size:13px}
+.u-card-title{font-weight:700;font-size:16px}
 .u-card-body{padding:16px 18px}
 .u-tw{overflow-x:auto}
 .u-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
@@ -250,7 +251,7 @@ input,select,textarea{outline:none}
 .stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:11px;margin-bottom:16px}
 .stat-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;border-left:3px solid var(--border2)}
 .stat-num{font-family:var(--serif);font-size:1.7rem;font-weight:400;line-height:1}
-.stat-lbl{font-size:11px;color:var(--ink3);margin-top:3px;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.stat-lbl{font-size:17px;color:var(--ink3);margin-top:3px;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
 
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(3px);display:flex;align-items:flex-start;justify-content:center;padding:30px 16px;z-index:1000;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .2s}
 .modal-overlay.open{opacity:1;pointer-events:auto}
@@ -271,7 +272,7 @@ input,select,textarea{outline:none}
 .modal-overlay.modal-page .modal-title{font-family:var(--serif);font-size:1.15rem;font-weight:600}
 .modal-overlay.modal-page .modal-body{flex:1;max-height:none;padding:22px;max-width:980px;margin:0 auto;width:100%;box-sizing:border-box}
 .modal-overlay.modal-page .modal-foot{background:#fff;position:sticky;bottom:0;padding:14px 22px;box-shadow:0 -4px 14px rgba(0,0,0,.05)}
-.modal-back{background:transparent;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;color:var(--ink);font-size:14px;font-weight:600;padding:6px 10px;border-radius:8px;transition:background .15s}
+.modal-back{background:transparent;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;color:var(--ink);font-size:17px;font-weight:600;padding:6px 10px;border-radius:8px;transition:background .15s}
 .modal-back:hover{background:var(--bg)}
 .msec{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#fff;background:var(--sidebar);padding:5px 11px;border-radius:5px;margin:16px 0 10px;display:inline-block}
 .fg{margin-bottom:13px}
@@ -279,8 +280,8 @@ input,select,textarea{outline:none}
 .fg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 12px}
 .flbl{display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:4px}
 .flbl .req{color:var(--accent)}
-.finp,.fsel,.fta{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;background:#fff;color:var(--ink);font-size:13px;transition:border .13s}
-.finp:focus,.fsel:focus,.fta:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(194,85,61,.08)}
+.finp,.fsel,.fta{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;background:#fff;color:var(--ink);font-size:16px;transition:border .13s}
+.finp:focus,.fsel:focus,.fta:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(13,123,106,.08)}
 .fta{resize:vertical;min-height:60px}
 
 .u-popup{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);z-index:99999;min-width:290px;max-width:390px;width:90%;border-radius:11px;padding:11px 14px;display:flex;align-items:flex-start;gap:9px;background:#fff;box-shadow:var(--shadow2);transition:transform .28s cubic-bezier(.34,1.56,.64,1),opacity .22s;opacity:0;pointer-events:none}
@@ -289,16 +290,16 @@ input,select,textarea{outline:none}
 .u-popup-title{font-weight:700;font-size:12.5px;margin-bottom:1px}
 .u-popup-msg{font-size:11.5px;color:var(--ink3)}
 .u-popup-x{margin-left:auto;flex-shrink:0;background:none;border:none;font-size:16px;cursor:pointer;color:var(--ink4);padding:0 0 0 5px}
-#uToast{position:fixed;bottom:20px;right:20px;background:var(--ink);color:#fff;padding:10px 16px;border-radius:9px;font-size:13px;font-weight:500;box-shadow:var(--shadow2);transform:translateY(60px);opacity:0;transition:all .3s;z-index:9999;display:flex;align-items:center;gap:6px}
+#uToast{position:fixed;bottom:20px;right:20px;background:var(--ink);color:#fff;padding:10px 16px;border-radius:9px;font-size:16px;font-weight:500;box-shadow:var(--shadow2);transform:translateY(60px);opacity:0;transition:all .3s;z-index:9999;display:flex;align-items:center;gap:6px}
 
 .plan-card{transition:all .25s ease}
 .plan-card:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(0,0,0,.12);border-color:#cbd5e1 !important}
-.plan-card.selected{border-color:var(--accent) !important;box-shadow:0 0 0 4px rgba(194,85,61,.18),0 12px 28px rgba(194,85,61,.18);transform:translateY(-4px)}
+.plan-card.selected{border-color:var(--accent) !important;box-shadow:0 0 0 4px rgba(13,123,106,.18),0 12px 28px rgba(13,123,106,.18);transform:translateY(-4px)}
 .plan-card.selected .plan-card-cta{background:var(--accent) !important;color:#fff !important;border-style:solid !important;border-color:var(--accent) !important}
 .plan-card-badge{position:absolute;top:-8px;right:12px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px}
 .pay-step{display:flex;flex-direction:column;align-items:center;gap:5px}
-.pay-step-circle{width:32px;height:32px;border-radius:50%;border:2px solid var(--border2);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--ink4);transition:all .25s}
-.pay-step-label{font-size:11px;color:var(--ink4);font-weight:500;white-space:nowrap}
+.pay-step-circle{width:32px;height:32px;border-radius:50%;border:2px solid var(--border2);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--ink4);transition:all .25s}
+.pay-step-label{font-size:17px;color:var(--ink4);font-weight:500;white-space:nowrap}
 .pay-step-done .pay-step-circle{background:var(--green);border-color:var(--green);color:#fff}
 .pay-step-done .pay-step-label{color:var(--green);font-weight:600}
 .pay-step-line{flex:1;height:2px;background:var(--border);margin-top:-18px;transition:background .25s}
@@ -326,9 +327,9 @@ input,select,textarea{outline:none}
 
 /* ===== Wizard custom dropdowns ===== */
 .cdd{position:relative}
-.cdd-toggle{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;background:#fff;color:var(--ink);font-size:13px;font-family:inherit;text-align:left;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:border .13s,box-shadow .13s}
+.cdd-toggle{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;background:#fff;color:var(--ink);font-size:16px;font-family:inherit;text-align:left;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:border .13s,box-shadow .13s}
 .cdd-toggle:hover{border-color:var(--ink4)}
-.cdd-toggle:focus,.cdd.open .cdd-toggle{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(194,85,61,.08)}
+.cdd-toggle:focus,.cdd.open .cdd-toggle{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(13,123,106,.08)}
 .cdd-toggle.ph{color:var(--ink4)}
 .cdd-toggle::after{content:'';width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--ink3);flex-shrink:0;transition:transform .15s}
 .cdd.open .cdd-toggle::after{transform:rotate(180deg)}
@@ -365,8 +366,8 @@ input,select,textarea{outline:none}
   .modal-body .fg,
   .modal-body [style*="grid-template-columns"]{grid-template-columns:1fr 1fr!important}
   .modal-body .fg label,.modal-body .flbl{font-size:10px!important}
-  .modal-body input,.modal-body select,.modal-body textarea{font-size:14px!important;padding:8px 10px!important}
-  .modal-body .sec-title{font-size:12px!important;padding:5px 10px!important}
+  .modal-body input,.modal-body select,.modal-body textarea{font-size:17px!important;padding:8px 10px!important}
+  .modal-body .sec-title{font-size:15px!important;padding:5px 10px!important}
 }
 </style>
 </head>
@@ -383,7 +384,7 @@ input,select,textarea{outline:none}
      Prevents login page flashing on refresh when the user is still logged in. -->
 <div id="sessionCheckSplash" style="position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(145deg,#1a1a2e 0%,#252550 55%,#3d1a14 100%);z-index:99999;color:#fff;font-family:system-ui,sans-serif">
   <div style="width:44px;height:44px;border:3px solid rgba(255,255,255,0.15);border-top-color:#c2553d;border-radius:50%;animation:usr_spin 0.8s linear infinite"></div>
-  <div style="margin-top:16px;font-size:13px;color:rgba(255,255,255,0.7);letter-spacing:0.3px">Checking session…</div>
+  <div style="margin-top:16px;font-size:16px;color:rgba(255,255,255,0.7);letter-spacing:0.3px">Checking session…</div>
   <style>@keyframes usr_spin{to{transform:rotate(360deg)}}</style>
 </div>
 
@@ -397,8 +398,8 @@ input,select,textarea{outline:none}
     <div class="login-body">
       <div id="payLinkBanner" style="display:none;background:linear-gradient(135deg,#16a34a,#15803d);border-radius:10px;padding:12px 16px;margin-bottom:16px;color:#fff;text-align:center">
         <div style="font-size:20px;margin-bottom:4px">&#128179;</div>
-        <div style="font-weight:700;font-size:14px;margin-bottom:2px">Payment Link</div>
-        <div style="font-size:12px;opacity:.85" id="payLinkBannerText">Log in to proceed with your registration payment</div>
+        <div style="font-weight:700;font-size:17px;margin-bottom:2px">Payment Link</div>
+        <div style="font-size:15px;opacity:.85" id="payLinkBannerText">Log in to proceed with your registration payment</div>
       </div>
       <div id="loginMsg" class="msg"></div>
       <div class="inp-row">
@@ -577,14 +578,14 @@ input,select,textarea{outline:none}
       <div class="u-section active" id="myProfileSection"></div>
       <div class="u-section" id="suggestionsSection">
         <div class="chip-row" style="margin-bottom:14px;align-items:center">
-          <button class="btn btn-sm" onclick="filterSuggestions('all')" id="sgFiltAll" style="background:var(--accent);color:#fff;border:none;padding:6px 14px;border-radius:16px;font-size:12px;font-weight:600">All</button>
-          <button class="btn btn-sm" onclick="filterSuggestions('interested')" id="sgFiltInterested" style="background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;padding:6px 14px;border-radius:16px;font-size:12px;font-weight:600">💚 Interested</button>
-          <button class="btn btn-sm" onclick="filterSuggestions('later')" id="sgFiltLater" style="background:#fefce8;color:#a16207;border:1px solid #fde68a;padding:6px 14px;border-radius:16px;font-size:12px;font-weight:600">🕐 Later</button>
-          <button class="btn btn-sm" onclick="filterSuggestions('not_interested')" id="sgFiltNot" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;padding:6px 14px;border-radius:16px;font-size:12px;font-weight:600">❌ Not Interested</button>
-          <button class="btn btn-sm" onclick="filterSuggestions('untagged')" id="sgFiltUntagged" style="background:#f3f4f6;color:#6b7280;border:1px solid #e5e7eb;padding:6px 14px;border-radius:16px;font-size:12px;font-weight:600">🏷 Untagged</button>
+          <button class="btn btn-sm" onclick="filterSuggestions('all')" id="sgFiltAll" style="background:var(--accent);color:#fff;border:none;padding:6px 14px;border-radius:16px;font-size:15px;font-weight:600">All</button>
+          <button class="btn btn-sm" onclick="filterSuggestions('interested')" id="sgFiltInterested" style="background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;padding:6px 14px;border-radius:16px;font-size:15px;font-weight:600">💚 Interested</button>
+          <button class="btn btn-sm" onclick="filterSuggestions('later')" id="sgFiltLater" style="background:#fefce8;color:#a16207;border:1px solid #fde68a;padding:6px 14px;border-radius:16px;font-size:15px;font-weight:600">🕐 Later</button>
+          <button class="btn btn-sm" onclick="filterSuggestions('not_interested')" id="sgFiltNot" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;padding:6px 14px;border-radius:16px;font-size:15px;font-weight:600">❌ Not Interested</button>
+          <button class="btn btn-sm" onclick="filterSuggestions('untagged')" id="sgFiltUntagged" style="background:#f3f4f6;color:#6b7280;border:1px solid #e5e7eb;padding:6px 14px;border-radius:16px;font-size:15px;font-weight:600">🏷 Untagged</button>
           <span style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;flex-shrink:0">
-            <span style="font-size:11px;color:var(--ink3)">Sort:</span>
-            <select id="sgSort" onchange="renderSuggestionsUI()" style="padding:5px 10px;border:1px solid #e5e7eb;border-radius:8px;font-size:11px;font-weight:600;color:#374151;cursor:pointer">
+            <span style="font-size:17px;color:var(--ink3)">Sort:</span>
+            <select id="sgSort" onchange="renderSuggestionsUI()" style="padding:5px 10px;border:1px solid #e5e7eb;border-radius:8px;font-size:17px;font-weight:600;color:#374151;cursor:pointer">
               <option value="rating_desc">★ Rating High → Low</option>
               <option value="rating_asc">★ Rating Low → High</option>
               <option value="age_asc">Age Young → Old</option>
@@ -597,14 +598,14 @@ input,select,textarea{outline:none}
       </div>
       <div class="u-section" id="basicMatchesSection">
         <div class="u-card" style="padding:14px 16px;margin-bottom:14px;background:linear-gradient(135deg,#fef9c3 0%,#fef3c7 100%);border-left:3px solid #d97706">
-          <div style="font-weight:700;color:#92400e;font-size:13px;margin-bottom:4px">💑 Basic Matches</div>
+          <div style="font-weight:700;color:#92400e;font-size:16px;margin-bottom:4px">💑 Basic Matches</div>
           <div style="font-size:11.5px;color:#78350f;line-height:1.5">Profiles that satisfy <b>your</b> partner preferences (caste, age, qualification, marital status, etc.).</div>
         </div>
         <div id="basicMatchesContent" style="display:flex;flex-direction:column;gap:10px"></div>
       </div>
       <div class="u-section" id="mutualMatchesSection">
         <div class="u-card" style="padding:14px 16px;margin-bottom:14px;background:linear-gradient(135deg,#dcfce7 0%,#bbf7d0 100%);border-left:3px solid #059669">
-          <div style="font-weight:700;color:#065f46;font-size:13px;margin-bottom:4px">💞 Mutual Matches</div>
+          <div style="font-weight:700;color:#065f46;font-size:16px;margin-bottom:4px">💞 Mutual Matches</div>
           <div style="font-size:11.5px;color:#064e3b;line-height:1.5">Two-way fit: profiles that match <b>your</b> preferences <i>and</i> whose own preferences are satisfied by <b>your basic details</b>.</div>
         </div>
         <div id="mutualMatchesContent" style="display:flex;flex-direction:column;gap:10px"></div>
@@ -684,11 +685,11 @@ input,select,textarea{outline:none}
           </div>
           <div class="u-card-body" style="padding:20px;text-align:center">
             <div style="font-size:42px;font-weight:900;color:#8B0000" id="ptsBalance">—</div>
-            <div style="font-size:13px;color:#888;margin-top:4px">Available Points</div>
+            <div style="font-size:16px;color:#888;margin-top:4px">Available Points</div>
             <div style="display:flex;justify-content:center;gap:24px;margin-top:16px;flex-wrap:wrap">
-              <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#333" id="ptsBought">—</div><div style="font-size:11px;color:#aaa">Total Purchased</div></div>
-              <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#333" id="ptsUsed">—</div><div style="font-size:11px;color:#aaa">Total Used</div></div>
-              <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#2563eb">10 pts</div><div style="font-size:11px;color:#aaa">Per Contact View</div></div>
+              <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#333" id="ptsBought">—</div><div style="font-size:17px;color:#aaa">Total Purchased</div></div>
+              <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#333" id="ptsUsed">—</div><div style="font-size:17px;color:#aaa">Total Used</div></div>
+              <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#2563eb">10 pts</div><div style="font-size:17px;color:#aaa">Per Contact View</div></div>
             </div>
           </div>
         </div>
@@ -696,17 +697,17 @@ input,select,textarea{outline:none}
           <div class="u-card-head"><span class="u-card-title">Buy Points</span></div>
           <div class="u-card-body" style="padding:16px">
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px">
-              <?php foreach($_pointPackages as $pkg): $pkgId = htmlspecialchars($pkg['pkg_id']); $badge = htmlspecialchars($pkg['badge']); ?>
-              <div style="border:2px solid <?= $badge ? '#8B0000' : '#e5e7eb' ?>;border-radius:12px;padding:14px;text-align:center;cursor:pointer;position:relative;transition:all .2s"
+              <?php $pkgIdx=0; foreach($_pointPackages as $pkg): $pkgId = htmlspecialchars($pkg['pkg_id']); $badge = htmlspecialchars($pkg['badge']); $isFirst = $pkgIdx===0; ?>
+              <div style="border:2px solid <?= $isFirst ? '#16a34a' : ($badge ? '#8B0000' : '#e5e7eb') ?>;border-radius:12px;padding:14px;text-align:center;cursor:pointer;position:relative;transition:all .2s;background:<?= $isFirst ? '#f0fdf4' : '#fff' ?>"
                 onclick="initPointsBuy('<?= $pkgId ?>')">
-                <?php if($badge): ?><div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#8B0000;color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap"><?= $badge ?></div><?php endif; ?>
-                <div style="font-size:22px;font-weight:900;color:#8B0000"><?= (int)$pkg['points'] ?></div>
-                <div style="font-size:11px;color:#888;margin:2px 0">points</div>
-                <div style="background:#8B0000;color:#fff;border-radius:8px;padding:5px 12px;font-size:13px;font-weight:700;margin-top:8px;display:inline-block">₹<?= number_format((float)$pkg['price'], 0) ?></div>
+                <?php if($isFirst): ?><div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#16a34a;color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap">✓ Recommended</div><?php elseif($badge): ?><div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#8B0000;color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap"><?= $badge ?></div><?php endif; ?>
+                <div style="font-size:22px;font-weight:900;color:<?= $isFirst ? '#15803d' : '#8B0000' ?>"><?= (int)$pkg['points'] ?></div>
+                <div style="font-size:17px;color:#888;margin:2px 0">points</div>
+                <div style="background:<?= $isFirst ? '#16a34a' : '#8B0000' ?>;color:#fff;border-radius:8px;padding:5px 12px;font-size:16px;font-weight:700;margin-top:8px;display:inline-block">₹<?= number_format((float)$pkg['price'], 0) ?></div>
               </div>
-              <?php endforeach; ?>
+              <?php $pkgIdx++; endforeach; ?>
             </div>
-            <div id="ptsPayMsg" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px;font-size:13px;color:#166534;margin-top:8px"></div>
+            <div id="ptsPayMsg" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:14px;font-size:16px;color:#991b1b;margin-top:8px"></div>
           </div>
         </div>
         <div class="u-card">
@@ -721,7 +722,7 @@ input,select,textarea{outline:none}
       </div>
       <div class="u-section" id="mySettingsSection">
         <div class="u-card">
-          <div class="u-card-head" style="background:#fffbeb"><div><span class="u-card-title" style="color:#92400e">Request Mobile Number Change</span><div style="font-size:12px;color:var(--ink3);margin-top:1px">Admin approval required.</div></div></div>
+          <div class="u-card-head" style="background:#fffbeb"><div><span class="u-card-title" style="color:#92400e">Request Mobile Number Change</span><div style="font-size:15px;color:var(--ink3);margin-top:1px">Admin approval required.</div></div></div>
           <div class="u-card-body" id="settingsBody"></div>
         </div>
         <div class="u-card"><div class="u-card-head"><span class="u-card-title">Current Session</span></div><div class="u-card-body" id="sessionBody"></div></div>
@@ -736,7 +737,7 @@ input,select,textarea{outline:none}
           <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:16px">👤</div>
           <div>
             <div style="color:white;font-family:var(--serif);font-size:1.1rem">Create New Profile</div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:2px">Fill in your profile details below</div>
+            <div style="font-size:17px;color:rgba(255,255,255,0.7);margin-top:2px">Fill in your profile details below</div>
           </div>
         </div>
         <div style="padding:20px 22px">
@@ -746,7 +747,7 @@ input,select,textarea{outline:none}
             <div class="fg"><label class="flbl">Mobile <span class="req">*</span></label><input class="finp" id="up_ap_mobile" placeholder="10-digit mobile" type="tel" maxlength="10" style="border-color:#D4A0A8"></div>
             <div class="fg"><label class="flbl">Name <span class="req">*</span></label><input class="finp" id="up_ap_name" placeholder="Full name" style="border-color:#D4A0A8"></div>
             <div class="fg"><label class="flbl">Gender <span class="req">*</span></label><select class="fsel" id="up_ap_gender" style="border-color:#D4A0A8"><option value="">— Select —</option><option>Male</option><option>Female</option></select></div>
-            <div class="fg"><label class="flbl">Date of Birth <span class="req">*</span> <span id="up_ap_age_display" style="font-weight:700;font-size:12px;margin-left:4px"></span></label><input class="finp" id="up_ap_dob" type="date" style="border-color:#D4A0A8"></div>
+            <div class="fg"><label class="flbl">Date of Birth <span class="req">*</span> <span id="up_ap_age_display" style="font-weight:700;font-size:15px;margin-left:4px"></span></label><input class="finp" id="up_ap_dob" type="date" style="border-color:#D4A0A8"></div>
             <div class="fg"><label class="flbl">Age</label><input class="finp" id="up_ap_age_input" readonly style="border-color:#D4A0A8;background:#f0fdf4;font-weight:700;text-align:center;font-size:15px"></div>
           </div>
           <div class="fg" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0 10px">
@@ -817,8 +818,8 @@ input,select,textarea{outline:none}
       <!-- Pay Now Button (hidden once payment submitted) -->
       <div id="payLaterPayNowCard" class="u-card" style="margin-bottom:16px;text-align:center;padding:24px 16px">
         <div style="font-size:15px;font-weight:700;color:var(--ink1);margin-bottom:6px">Want to upgrade your plan?</div>
-        <div style="font-size:13px;color:var(--ink3);margin-bottom:16px">Choose a plan and complete payment to unlock premium features.</div>
-        <button class="btn btn-primary" onclick="goToPayment()" style="background:linear-gradient(135deg,#f59e0b,#d97706);border-color:#d97706;padding:12px 32px;font-size:14px;font-weight:700">💳 Pay Now — Choose Plan</button>
+        <div style="font-size:16px;color:var(--ink3);margin-bottom:16px">Choose a plan and complete payment to unlock premium features.</div>
+        <button class="btn btn-primary" onclick="goToPayment()" style="background:linear-gradient(135deg,#f59e0b,#d97706);border-color:#d97706;padding:12px 32px;font-size:17px;font-weight:700">💳 Pay Now — Choose Plan</button>
       </div>
       <!-- Order History -->
       <div class="u-card" style="margin-bottom:16px">
@@ -852,21 +853,21 @@ input,select,textarea{outline:none}
         <div style="flex:1;min-width:120px">
           <label class="flbl">Photo 1</label>
           <div style="height:110px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--bg);overflow:hidden" onclick="this.querySelector('input').click()">
-            <img id="ep_photo1_prev" style="display:none;width:100%;height:100%;object-fit:cover"><span id="ep_photo1_ph" style="color:var(--ink4);font-size:11px;text-align:center">Upload Photo</span>
+            <img id="ep_photo1_prev" style="display:none;width:100%;height:100%;object-fit:cover"><span id="ep_photo1_ph" style="color:var(--ink4);font-size:17px;text-align:center">Upload Photo</span>
             <input type="file" id="ep_photo1_file" accept="image/*" style="display:none" onchange="upPhotoPreview(this,'ep_photo1')">
           </div>
         </div>
         <div style="flex:1;min-width:120px">
           <label class="flbl">Photo 2</label>
           <div style="height:110px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--bg);overflow:hidden" onclick="this.querySelector('input').click()">
-            <img id="ep_photo2_prev" style="display:none;width:100%;height:100%;object-fit:cover"><span id="ep_photo2_ph" style="color:var(--ink4);font-size:11px;text-align:center">Upload Photo</span>
+            <img id="ep_photo2_prev" style="display:none;width:100%;height:100%;object-fit:cover"><span id="ep_photo2_ph" style="color:var(--ink4);font-size:17px;text-align:center">Upload Photo</span>
             <input type="file" id="ep_photo2_file" accept="image/*" style="display:none" onchange="upPhotoPreview(this,'ep_photo2')">
           </div>
         </div>
         <div style="flex:1;min-width:120px">
           <label class="flbl">Photo 3</label>
           <div style="height:110px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--bg);overflow:hidden" onclick="this.querySelector('input').click()">
-            <img id="ep_photo3_prev" style="display:none;width:100%;height:100%;object-fit:cover"><span id="ep_photo3_ph" style="color:var(--ink4);font-size:11px;text-align:center">Upload Photo</span>
+            <img id="ep_photo3_prev" style="display:none;width:100%;height:100%;object-fit:cover"><span id="ep_photo3_ph" style="color:var(--ink4);font-size:17px;text-align:center">Upload Photo</span>
             <input type="file" id="ep_photo3_file" accept="image/*" style="display:none" onchange="upPhotoPreview(this,'ep_photo3')">
           </div>
         </div>
@@ -878,7 +879,7 @@ input,select,textarea{outline:none}
         <div class="fg"><label class="flbl">Mobile <span class="req">*</span></label><input class="finp" id="ep_mobile" readonly style="background:#f3f4f6"></div>
         <div class="fg"><label class="flbl">Name <span class="req">*</span></label><input class="finp" id="ep_name"></div>
         <div class="fg"><label class="flbl">Gender <span class="req">*</span></label><select class="fsel" id="ep_gender"><option value="">-</option><option>Male</option><option>Female</option></select></div>
-        <div class="fg"><label class="flbl">Date of Birth <span class="req">*</span> <span id="ep_age_display" style="font-weight:700;font-size:12px;margin-left:4px"></span></label><input class="finp" id="ep_dob" type="date"></div>
+        <div class="fg"><label class="flbl">Date of Birth <span class="req">*</span> <span id="ep_age_display" style="font-weight:700;font-size:15px;margin-left:4px"></span></label><input class="finp" id="ep_dob" type="date"></div>
         <div class="fg"><label class="flbl">Age</label><input class="finp" id="ep_age_input" readonly style="background:#f0fdf4;font-weight:700;text-align:center;font-size:15px"></div>
       </div>
       <div class="fg" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0 10px">
@@ -912,21 +913,21 @@ input,select,textarea{outline:none}
         <div class="fg"><label class="flbl">Mother Status</label><select class="fsel" id="ep_mother_alive"><option value="">-</option><option>Home Maker</option><option>Employed</option><option>Businessman</option><option>Professional</option><option>Retired</option><option>Not Employed</option><option>Passed Away</option></select></div>
         <div class="fg"><label class="flbl">Mother's Job</label><input class="finp" id="ep_mother_job" list="occupation_list" placeholder="Type or select"></div>
       </div>
-      <div class="fg" style="font-size:12px;font-weight:600;color:var(--ink3);margin:4px 0 6px">Siblings</div>
+      <div class="fg" style="font-size:15px;font-weight:600;color:var(--ink3);margin:4px 0 6px">Siblings</div>
       <div style="overflow-x:auto;margin-bottom:14px">
-        <table style="width:100%;border-collapse:collapse;font-size:12px;border:1px solid var(--border);border-radius:6px">
+        <table style="width:100%;border-collapse:collapse;font-size:15px;border:1px solid var(--border);border-radius:6px">
           <thead><tr style="background:var(--bg)"><th style="padding:6px 8px;border:1px solid var(--border)"></th><th style="padding:6px 8px;border:1px solid var(--border)">Elder Brother</th><th style="padding:6px 8px;border:1px solid var(--border)">Younger Brother</th><th style="padding:6px 8px;border:1px solid var(--border)">Elder Sister</th><th style="padding:6px 8px;border:1px solid var(--border)">Younger Sister</th></tr></thead>
           <tbody>
             <tr><td style="padding:6px 8px;border:1px solid var(--border);font-weight:600">Married</td>
-              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="ep_sib_eb_m" style="font-size:11px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td>
-              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="ep_sib_yb_m" style="font-size:11px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td>
-              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="ep_sib_es_m" style="font-size:11px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td>
-              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="ep_sib_ys_m" style="font-size:11px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td></tr>
+              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="ep_sib_eb_m" style="font-size:17px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td>
+              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="ep_sib_yb_m" style="font-size:17px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td>
+              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="ep_sib_es_m" style="font-size:17px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td>
+              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="ep_sib_ys_m" style="font-size:17px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td></tr>
             <tr><td style="padding:6px 8px;border:1px solid var(--border);font-weight:600">Unmarried</td>
-              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="ep_sib_eb_u" style="font-size:11px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td>
-              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="ep_sib_yb_u" style="font-size:11px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td>
-              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="ep_sib_es_u" style="font-size:11px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td>
-              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="ep_sib_ys_u" style="font-size:11px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td></tr>
+              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="ep_sib_eb_u" style="font-size:17px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td>
+              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="ep_sib_yb_u" style="font-size:17px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td>
+              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="ep_sib_es_u" style="font-size:17px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td>
+              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="ep_sib_ys_u" style="font-size:17px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td></tr>
           </tbody>
         </table>
       </div>
@@ -993,14 +994,14 @@ input,select,textarea{outline:none}
         <div class="fg">
           <label class="flbl">Rasi Chart Photo</label>
           <div style="height:100px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--bg);overflow:hidden" onclick="this.querySelector('input').click()">
-            <img id="ep_rasi_prev" style="display:none;width:100%;height:100%;object-fit:contain"><span id="ep_rasi_ph" style="color:var(--ink4);font-size:11px">📄 Upload Rasi Chart</span>
+            <img id="ep_rasi_prev" style="display:none;width:100%;height:100%;object-fit:contain"><span id="ep_rasi_ph" style="color:var(--ink4);font-size:17px">📄 Upload Rasi Chart</span>
             <input type="file" id="ep_rasi_file" accept="image/*" style="display:none" onchange="upPhotoPreview(this,'ep_rasi')">
           </div>
         </div>
         <div class="fg">
           <label class="flbl">Amsam Chart Photo</label>
           <div style="height:100px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--bg);overflow:hidden" onclick="this.querySelector('input').click()">
-            <img id="ep_amsam_prev" style="display:none;width:100%;height:100%;object-fit:contain"><span id="ep_amsam_ph" style="color:var(--ink4);font-size:11px">📄 Upload Amsam Chart</span>
+            <img id="ep_amsam_prev" style="display:none;width:100%;height:100%;object-fit:contain"><span id="ep_amsam_ph" style="color:var(--ink4);font-size:17px">📄 Upload Amsam Chart</span>
             <input type="file" id="ep_amsam_file" accept="image/*" style="display:none" onchange="upPhotoPreview(this,'ep_amsam')">
           </div>
         </div>
@@ -1052,21 +1053,21 @@ input,select,textarea{outline:none}
         <div style="flex:1;min-width:120px">
           <label class="flbl">Photo 1 <span class="req">*</span></label>
           <div style="height:110px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--bg);overflow:hidden" onclick="this.querySelector('input').click()">
-            <img id="cp_photo1_prev" style="display:none;width:100%;height:100%;object-fit:cover"><span id="cp_photo1_ph" style="color:var(--ink4);font-size:11px;text-align:center">Upload Photo</span>
+            <img id="cp_photo1_prev" style="display:none;width:100%;height:100%;object-fit:cover"><span id="cp_photo1_ph" style="color:var(--ink4);font-size:17px;text-align:center">Upload Photo</span>
             <input type="file" id="cp_photo1_file" accept="image/*" style="display:none" onchange="upPhotoPreview(this,'cp_photo1')">
           </div>
         </div>
         <div style="flex:1;min-width:120px">
           <label class="flbl">Photo 2</label>
           <div style="height:110px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--bg);overflow:hidden" onclick="this.querySelector('input').click()">
-            <img id="cp_photo2_prev" style="display:none;width:100%;height:100%;object-fit:cover"><span id="cp_photo2_ph" style="color:var(--ink4);font-size:11px;text-align:center">Upload Photo</span>
+            <img id="cp_photo2_prev" style="display:none;width:100%;height:100%;object-fit:cover"><span id="cp_photo2_ph" style="color:var(--ink4);font-size:17px;text-align:center">Upload Photo</span>
             <input type="file" id="cp_photo2_file" accept="image/*" style="display:none" onchange="upPhotoPreview(this,'cp_photo2')">
           </div>
         </div>
         <div style="flex:1;min-width:120px">
           <label class="flbl">Photo 3</label>
           <div style="height:110px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--bg);overflow:hidden" onclick="this.querySelector('input').click()">
-            <img id="cp_photo3_prev" style="display:none;width:100%;height:100%;object-fit:cover"><span id="cp_photo3_ph" style="color:var(--ink4);font-size:11px;text-align:center">Upload Photo</span>
+            <img id="cp_photo3_prev" style="display:none;width:100%;height:100%;object-fit:cover"><span id="cp_photo3_ph" style="color:var(--ink4);font-size:17px;text-align:center">Upload Photo</span>
             <input type="file" id="cp_photo3_file" accept="image/*" style="display:none" onchange="upPhotoPreview(this,'cp_photo3')">
           </div>
         </div>
@@ -1077,7 +1078,7 @@ input,select,textarea{outline:none}
         <div class="fg"><label class="flbl">Mobile <span class="req">*</span></label><input class="finp" id="cp_mobile" placeholder="10-digit mobile" type="tel" maxlength="10"></div>
         <div class="fg"><label class="flbl">Full Name <span class="req">*</span></label><input class="finp" id="cp_name"></div>
         <div class="fg"><label class="flbl">Gender <span class="req">*</span></label><select class="fsel" id="cp_gender"><option value="">-</option><option>Male</option><option>Female</option></select></div>
-        <div class="fg"><label class="flbl">Date of Birth <span class="req">*</span> <span id="cp_age_display" style="font-weight:700;font-size:12px;margin-left:4px"></span></label><input class="finp" id="cp_dob" type="date"></div>
+        <div class="fg"><label class="flbl">Date of Birth <span class="req">*</span> <span id="cp_age_display" style="font-weight:700;font-size:15px;margin-left:4px"></span></label><input class="finp" id="cp_dob" type="date"></div>
         <div class="fg"><label class="flbl">Age</label><input class="finp" id="cp_age_input" readonly style="background:#f0fdf4;font-weight:700;text-align:center;font-size:15px"></div>
       </div>
       <div class="fg" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0 10px">
@@ -1118,21 +1119,21 @@ input,select,textarea{outline:none}
         <div class="fg"><label class="flbl">Mother Status</label><select class="fsel" id="cp_mother_alive"><option value="">-</option><option>Home Maker</option><option>Employed</option><option>Businessman</option><option>Professional</option><option>Retired</option><option>Not Employed</option><option>Passed Away</option></select></div>
         <div class="fg"><label class="flbl">Mother's Occupation</label><input class="finp" id="cp_mother_job" list="occupation_list" placeholder="Type or select"></div>
       </div>
-      <div class="fg" style="font-size:12px;font-weight:600;color:var(--ink3);margin:4px 0 6px">Siblings</div>
+      <div class="fg" style="font-size:15px;font-weight:600;color:var(--ink3);margin:4px 0 6px">Siblings</div>
       <div style="overflow-x:auto;margin-bottom:14px">
-        <table style="width:100%;border-collapse:collapse;font-size:12px;border:1px solid var(--border);border-radius:6px">
+        <table style="width:100%;border-collapse:collapse;font-size:15px;border:1px solid var(--border);border-radius:6px">
           <thead><tr style="background:var(--bg)"><th style="padding:6px 8px;border:1px solid var(--border)"></th><th style="padding:6px 8px;border:1px solid var(--border)">Elder Brother</th><th style="padding:6px 8px;border:1px solid var(--border)">Younger Brother</th><th style="padding:6px 8px;border:1px solid var(--border)">Elder Sister</th><th style="padding:6px 8px;border:1px solid var(--border)">Younger Sister</th></tr></thead>
           <tbody>
             <tr><td style="padding:6px 8px;border:1px solid var(--border);font-weight:600">Married</td>
-              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="cp_sib_eb_m" style="font-size:11px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td>
-              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="cp_sib_yb_m" style="font-size:11px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td>
-              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="cp_sib_es_m" style="font-size:11px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td>
-              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="cp_sib_ys_m" style="font-size:11px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td></tr>
+              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="cp_sib_eb_m" style="font-size:17px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td>
+              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="cp_sib_yb_m" style="font-size:17px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td>
+              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="cp_sib_es_m" style="font-size:17px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td>
+              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="cp_sib_ys_m" style="font-size:17px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td></tr>
             <tr><td style="padding:6px 8px;border:1px solid var(--border);font-weight:600">Unmarried</td>
-              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="cp_sib_eb_u" style="font-size:11px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td>
-              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="cp_sib_yb_u" style="font-size:11px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td>
-              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="cp_sib_es_u" style="font-size:11px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td>
-              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="cp_sib_ys_u" style="font-size:11px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td></tr>
+              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="cp_sib_eb_u" style="font-size:17px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td>
+              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="cp_sib_yb_u" style="font-size:17px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td>
+              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="cp_sib_es_u" style="font-size:17px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td>
+              <td style="padding:4px;border:1px solid var(--border)"><select class="fsel" id="cp_sib_ys_u" style="font-size:17px;padding:4px"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></td></tr>
           </tbody>
         </table>
       </div>
@@ -1196,14 +1197,14 @@ input,select,textarea{outline:none}
         <div class="fg">
           <label class="flbl">Rasi Chart Photo</label>
           <div style="height:100px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--bg);overflow:hidden" onclick="this.querySelector('input').click()">
-            <img id="cp_rasi_prev" style="display:none;width:100%;height:100%;object-fit:contain"><span id="cp_rasi_ph" style="color:var(--ink4);font-size:11px">Upload Rasi Chart</span>
+            <img id="cp_rasi_prev" style="display:none;width:100%;height:100%;object-fit:contain"><span id="cp_rasi_ph" style="color:var(--ink4);font-size:17px">Upload Rasi Chart</span>
             <input type="file" id="cp_rasi_file" accept="image/*" style="display:none" onchange="upPhotoPreview(this,'cp_rasi')">
           </div>
         </div>
         <div class="fg">
           <label class="flbl">Amsam Chart Photo</label>
           <div style="height:100px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--bg);overflow:hidden" onclick="this.querySelector('input').click()">
-            <img id="cp_amsam_prev" style="display:none;width:100%;height:100%;object-fit:contain"><span id="cp_amsam_ph" style="color:var(--ink4);font-size:11px">Upload Amsam Chart</span>
+            <img id="cp_amsam_prev" style="display:none;width:100%;height:100%;object-fit:contain"><span id="cp_amsam_ph" style="color:var(--ink4);font-size:17px">Upload Amsam Chart</span>
             <input type="file" id="cp_amsam_file" accept="image/*" style="display:none" onchange="upPhotoPreview(this,'cp_amsam')">
           </div>
         </div>
@@ -1250,14 +1251,14 @@ input,select,textarea{outline:none}
     <div id="payStepPlans">
       <div style="text-align:center;margin-bottom:22px">
         <div style="font-family:var(--serif);font-size:1.55rem;color:var(--ink1);margin-bottom:4px">Choose Your Plan</div>
-        <div style="font-size:13px;color:var(--ink3)">Pick a plan and pay securely via PayU</div>
+        <div style="font-size:16px;color:var(--ink3)">Pick a plan and pay securely via PayU</div>
       </div>
       <div id="payPlansGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px"></div>
       <div id="payNowBtnWrap" style="display:none;margin-top:20px">
-        <button id="payNowBtn" onclick="confirmPlanSelection()" class="btn btn-primary" style="width:100%;padding:15px;font-size:15.5px;font-weight:800;border-radius:12px;letter-spacing:.02em;box-shadow:0 6px 18px rgba(194,85,61,.25)">Pay Now</button>
+        <button id="payNowBtn" onclick="confirmPlanSelection()" class="btn btn-primary" style="width:100%;padding:15px;font-size:15.5px;font-weight:800;border-radius:12px;letter-spacing:.02em;box-shadow:0 6px 18px rgba(13,123,106,.25)">Pay Now</button>
       </div>
       <div style="text-align:center;margin-top:22px">
-        <a onclick="skipPayment()" style="font-size:13px;color:var(--ink3);text-decoration:underline;cursor:pointer">Skip and pay later</a>
+        <a onclick="skipPayment()" style="font-size:16px;color:var(--ink3);text-decoration:underline;cursor:pointer">Skip and pay later</a>
       </div>
     </div>
     <div id="payStepPayment" style="display:none">
@@ -1269,7 +1270,7 @@ input,select,textarea{outline:none}
       <div style="font-size:52px;margin-bottom:14px">&#127881;</div>
       <div style="font-family:var(--serif);font-size:1.5rem;margin-bottom:8px">Registration Submitted!</div>
       <div style="font-size:13.5px;color:var(--ink3);line-height:1.75;margin-bottom:6px" id="payDoneMsg"></div>
-      <button onclick="closePaymentPage()" class="btn btn-primary" style="padding:13px 32px;font-size:14px;margin-top:18px">Go to My Profile</button>
+      <button onclick="closePaymentPage()" class="btn btn-primary" style="padding:13px 32px;font-size:17px;margin-top:18px">Go to My Profile</button>
     </div>
   </div>
 </div>
@@ -1523,12 +1524,12 @@ async function showWelcomeBalance() {
       return `<div style="background:#fff;border-radius:12px;padding:14px 16px;border:1px solid #e5e7eb">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
           <span style="font-size:18px">${icon}</span>
-          <span style="font-size:12px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px">${label}</span>
+          <span style="font-size:15px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px">${label}</span>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
           <div><span style="font-size:24px;font-weight:800;color:${barColor}">${remaining}</span>
-          <span style="font-size:12px;color:#9ca3af;margin-left:4px">remaining</span></div>
-          <span style="font-size:11px;color:#6b7280">${used} used / ${allotted > 0 ? allotted : '∞'}</span>
+          <span style="font-size:15px;color:#9ca3af;margin-left:4px">remaining</span></div>
+          <span style="font-size:17px;color:#6b7280">${used} used / ${allotted > 0 ? allotted : '∞'}</span>
         </div>
         <div style="height:6px;background:#f3f4f6;border-radius:3px;overflow:hidden">
           <div style="height:100%;width:${allotted>0?pct:0}%;background:${barColor};border-radius:3px;transition:width .5s"></div>
@@ -1544,17 +1545,17 @@ async function showWelcomeBalance() {
         <div style="background:linear-gradient(135deg,#1e3a5f,#2563eb);padding:22px 20px;text-align:center">
           <div style="font-size:28px;margin-bottom:6px">👋</div>
           <div style="color:#fff;font-size:18px;font-weight:700;font-family:Georgia,serif">Welcome, ${esc(name)}!</div>
-          ${cpId ? `<div style="color:rgba(255,255,255,0.6);font-size:12px;margin-top:4px">${esc(cpId)}</div>` : ''}
+          ${cpId ? `<div style="color:rgba(255,255,255,0.6);font-size:15px;margin-top:4px">${esc(cpId)}</div>` : ''}
         </div>
         <div style="padding:20px">
-          <div style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;text-align:center">Contact View Balance</div>
+          <div style="font-size:15px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;text-align:center">Contact View Balance</div>
           <div style="display:flex;flex-direction:column;gap:10px">
             ${balItem('Today', l.day, u.day, '📅', '#2563eb')}
             ${balItem('This Month', l.month, u.month, '📆', '#7c3aed')}
             ${balItem('Lifetime', l.total, u.total, '📊', '#059669')}
           </div>
           <button onclick="document.getElementById('welcomeBalanceOverlay').remove()"
-            style="width:100%;margin-top:16px;padding:12px;background:linear-gradient(135deg,#1e3a5f,#2563eb);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.5px">
+            style="width:100%;margin-top:16px;padding:12px;background:linear-gradient(135deg,#1e3a5f,#2563eb);color:#fff;border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;letter-spacing:.5px">
             Continue →
           </button>
         </div>
@@ -1742,7 +1743,7 @@ async function renderMyOrders() {
     if (showBanner) {
       profCard.innerHTML = '<div style="display:flex;align-items:center;gap:14px;padding:16px 18px">'
         + '<div style="font-size:26px">👑</div>'
-        + '<div><div style="font-weight:700;font-size:14px;color:#92400e">Upgrade Your Plan</div>'
+        + '<div><div style="font-weight:700;font-size:17px;color:#92400e">Upgrade Your Plan</div>'
         + '<div style="font-size:12.5px;color:#b45309;margin-top:3px">You are on the <strong>Free</strong> plan. Upgrade to unlock unlimited contacts, priority listing &amp; more features.</div></div></div>';
     }
   }
@@ -1758,24 +1759,24 @@ async function renderMyOrders() {
   }
   tbody.innerHTML = myOrdersList.map((o, i) => {
     const st = o.status === 'approved'
-      ? '<span style="background:#dcfce7;color:#16a34a;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">✓ Approved</span>'
+      ? '<span style="background:#dcfce7;color:#16a34a;padding:2px 8px;border-radius:10px;font-size:17px;font-weight:600">✓ Approved</span>'
       : o.status === 'rejected'
-      ? '<span style="background:#fee2e2;color:#dc2626;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">✕ Rejected</span>'
-      : '<span style="background:#fef3c7;color:#d97706;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⏳ Pending</span>';
+      ? '<span style="background:#fee2e2;color:#dc2626;padding:2px 8px;border-radius:10px;font-size:17px;font-weight:600">✕ Rejected</span>'
+      : '<span style="background:#fef3c7;color:#d97706;padding:2px 8px;border-radius:10px;font-size:17px;font-weight:600">⏳ Pending</span>';
     const processedInfo = o.processed_by ? `<div style="font-size:10px;color:var(--ink3)">by ${esc(o.processed_by)} · ${esc(o.processed_at||'')}</div>` : '';
     const proofHtml = o.payment_proof
-      ? `<a href="api/uploads/${esc(o.payment_proof)}" target="_blank" style="color:#2563eb;font-size:11px;font-weight:600">📄 View</a>`
+      ? `<a href="api/uploads/${esc(o.payment_proof)}" target="_blank" style="color:#2563eb;font-size:17px;font-weight:600">📄 View</a>`
       : (o.status === 'pending' ? '<span style="color:#d97706;font-size:10px">Awaiting</span>' : '-');
     return `<tr>
       <td>${i+1}</td>
-      <td style="font-size:11px;white-space:nowrap">${esc(o.created_at||'-')}</td>
+      <td style="font-size:17px;white-space:nowrap">${esc(o.created_at||'-')}</td>
       <td style="font-weight:600">${esc(o.plan)}</td>
       <td>${o.amount ? 'Rs. '+esc(o.amount) : '-'}</td>
-      <td style="font-size:12px">${esc(o.method||'-')}</td>
-      <td style="font-size:12px">${esc(o.txn_ref||'-')}</td>
+      <td style="font-size:15px">${esc(o.method||'-')}</td>
+      <td style="font-size:15px">${esc(o.txn_ref||'-')}</td>
       <td>${proofHtml}</td>
       <td>${st}${processedInfo}</td>
-      <td style="font-size:11px;color:var(--ink3)">${esc(o.admin_note||'-')}</td>
+      <td style="font-size:17px;color:var(--ink3)">${esc(o.admin_note||'-')}</td>
     </tr>`;
   }).join('');
 }
@@ -1795,31 +1796,31 @@ function renderPayLaterOpts(opts) {
     if (opt.method === 'upi') {
       body = '<div style="text-align:center;margin-bottom:14px"><div style="font-family:monospace;font-size:18px;font-weight:800;background:#f3f4f6;display:inline-block;padding:8px 18px;border-radius:9px">' + esc(d.upi_id || d.upiId || '') + '</div>'
         + '<div style="font-size:12.5px;color:var(--ink3);margin-top:6px">Send payment to this UPI ID</div></div>'
-        + '<button onclick="copyText(\'' + esc(d.upi_id || d.upiId || '') + '\',\'UPI ID\')" class="copy-btn" style="width:100%;padding:9px;border-radius:8px;font-size:13px;margin-bottom:10px">Copy UPI ID</button>';
+        + '<button onclick="copyText(\'' + esc(d.upi_id || d.upiId || '') + '\',\'UPI ID\')" class="copy-btn" style="width:100%;padding:9px;border-radius:8px;font-size:16px;margin-bottom:10px">Copy UPI ID</button>';
     } else if (opt.method === 'bank') {
       const rows = [['Account Name', d.account_name||d.accountName],['Account No',d.account_no||d.accountNo],['IFSC',d.ifsc],['Bank',d.bank_name||d.bankName],['Branch',d.branch]].filter(([,v])=>v);
       body = '<div style="background:#faf9f7;border-radius:9px;padding:4px 14px;margin-bottom:12px">'
         + rows.map(([l,v]) => '<div class="bank-row"><div><div class="bank-lbl">'+esc(l)+'</div><div class="bank-val">'+esc(v)+'</div></div><button class="copy-btn" onclick="copyText(\''+esc(v)+'\',\''+esc(l)+'\')">Copy</button></div>').join('') + '</div>';
     } else if (opt.method === 'mobile') {
       body = '<div style="text-align:center;margin-bottom:14px"><div style="font-family:monospace;font-size:22px;font-weight:800;background:#f3f4f6;display:inline-block;padding:8px 20px;border-radius:9px">' + esc(d.mobileNo||d.mobile_no||'') + '</div>'
-        + '<div style="font-size:13px;font-weight:600;margin-top:4px">' + esc(d.holderName||d.holder_name||'') + '</div></div>'
-        + '<button onclick="copyText(\'' + esc(d.mobileNo||d.mobile_no||'') + '\',\'Number\')" class="copy-btn" style="width:100%;padding:9px;border-radius:8px;font-size:13px;margin-bottom:10px">Copy Number</button>';
+        + '<div style="font-size:16px;font-weight:600;margin-top:4px">' + esc(d.holderName||d.holder_name||'') + '</div></div>'
+        + '<button onclick="copyText(\'' + esc(d.mobileNo||d.mobile_no||'') + '\',\'Number\')" class="copy-btn" style="width:100%;padding:9px;border-radius:8px;font-size:16px;margin-bottom:10px">Copy Number</button>';
     } else if (opt.method === 'qr') {
       const qrUrl = d.qr_url || d.qrUrl || '';
       body = (qrUrl ? '<div style="text-align:center;margin-bottom:14px"><img src="' + esc(qrUrl) + '" alt="QR" style="width:180px;height:180px;object-fit:contain;border:2px solid var(--border);border-radius:10px;padding:10px;background:#fff"></div>' : '')
-        + '<div style="text-align:center;font-size:13px;color:var(--ink3)">Scan QR code to pay</div>';
+        + '<div style="text-align:center;font-size:16px;color:var(--ink3)">Scan QR code to pay</div>';
     }
-    if (opt.notes) body += '<div style="margin-top:10px;padding:8px 12px;background:#fffbeb;border-radius:8px;font-size:12px;color:#92400e">' + esc(opt.notes) + '</div>';
+    if (opt.notes) body += '<div style="margin-top:10px;padding:8px 12px;background:#fffbeb;border-radius:8px;font-size:15px;color:#92400e">' + esc(opt.notes) + '</div>';
     body += '<div style="margin-top:14px;padding-top:12px;border-top:1px dashed #e5e7eb">'
-      + '<div style="font-size:11px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">📤 Upload Payment Proof</div>'
-      + '<div style="margin-bottom:8px"><input type="file" id="plProofFile_'+i+'" accept="image/*" class="finp" style="font-size:12px;padding:6px;border-color:#fde68a"></div>'
-      + '<div style="margin-bottom:10px"><input class="finp" id="plTxnRef_'+i+'" placeholder="Transaction Ref / UPI ID (optional)" style="font-size:12px;padding:8px;border-color:#fde68a"></div>'
+      + '<div style="font-size:17px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">📤 Upload Payment Proof</div>'
+      + '<div style="margin-bottom:8px"><input type="file" id="plProofFile_'+i+'" accept="image/*" class="finp" style="font-size:15px;padding:6px;border-color:#fde68a"></div>'
+      + '<div style="margin-bottom:10px"><input class="finp" id="plTxnRef_'+i+'" placeholder="Transaction Ref / UPI ID (optional)" style="font-size:15px;padding:8px;border-color:#fde68a"></div>'
       + '<button class="pay-i-paid-btn" onclick="submitPayLaterProof(\'' + esc(opt.opt_id) + '\',' + i + ')">📤 Submit Proof & Notify Admin</button>'
       + '</div>';
     return '<div class="pay-opt-card" id="plOptCard_'+i+'">'
       + '<div class="pay-opt-header" onclick="togglePayLaterOpt('+i+')">'
       + '<div style="width:36px;height:36px;border-radius:9px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">' + (mIcon[opt.method]||'💳') + '</div>'
-      + '<div style="flex:1"><div style="font-weight:700;font-size:13.5px">'+esc(opt.label)+'</div><div style="font-size:12px;color:var(--ink3);margin-top:1px">'+esc(mLabel[opt.method]||opt.method)+'</div></div>'
+      + '<div style="flex:1"><div style="font-weight:700;font-size:13.5px">'+esc(opt.label)+'</div><div style="font-size:15px;color:var(--ink3);margin-top:1px">'+esc(mLabel[opt.method]||opt.method)+'</div></div>'
       + '<svg id="plOptChevron_'+i+'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--ink4);transition:transform .2s"><polyline points="6 9 12 15 18 9"/></svg>'
       + '</div><div class="pay-opt-body" id="plOptBody_'+i+'">' + body + '</div></div>';
   }).join('');
@@ -2034,16 +2035,16 @@ function renderMyProfile() {
     const canCreate = upAllowed('feat_create_profile');
     const _oc = 'openCreate()';
     const tabBtn = (label, icon) =>
-      '<button onclick="' + _oc + '" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:20px;border:1px solid #d1d5db;background:#fff;font-size:13px;font-weight:500;color:#374151;cursor:pointer">'
+      '<button onclick="' + _oc + '" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:20px;border:1px solid #d1d5db;background:#fff;font-size:16px;font-weight:500;color:#374151;cursor:pointer">'
       + icon + label + '</button>';
     const activeTabBtn = (label, icon) =>
-      '<button onclick="' + _oc + '" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:20px;border:none;background:var(--primary,#7f1d1d);color:#fff;font-size:13px;font-weight:600;cursor:pointer">'
+      '<button onclick="' + _oc + '" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:20px;border:none;background:var(--primary,#7f1d1d);color:#fff;font-size:16px;font-weight:600;cursor:pointer">'
       + icon + label + '</button>';
     const filterBtn = (label, icon) =>
-      '<button onclick="' + _oc + '" style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:16px;border:1px solid #d1d5db;background:#fff;font-size:12px;color:#374151;cursor:pointer">'
+      '<button onclick="' + _oc + '" style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:16px;border:1px solid #d1d5db;background:#fff;font-size:15px;color:#374151;cursor:pointer">'
       + icon + label + '</button>';
     const activeFilterBtn = (label, icon) =>
-      '<button onclick="' + _oc + '" style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:16px;border:none;background:var(--primary,#7f1d1d);color:#fff;font-size:12px;font-weight:600;cursor:pointer">'
+      '<button onclick="' + _oc + '" style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:16px;border:none;background:var(--primary,#7f1d1d);color:#fff;font-size:15px;font-weight:600;cursor:pointer">'
       + icon + label + '</button>';
     const dummyCard = '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:14px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="' + _oc + '">'
       + '<div style="width:60px;height:72px;border-radius:8px;background:#f3f4f6;flex-shrink:0"></div>'
@@ -2051,7 +2052,7 @@ function renderMyProfile() {
       + '<div style="height:10px;background:#f3f4f6;border-radius:6px;width:80%;margin-bottom:6px"></div>'
       + '<div style="height:10px;background:#f3f4f6;border-radius:6px;width:50%"></div></div></div>';
     sec.innerHTML =
-      '<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;font-size:13px;color:#92400e;flex-wrap:wrap">'
+      '<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;font-size:16px;color:#92400e;flex-wrap:wrap">'
       + '<span style="font-size:16px">&#128100;</span>'
       + '<div style="flex:1;min-width:180px">No profile linked to <strong>' + esc(mob) + '</strong>. '
       + (canCreate ? 'Click any button below to <strong>create your profile</strong>.' : 'Contact admin to create one.')
@@ -2062,11 +2063,11 @@ function renderMyProfile() {
       + activeTabBtn('All', '&#128101; ')
       + tabBtn('Female', '&#128100; ')
       + tabBtn('Male', '&#128100; ')
-      + '<button onclick="' + _oc + '" style="margin-left:auto;display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:20px;border:2px solid var(--primary,#7f1d1d);background:#fff;color:var(--primary,#7f1d1d);font-size:13px;font-weight:600;cursor:pointer">+ Add Profile</button>'
+      + '<button onclick="' + _oc + '" style="margin-left:auto;display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:20px;border:2px solid var(--primary,#7f1d1d);background:#fff;color:var(--primary,#7f1d1d);font-size:16px;font-weight:600;cursor:pointer">+ Add Profile</button>'
       + '</div>'
       // search bar (decorative, click → create)
       + '<div style="padding:10px 14px;border-bottom:1px solid #f3f4f6" onclick="' + _oc + '">'
-      + '<div style="display:flex;align-items:center;gap:8px;border:1px solid #d1d5db;border-radius:8px;padding:7px 12px;cursor:pointer;color:#9ca3af;font-size:13px">'
+      + '<div style="display:flex;align-items:center;gap:8px;border:1px solid #d1d5db;border-radius:8px;padding:7px 12px;cursor:pointer;color:#9ca3af;font-size:16px">'
       + '<span>&#128269;</span> Search by name or profile ID...</div></div>'
       // filter pills
       + '<div style="padding:10px 14px;border-bottom:1px solid #f3f4f6;display:flex;gap:8px;flex-wrap:wrap">'
@@ -2082,8 +2083,8 @@ function renderMyProfile() {
       + '<div style="font-size:38px">&#128100;</div>'
       + '<div style="font-weight:700;font-size:15px;color:#111827;text-align:center">'
       + (canCreate ? 'Create your profile to get started' : 'Want to create a profile?') + '</div>'
-      + '<button onclick="' + _oc + '" style="background:var(--primary,#7f1d1d);color:#fff;border:none;padding:12px 32px;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer">+ Create Profile</button>'
-      + (!canCreate ? '<div style="font-size:12px;color:#6b7280;text-align:center">Admin will set up your profile</div>' : '')
+      + '<button onclick="' + _oc + '" style="background:var(--primary,#7f1d1d);color:#fff;border:none;padding:12px 32px;border-radius:10px;font-weight:700;font-size:17px;cursor:pointer">+ Create Profile</button>'
+      + (!canCreate ? '<div style="font-size:15px;color:#6b7280;text-align:center">Admin will set up your profile</div>' : '')
       + '</div></div>'
       + '</div>';
     return;
@@ -2101,19 +2102,19 @@ function renderMyProfile() {
       + '<div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">&#x1F451;</div>'
       + '<div style="flex:1;min-width:180px"><div style="font-weight:700;font-size:14.5px;color:#92400e">Upgrade Your Plan</div>'
       + '<div style="font-size:12.5px;color:#a16207;margin-top:2px;line-height:1.5">You are on the <strong>Free</strong> plan. Upgrade to unlock unlimited contacts, priority listing & more features.</div></div>'
-      + '<button onclick="goToPayment()" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;padding:12px 28px;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap;box-shadow:0 4px 14px rgba(217,119,6,0.3);transition:all .2s" onmouseover="this.style.transform=\'translateY(-1px)\';this.style.boxShadow=\'0 6px 20px rgba(217,119,6,0.4)\'" onmouseout="this.style.transform=\'\';this.style.boxShadow=\'0 4px 14px rgba(217,119,6,0.3)\'">Pay Now</button>'
+      + '<button onclick="goToPayment()" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;padding:12px 28px;border-radius:10px;font-weight:700;font-size:17px;cursor:pointer;white-space:nowrap;box-shadow:0 4px 14px rgba(217,119,6,0.3);transition:all .2s" onmouseover="this.style.transform=\'translateY(-1px)\';this.style.boxShadow=\'0 6px 20px rgba(217,119,6,0.4)\'" onmouseout="this.style.transform=\'\';this.style.boxShadow=\'0 4px 14px rgba(217,119,6,0.3)\'">Pay Now</button>'
       + '</div>';
   } else if (isPending) {
     payBanner = '<div style="margin:0 -22px;padding:14px 22px;background:#eff6ff;border-top:1px solid #bfdbfe;border-bottom:1px solid #bfdbfe;display:flex;align-items:center;gap:12px">'
       + '<div style="font-size:18px">&#x23F3;</div>'
       + '<div><div style="font-weight:700;font-size:13.5px;color:#1e40af">Payment Verification Pending</div>'
-      + '<div style="font-size:12px;color:#3b82f6;margin-top:2px">Your payment for <strong>' + esc(p.pending_plan || '') + '</strong> is being verified by admin.</div></div></div>';
+      + '<div style="font-size:15px;color:#3b82f6;margin-top:2px">Your payment for <strong>' + esc(p.pending_plan || '') + '</strong> is being verified by admin.</div></div></div>';
   } else if (!isFree) {
     // Paid plan — show success banner
     payBanner = '<div style="margin:0 -22px;padding:14px 22px;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-top:1px solid #bbf7d0;border-bottom:1px solid #bbf7d0;display:flex;align-items:center;gap:12px">'
       + '<div style="font-size:20px">✅</div>'
       + '<div><div style="font-weight:700;font-size:13.5px;color:#16a34a">Plan Active — ' + esc(plLabel) + '</div>'
-      + '<div style="font-size:12px;color:#15803d;margin-top:2px">Valid till <strong>' + esc(p.expiry || 'N/A') + '</strong></div></div></div>';
+      + '<div style="font-size:15px;color:#15803d;margin-top:2px">Valid till <strong>' + esc(p.expiry || 'N/A') + '</strong></div></div></div>';
   }
 
   // Profile photo
@@ -2132,11 +2133,11 @@ function renderMyProfile() {
     + '<circle cx="18" cy="18" r="15.9" fill="none" stroke="#e5e7eb" stroke-width="3"/>'
     + '<circle cx="18" cy="18" r="15.9" fill="none" stroke="' + compColor + '" stroke-width="3" stroke-dasharray="' + (completion.pct * 0.999).toFixed(2) + ' 100" stroke-linecap="round"/>'
     + '</svg>'
-    + '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:' + compColor + '">' + completion.pct + '%</div>'
+    + '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:' + compColor + '">' + completion.pct + '%</div>'
     + '</div>'
     + '<div style="flex:1;min-width:180px">'
-    + '<div style="font-weight:700;font-size:14px;color:var(--ink1)">Profile Completion</div>'
-    + '<div style="font-size:12px;color:var(--ink3);margin-top:2px;line-height:1.5">' + completion.filled + ' of ' + completion.total + ' details filled'
+    + '<div style="font-weight:700;font-size:17px;color:var(--ink1)">Profile Completion</div>'
+    + '<div style="font-size:15px;color:var(--ink3);margin-top:2px;line-height:1.5">' + completion.filled + ' of ' + completion.total + ' details filled'
     + (completion.pct < 100 ? '. Click <strong>Edit</strong> to add missing info for better matches.' : '. Your profile is complete!') + '</div>'
     + '</div>'
     + (completion.pct < 100 && upAllowed('feat_edit_profile') ? '<button onclick="openEdit()" class="btn btn-outline btn-sm" style="white-space:nowrap">Complete Now</button>' : '')
@@ -2168,8 +2169,8 @@ function renderMyProfile() {
       if (rasi || amsam) {
         html += '<div class="det-sec"><div class="det-sec-title">Horoscope Charts</div>'
           + '<div style="display:flex;gap:12px;flex-wrap:wrap;padding:4px 0">';
-        if (rasi) html += '<div style="text-align:center"><img src="'+rasi+'" style="width:180px;border-radius:10px;border:2px solid #e5e7eb" onerror="this.parentElement.style.display=\'none\'"><div style="font-size:11px;color:var(--ink3);margin-top:4px">Rasi Chart</div></div>';
-        if (amsam) html += '<div style="text-align:center"><img src="'+amsam+'" style="width:180px;border-radius:10px;border:2px solid #e5e7eb" onerror="this.parentElement.style.display=\'none\'"><div style="font-size:11px;color:var(--ink3);margin-top:4px">Amsam Chart</div></div>';
+        if (rasi) html += '<div style="text-align:center"><img src="'+rasi+'" style="width:180px;border-radius:10px;border:2px solid #e5e7eb" onerror="this.parentElement.style.display=\'none\'"><div style="font-size:17px;color:var(--ink3);margin-top:4px">Rasi Chart</div></div>';
+        if (amsam) html += '<div style="text-align:center"><img src="'+amsam+'" style="width:180px;border-radius:10px;border:2px solid #e5e7eb" onerror="this.parentElement.style.display=\'none\'"><div style="font-size:17px;color:var(--ink3);margin-top:4px">Amsam Chart</div></div>';
         html += '</div></div>';
       }
       return html;
@@ -2231,7 +2232,7 @@ async function loadUsageLimits() {
       return `<div style="flex:1;min-width:140px">
         <div style="display:flex;justify-content:space-between;margin-bottom:4px">
           <span style="font-weight:700;color:${barColor};font-size:18px">${used}</span>
-          <span style="font-size:12px;color:#9ca3af;align-self:flex-end">${limit > 0 ? 'of '+limit : 'Unlimited'}</span>
+          <span style="font-size:15px;color:#9ca3af;align-self:flex-end">${limit > 0 ? 'of '+limit : 'Unlimited'}</span>
         </div>
         <div style="height:6px;background:#f3f4f6;border-radius:3px;overflow:hidden">
           <div style="height:100%;width:${limit>0?p:0}%;background:${barColor};border-radius:3px;transition:width .5s"></div>
@@ -2239,18 +2240,18 @@ async function loadUsageLimits() {
       </div>`;
     };
     card.innerHTML = `<div style="margin:0 -22px;padding:16px 22px;background:linear-gradient(135deg,#f0f9ff,#eff6ff);border-top:1px solid #bfdbfe;border-bottom:1px solid #bfdbfe">
-      <div style="font-weight:700;font-size:13px;color:#1e40af;margin-bottom:12px">📊 Contact View Usage</div>
+      <div style="font-weight:700;font-size:16px;color:#1e40af;margin-bottom:12px">📊 Contact View Usage</div>
       <div style="display:flex;gap:20px;flex-wrap:wrap">
         <div style="flex:1;min-width:130px;background:#fff;border-radius:10px;padding:12px 14px;border:1px solid #dbeafe">
-          <div style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Today</div>
+          <div style="font-size:17px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Today</div>
           ${bar(u.day, l.day, '#2563eb')}
         </div>
         <div style="flex:1;min-width:130px;background:#fff;border-radius:10px;padding:12px 14px;border:1px solid #dbeafe">
-          <div style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">This Month</div>
+          <div style="font-size:17px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">This Month</div>
           ${bar(u.month, l.month, '#7c3aed')}
         </div>
         <div style="flex:1;min-width:130px;background:#fff;border-radius:10px;padding:12px 14px;border:1px solid #dbeafe">
-          <div style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Total (Lifetime)</div>
+          <div style="font-size:17px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Total (Lifetime)</div>
           ${bar(u.total, l.total, '#059669')}
         </div>
       </div>
@@ -2577,17 +2578,17 @@ async function renderMyBills() {
       + '<div class="stat-card" style="border-color:var(--green)"><div class="stat-num">\u20B9' + totalPd.toLocaleString('en-IN') + '</div><div class="stat-lbl">Total Paid</div></div>'
       + '<div class="stat-card" style="border-color:#d97706"><div class="stat-num">' + (active?.expiry || '-') + '</div><div class="stat-lbl">Plan Expiry</div></div>';
     document.getElementById('activePlanBody').innerHTML = active
-      ? '<div style="font-weight:700;font-size:14.5px">' + esc(active.plan_name || '-') + '</div><div style="font-size:12px;color:var(--ink3);margin-top:3px">\u20B9' + Number(active.amount).toLocaleString('en-IN') + ' \u00B7 ' + esc(active.payment || '-') + ' \u00B7 Expires: ' + esc(active.expiry) + '</div>'
-      : '<div style="color:var(--ink3);font-size:13px">No active plan.</div>';
+      ? '<div style="font-weight:700;font-size:14.5px">' + esc(active.plan_name || '-') + '</div><div style="font-size:15px;color:var(--ink3);margin-top:3px">\u20B9' + Number(active.amount).toLocaleString('en-IN') + ' \u00B7 ' + esc(active.payment || '-') + ' \u00B7 Expires: ' + esc(active.expiry) + '</div>'
+      : '<div style="color:var(--ink3);font-size:16px">No active plan.</div>';
     document.getElementById('billHistBadge').textContent = bills.length;
     document.getElementById('billTbody').innerHTML = bills.length === 0
       ? '<tr><td colspan="8" style="text-align:center;padding:22px;color:var(--ink3)">No bills yet</td></tr>'
       : bills.map((b, i) => {
         const a = b.expiry && b.expiry >= today;
-        return '<tr><td style="color:var(--ink4);font-size:11px">' + (i+1) + '</td>'
+        return '<tr><td style="color:var(--ink4);font-size:17px">' + (i+1) + '</td>'
           + '<td style="font-weight:600">' + esc(b.plan_name || '-') + '</td>'
           + '<td style="font-family:var(--mono)">\u20B9' + Number(b.amount).toLocaleString('en-IN') + '</td>'
-          + '<td style="font-size:12px">' + esc(b.payment || '-') + '</td>'
+          + '<td style="font-size:15px">' + esc(b.payment || '-') + '</td>'
           + '<td style="font-size:11.5px">' + esc(b.billed_date || '-') + '</td>'
           + '<td style="font-size:11.5px">' + esc(b.expiry || '-') + '</td>'
           + '<td style="font-size:11.5px">' + esc(b.billed_by || '-') + '</td>'
@@ -2610,11 +2611,11 @@ async function renderMyActivity() {
     document.getElementById('vbBadge').textContent = vb.length;
     const emp = (c, m) => '<tr><td colspan="' + c + '" style="text-align:center;padding:18px;color:var(--ink3)">' + m + '</td></tr>';
     document.getElementById('pvTbody').innerHTML = pv.length === 0 ? emp(5, 'No profile views yet') : pv.map((v, i) =>
-      '<tr><td style="color:var(--ink4)">' + (i+1) + '</td><td><code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-size:11.5px">' + esc(v.target_cp_id) + '</code></td><td style="font-size:12px">' + esc(v.target_name || '-') + '</td><td style="font-size:11.5px">' + esc(v.datetime) + '</td><td><span class="badge badge-blue">' + (v.time_spent || 0) + 's</span></td></tr>').join('');
+      '<tr><td style="color:var(--ink4)">' + (i+1) + '</td><td><code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-size:11.5px">' + esc(v.target_cp_id) + '</code></td><td style="font-size:15px">' + esc(v.target_name || '-') + '</td><td style="font-size:11.5px">' + esc(v.datetime) + '</td><td><span class="badge badge-blue">' + (v.time_spent || 0) + 's</span></td></tr>').join('');
     document.getElementById('cvTbody').innerHTML = cv.length === 0 ? emp(4, 'No contacts viewed yet') : cv.map((v, i) =>
-      '<tr><td style="color:var(--ink4)">' + (i+1) + '</td><td><code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-size:11.5px">' + esc(v.target_cp_id) + '</code></td><td style="font-size:12px">' + esc(v.target_name || '-') + '</td><td style="font-size:11.5px">' + esc(v.datetime) + '</td></tr>').join('');
+      '<tr><td style="color:var(--ink4)">' + (i+1) + '</td><td><code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-size:11.5px">' + esc(v.target_cp_id) + '</code></td><td style="font-size:15px">' + esc(v.target_name || '-') + '</td><td style="font-size:11.5px">' + esc(v.datetime) + '</td></tr>').join('');
     document.getElementById('vbTbody').innerHTML = vb.length === 0 ? emp(5, 'No one has viewed your profile yet') : vb.map((v, i) =>
-      '<tr><td style="color:var(--ink4)">' + (i+1) + '</td><td style="font-size:12px">' + esc(v.viewer_profile_name || v.viewer_name || 'Anonymous') + '</td><td><span class="badge badge-blue">' + esc((v.viewer_plan || v.viewer_profile_plan || 'free').charAt(0).toUpperCase() + (v.viewer_plan || v.viewer_profile_plan || 'free').slice(1)) + '</span></td><td style="font-size:11.5px">' + esc(v.datetime) + '</td><td><span class="badge badge-gray">' + (v.time_spent || 0) + 's</span></td></tr>').join('');
+      '<tr><td style="color:var(--ink4)">' + (i+1) + '</td><td style="font-size:15px">' + esc(v.viewer_profile_name || v.viewer_name || 'Anonymous') + '</td><td><span class="badge badge-blue">' + esc((v.viewer_plan || v.viewer_profile_plan || 'free').charAt(0).toUpperCase() + (v.viewer_plan || v.viewer_profile_plan || 'free').slice(1)) + '</span></td><td style="font-size:11.5px">' + esc(v.datetime) + '</td><td><span class="badge badge-gray">' + (v.time_spent || 0) + 's</span></td></tr>').join('');
   } catch (e) { toast('Failed to load activity: ' + e.message, 'err'); }
 }
 
@@ -2640,36 +2641,36 @@ async function renderMyReports() {
 
   tbody.innerHTML = myReports.map((r, i) => {
     const reason = r.reason === 'already_married' || r.reason === 'Already Married'
-      ? '<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">💍 Already Married</span>'
+      ? '<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:10px;font-size:17px;font-weight:600">💍 Already Married</span>'
       : r.reason === 'fraud'
-      ? '<span style="background:#fee2e2;color:#dc2626;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">🚨 Fraud</span>'
+      ? '<span style="background:#fee2e2;color:#dc2626;padding:2px 8px;border-radius:10px;font-size:17px;font-weight:600">🚨 Fraud</span>'
       : r.reason === 'misinformation'
-      ? '<span style="background:#fff7ed;color:#c2410c;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚠️ Misinformation</span>'
-      : `<span style="background:#f3f4f6;color:#6b7280;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">${r.reason}</span>`;
+      ? '<span style="background:#fff7ed;color:#c2410c;padding:2px 8px;border-radius:10px;font-size:17px;font-weight:600">⚠️ Misinformation</span>'
+      : `<span style="background:#f3f4f6;color:#6b7280;padding:2px 8px;border-radius:10px;font-size:17px;font-weight:600">${r.reason}</span>`;
 
     const status = r.status === 'resolved'
-      ? '<span style="background:#dcfce7;color:#16a34a;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">Resolved</span>'
+      ? '<span style="background:#dcfce7;color:#16a34a;padding:2px 8px;border-radius:10px;font-size:17px;font-weight:600">Resolved</span>'
       : r.status === 'dismissed'
-      ? '<span style="background:#f3f4f6;color:#6b7280;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">Dismissed</span>'
+      ? '<span style="background:#f3f4f6;color:#6b7280;padding:2px 8px;border-radius:10px;font-size:17px;font-weight:600">Dismissed</span>'
       : r.status === 'revoked'
-      ? '<span style="background:#e0e7ff;color:#4338ca;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">Revoked</span>'
-      : '<span style="background:#fef3c7;color:#d97706;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">Pending</span>';
+      ? '<span style="background:#e0e7ff;color:#4338ca;padding:2px 8px;border-radius:10px;font-size:17px;font-weight:600">Revoked</span>'
+      : '<span style="background:#fef3c7;color:#d97706;padding:2px 8px;border-radius:10px;font-size:17px;font-weight:600">Pending</span>';
 
     const adminNote = r.admin_note || '';
     const resolvedInfo = r.resolved_by ? `<div style="font-size:10px;color:#6b7280">by ${r.resolved_by} · ${r.resolved_at || ''}</div>` : '';
 
     const revokeBtn = r.status === 'pending'
-      ? `<button onclick="revokeReport(${r.id})" style="background:#e0e7ff;color:#4338ca;border:1px solid #c7d2fe;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer">Revoke</button>`
+      ? `<button onclick="revokeReport(${r.id})" style="background:#e0e7ff;color:#4338ca;border:1px solid #c7d2fe;padding:4px 10px;border-radius:6px;font-size:17px;font-weight:600;cursor:pointer">Revoke</button>`
       : '';
 
     return `<tr>
       <td>${i+1}</td>
-      <td style="font-size:11px;white-space:nowrap">${r.reported_at || '-'}</td>
-      <td><code style="font-size:11px;background:#f3f4f6;padding:2px 6px;border-radius:4px">${r.cp_id}</code></td>
+      <td style="font-size:17px;white-space:nowrap">${r.reported_at || '-'}</td>
+      <td><code style="font-size:17px;background:#f3f4f6;padding:2px 6px;border-radius:4px">${r.cp_id}</code></td>
       <td>${r.profile_name || '-'}</td>
       <td>${reason}</td>
       <td>${status}${resolvedInfo}</td>
-      <td style="font-size:11px;color:#6b7280">${adminNote || '-'}</td>
+      <td style="font-size:17px;color:#6b7280">${adminNote || '-'}</td>
       <td>${revokeBtn}</td>
     </tr>`;
   }).join('');
@@ -2694,7 +2695,7 @@ async function renderSuggestions() {
   if (!container) return;
   container.innerHTML = '<div style="text-align:center;padding:36px 20px;color:var(--ink3);display:flex;flex-direction:column;align-items:center;gap:12px">'
     + '<span class="u-spinner lg"></span>'
-    + '<span style="font-size:13px;font-weight:500">Loading suggestions…</span>'
+    + '<span style="font-size:16px;font-weight:500">Loading suggestions…</span>'
     + '</div>';
 
   try {
@@ -2718,7 +2719,7 @@ function starRating(score) {
   const full = Math.floor(score);
   const half = score - full >= 0.5 ? 1 : 0;
   const empty = 5 - full - half;
-  return '<span style="color:#f59e0b;font-size:13px;letter-spacing:1px">'
+  return '<span style="color:#f59e0b;font-size:16px;letter-spacing:1px">'
     + '★'.repeat(full) + (half ? '½' : '') + '<span style="color:#e5e7eb">' + '★'.repeat(empty) + '</span>'
     + '</span><span style="font-size:10px;color:#9ca3af;margin-left:4px">' + score + '/5</span>';
 }
@@ -2750,8 +2751,8 @@ function renderSuggestionsUI() {
       onmouseover="this.style.boxShadow='0 4px 12px rgba(139,0,0,0.1)'" onmouseout="this.style.boxShadow='none'">
       <div style="cursor:pointer;flex-shrink:0" onclick="window.open('/detail/${esc(p.cp_id)}','_blank')">${imgHtml}${fallback}</div>
       <div style="flex:1;min-width:0;cursor:pointer" onclick="window.open('/detail/${esc(p.cp_id)}','_blank')">
-        <div style="font-weight:700;font-size:13px;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.name)}</div>
-        <div style="font-size:11px;color:var(--ink3)">${esc(p.cp_id)} · ${p.age||''} yrs · ${esc(p.caste||'')}</div>
+        <div style="font-weight:700;font-size:16px;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.name)}</div>
+        <div style="font-size:17px;color:var(--ink3)">${esc(p.cp_id)} · ${p.age||''} yrs · ${esc(p.caste||'')}</div>
         <div style="margin-top:3px">${starRating(score)}</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end;flex-shrink:0">
@@ -2788,7 +2789,7 @@ function renderSuggestionsUI() {
         <span class="u-card-title" style="color:${color}">${icon} ${title}</span>
         <span class="badge" style="background:${color}20;color:${color}">${filtered.length}</span>
       </div>
-      <div style="padding:4px 10px 10px;font-size:11px;color:var(--ink3);margin-bottom:4px">${desc}</div>
+      <div style="padding:4px 10px 10px;font-size:17px;color:var(--ink3);margin-bottom:4px">${desc}</div>
       <div style="display:flex;flex-direction:column;gap:6px;padding:0 10px 14px">
         ${filtered.map(card).join('')}
       </div>
@@ -2824,11 +2825,11 @@ function _setViewMode(v) { _viewMode = v; localStorage.setItem('up_view_mode', v
 function _viewToggleHtml(countLabel, onToggle) {
   const isTable = _viewMode === 'table';
   return `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px">
-    <span style="font-size:12px;color:var(--ink3);font-weight:600">${countLabel}</span>
+    <span style="font-size:15px;color:var(--ink3);font-weight:600">${countLabel}</span>
     <div style="display:flex;gap:0;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden">
-      <button onclick="${onToggle}('table')" style="padding:5px 12px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:${isTable?'#8B0000':'#fff'};color:${isTable?'#fff':'#374151'}">
+      <button onclick="${onToggle}('table')" style="padding:5px 12px;font-size:15px;font-weight:600;border:none;cursor:pointer;background:${isTable?'#8B0000':'#fff'};color:${isTable?'#fff':'#374151'}">
         ☰ Table</button>
-      <button onclick="${onToggle}('cards')" style="padding:5px 12px;font-size:12px;font-weight:600;border:none;border-left:1px solid #e5e7eb;cursor:pointer;background:${!isTable?'#8B0000':'#fff'};color:${!isTable?'#fff':'#374151'}">
+      <button onclick="${onToggle}('cards')" style="padding:5px 12px;font-size:15px;font-weight:600;border:none;border-left:1px solid #e5e7eb;cursor:pointer;background:${!isTable?'#8B0000':'#fff'};color:${!isTable?'#fff':'#374151'}">
         ⊞ Cards</button>
     </div>
   </div>`;
@@ -2840,11 +2841,11 @@ function _profileTableRow(p, i) {
     ? (p.photo1.startsWith('http') ? p.photo1 : p.photo1.startsWith('uploads/') ? 'api/' + p.photo1 : photoBase + p.photo1) : '';
   const thumb = src
     ? `<img src="${src}" style="width:40px;height:48px;object-fit:cover;border-radius:6px;display:block" onerror="this.style.display='none'">`
-    : `<div style="width:40px;height:48px;border-radius:6px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#9ca3af">${esc((p.name||'?').charAt(0))}</div>`;
+    : `<div style="width:40px;height:48px;border-radius:6px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px;color:#9ca3af">${esc((p.name||'?').charAt(0))}</div>`;
   const loc = [p.present_city||p.present_district, p.nativity].filter(Boolean).join(', ');
   return `<tr style="cursor:pointer" onclick="window.open('/detail/${esc(p.cp_id)}','_blank')"
     onmouseover="this.style.background='#fef9f9'" onmouseout="this.style.background=''">
-    <td style="padding:7px 8px;color:var(--ink4);font-size:11px;text-align:center">${i+1}</td>
+    <td style="padding:7px 8px;color:var(--ink4);font-size:17px;text-align:center">${i+1}</td>
     <td style="padding:7px 8px">${thumb}</td>
     <td style="padding:7px 8px">
       <div style="font-weight:700;font-size:12.5px;color:#1a1a2e">${esc(p.name)}</div>
@@ -2852,9 +2853,9 @@ function _profileTableRow(p, i) {
     </td>
     <td style="padding:7px 8px;font-size:11.5px;color:var(--ink2)">${p.age||'-'} yrs<br><span style="color:var(--ink4)">${esc(p.height||'-')}</span></td>
     <td style="padding:7px 8px;font-size:11.5px;color:var(--ink2)">${esc(p.caste||'-')}<br><span style="color:var(--ink4)">${esc(p.religion||'')}</span></td>
-    <td style="padding:7px 8px;font-size:11px;color:var(--ink3);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc([p.qualification,p.job].filter(Boolean).join(' · ')||'-')}</td>
-    <td style="padding:7px 8px;font-size:11px;color:var(--ink3)">${esc(loc||'-')}</td>
-    <td style="padding:7px 8px"><a href="/detail/${esc(p.cp_id)}" target="_blank" style="font-size:11px;font-weight:600;color:#8B0000;text-decoration:none;white-space:nowrap">View →</a></td>
+    <td style="padding:7px 8px;font-size:17px;color:var(--ink3);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc([p.qualification,p.job].filter(Boolean).join(' · ')||'-')}</td>
+    <td style="padding:7px 8px;font-size:17px;color:var(--ink3)">${esc(loc||'-')}</td>
+    <td style="padding:7px 8px"><a href="/detail/${esc(p.cp_id)}" target="_blank" style="font-size:17px;font-weight:600;color:#8B0000;text-decoration:none;white-space:nowrap">View →</a></td>
   </tr>`;
 }
 
@@ -2878,8 +2879,8 @@ function _profileCardHtml(list) {
       onmouseover="this.style.boxShadow='0 4px 12px rgba(139,0,0,0.1)'" onmouseout="this.style.boxShadow='none'">
       <div style="flex-shrink:0">${imgHtml}${fallback}</div>
       <div style="flex:1;min-width:0">
-        <div style="font-weight:700;font-size:13px;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.name)}</div>
-        <div style="font-size:11px;color:var(--ink3)">${esc(p.cp_id)} · ${p.age||''} yrs · ${esc(p.caste||'')}</div>
+        <div style="font-weight:700;font-size:16px;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.name)}</div>
+        <div style="font-size:17px;color:var(--ink3)">${esc(p.cp_id)} · ${p.age||''} yrs · ${esc(p.caste||'')}</div>
         <div style="font-size:10.5px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc([p.qualification,p.job,where].filter(Boolean).join(' · '))}</div>
       </div>
     </div>`;
@@ -2898,10 +2899,10 @@ async function renderMatches(mode) {
   if (!container) return;
   container.innerHTML = '<div style="text-align:center;padding:36px 20px;color:var(--ink3);display:flex;flex-direction:column;align-items:center;gap:12px">'
     + '<span class="u-spinner lg"></span>'
-    + '<span style="font-size:13px;font-weight:500">Finding matches…</span>'
+    + '<span style="font-size:16px;font-weight:500">Finding matches…</span>'
     + '</div>';
   if (!profile) {
-    container.innerHTML = '<div style="text-align:center;padding:30px;color:var(--ink3);font-size:13px">Create your profile first to see matches.</div>';
+    container.innerHTML = '<div style="text-align:center;padding:30px;color:var(--ink3);font-size:16px">Create your profile first to see matches.</div>';
     return;
   }
   const action = mode === 'mutual' ? 'mutual_matches' : 'basic_matches';
@@ -2914,7 +2915,7 @@ async function renderMatches(mode) {
     data = await resp.json();
   } catch (e) {}
   if (!data || !data.ok) {
-    container.innerHTML = '<div style="text-align:center;padding:30px;color:#dc2626;font-size:13px">Could not load matches. Please try again.</div>';
+    container.innerHTML = '<div style="text-align:center;padding:30px;color:#dc2626;font-size:16px">Could not load matches. Please try again.</div>';
     return;
   }
   const list = data.profiles || [];
@@ -2922,7 +2923,7 @@ async function renderMatches(mode) {
     container.innerHTML = '<div class="u-card" style="padding:28px 20px;text-align:center;color:var(--ink3)">'
       + '<div style="font-size:34px;margin-bottom:8px">🔍</div>'
       + '<div style="font-weight:600;color:#1a1a2e;margin-bottom:4px">No matches yet</div>'
-      + '<div style="font-size:12px">Try widening your partner preferences (age range, caste, qualification) in Settings.</div>'
+      + '<div style="font-size:15px">Try widening your partner preferences (age range, caste, qualification) in Settings.</div>'
       + '</div>';
     return;
   }
@@ -2962,15 +2963,15 @@ async function renderAllProfiles() {
         onmouseout="this.style.boxShadow='none';this.style.borderColor='#e5e7eb'">
         ${imgHtml}${fallback}
         <div style="flex:1;min-width:0">
-          <div style="font-weight:700;font-size:13px;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.name)}</div>
-          <div style="font-size:11px;color:#8B0000;font-weight:600;margin:1px 0">${esc(p.cp_id)}</div>
-          <div style="font-size:11px;color:var(--ink3)">${[p.age?p.age+' yrs':'',p.caste,p.marital].filter(Boolean).join(' · ')}</div>
+          <div style="font-weight:700;font-size:16px;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.name)}</div>
+          <div style="font-size:17px;color:#8B0000;font-weight:600;margin:1px 0">${esc(p.cp_id)}</div>
+          <div style="font-size:17px;color:var(--ink3)">${[p.age?p.age+' yrs':'',p.caste,p.marital].filter(Boolean).join(' · ')}</div>
           <div style="font-size:10.5px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc([p.qualification,p.job].filter(Boolean).join(' · '))}</div>
         </div>
       </div>`;
     };
     grid.innerHTML = profiles.map(card).join('');
-    if (more) more.innerHTML = `<a href="/" target="_blank" style="font-size:13px;color:#8B0000;font-weight:600;text-decoration:none">View all profiles on home page →</a>`;
+    if (more) more.innerHTML = `<a href="/" target="_blank" style="font-size:16px;color:#8B0000;font-weight:600;text-decoration:none">View all profiles on home page →</a>`;
   } catch(e) {
     grid.innerHTML = '<div style="padding:24px;text-align:center;color:var(--ink3);grid-column:1/-1">Could not load profiles.</div>';
   }
@@ -3018,7 +3019,7 @@ async function renderUserProfileViewLog() {
       : pv.map((v, i) => `<tr>
           <td style="color:var(--ink4)">${i+1}</td>
           <td><a href="/detail/${esc(v.target_cp_id)}" target="_blank" rel="noopener" style="text-decoration:none"><code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-size:11.5px;color:#1d4ed8;cursor:pointer">${esc(v.target_cp_id)}</code></a></td>
-          <td style="font-size:12px">${esc(v.target_name || '-')}</td>
+          <td style="font-size:15px">${esc(v.target_name || '-')}</td>
           <td style="font-size:11.5px">${esc(v.datetime)}</td>
         </tr>`).join('');
 
@@ -3026,7 +3027,7 @@ async function renderUserProfileViewLog() {
       ? emp(4, 'No one has viewed your profile yet')
       : vb.map((v, i) => `<tr>
           <td style="color:var(--ink4)">${i+1}</td>
-          <td style="font-size:12px">${esc(v.viewer_profile_name || v.viewer_name || 'Anonymous')}</td>
+          <td style="font-size:15px">${esc(v.viewer_profile_name || v.viewer_name || 'Anonymous')}</td>
           <td><span class="badge badge-blue">${esc((v.viewer_plan || v.viewer_profile_plan || 'free').charAt(0).toUpperCase() + (v.viewer_plan || v.viewer_profile_plan || 'free').slice(1))}</span></td>
           <td style="font-size:11.5px">${esc(v.datetime)}</td>
         </tr>`).join('');
@@ -3051,7 +3052,7 @@ async function renderUserContactLog() {
       : cv.map((v, i) => `<tr>
           <td style="color:var(--ink4)">${i+1}</td>
           <td><a href="/detail/${esc(v.target_cp_id)}" target="_blank" rel="noopener" style="text-decoration:none"><code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-size:11.5px;color:#1d4ed8;cursor:pointer">${esc(v.target_cp_id)}</code></a></td>
-          <td style="font-size:12px">${esc(v.target_name || '-')}</td>
+          <td style="font-size:15px">${esc(v.target_name || '-')}</td>
           <td style="font-size:11.5px">${esc(v.datetime)}</td>
         </tr>`).join('');
   } catch(e) { console.log('Contact log error:', e); }
@@ -3082,9 +3083,9 @@ async function renderSettings() {
     const pending = reqs.find(r => r.status === 'pending');
     let html = '';
     if (reqs.length > 0) {
-      html += '<div style="margin-bottom:16px"><div style="font-weight:600;font-size:13px;margin-bottom:7px">Your Requests</div>'
+      html += '<div style="margin-bottom:16px"><div style="font-weight:600;font-size:16px;margin-bottom:7px">Your Requests</div>'
         + '<div class="u-tw"><table class="u-tbl"><thead><tr><th>#</th><th>Requested</th><th>Old</th><th>New</th><th>Status</th><th>Note</th></tr></thead><tbody>'
-        + reqs.map((r, i) => '<tr><td style="font-size:11px;color:var(--ink4)">' + (i+1) + '</td>'
+        + reqs.map((r, i) => '<tr><td style="font-size:17px;color:var(--ink4)">' + (i+1) + '</td>'
           + '<td style="font-size:11.5px">' + esc(r.requested_at) + '</td>'
           + '<td style="font-family:var(--mono);font-size:11.5px">' + esc(r.old_mobile) + '</td>'
           + '<td style="font-family:var(--mono);font-size:11.5px">' + esc(r.new_mobile) + '</td>'
@@ -3093,9 +3094,9 @@ async function renderSettings() {
         + '</tbody></table></div></div>';
     }
     if (!canReqMobile) {
-      html += '<div style="background:#f3f4f6;border:1px solid var(--border);border-radius:8px;padding:12px;font-size:13px;color:var(--ink3)">Mobile change requests are currently disabled.</div>';
+      html += '<div style="background:#f3f4f6;border:1px solid var(--border);border-radius:8px;padding:12px;font-size:16px;color:var(--ink3)">Mobile change requests are currently disabled.</div>';
     } else if (pending) {
-      html += '<div style="background:var(--green-bg);border:1px solid #a7f3d0;border-radius:8px;padding:11px 14px;font-size:13px;color:var(--green)">Pending request for <strong>' + esc(pending.new_mobile) + '</strong>. Awaiting admin approval.</div>';
+      html += '<div style="background:var(--green-bg);border:1px solid #a7f3d0;border-radius:8px;padding:11px 14px;font-size:16px;color:var(--green)">Pending request for <strong>' + esc(pending.new_mobile) + '</strong>. Awaiting admin approval.</div>';
     } else {
       html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">'
         + '<div class="fg"><label class="flbl">New Mobile <span style="color:var(--accent)">*</span></label><input class="finp" id="req_new" type="tel" maxlength="10" placeholder="New 10-digit number"></div>'
@@ -3202,7 +3203,7 @@ function renderPayPlans() {
       + '<div style="background:' + t.grad + ';padding:18px 18px 14px;color:#fff">'
         + '<div style="font-size:28px;line-height:1;margin-bottom:8px">' + t.icon + '</div>'
         + '<div style="font-size:15px;font-weight:800;letter-spacing:.02em">' + esc(p.name) + '</div>'
-        + '<div style="font-size:11px;opacity:.85;margin-top:2px;text-transform:uppercase;letter-spacing:.08em">' + esc(p.type) + ' plan</div>'
+        + '<div style="font-size:17px;opacity:.85;margin-top:2px;text-transform:uppercase;letter-spacing:.08em">' + esc(p.type) + ' plan</div>'
       + '</div>'
       + '<div style="padding:16px 18px 18px;display:flex;flex-direction:column;flex:1">'
         + '<div style="display:flex;align-items:baseline;gap:6px;margin-bottom:4px">'
@@ -3259,7 +3260,7 @@ function renderPayOpts(opts) {
   const plan = _payPlan;
   const amount = Number(plan.amount).toLocaleString('en-IN');
   document.getElementById('paySelectedPlanCard').innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">'
-    + '<div><div style="font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.5);margin-bottom:4px">Selected Plan</div>'
+    + '<div><div style="font-size:17px;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.5);margin-bottom:4px">Selected Plan</div>'
     + '<div style="font-size:18px;font-weight:700">' + esc(plan.name) + '</div></div>'
     + '<div style="text-align:right"><div style="font-size:28px;font-weight:800;font-family:var(--mono)">\u20B9' + amount + '</div></div></div>';
   const mIcon = { qr: '\uD83D\uDCB3', upi: '\uD83D\uDCF2', bank: '\uD83C\uDFE6', mobile: '\uD83D\uDCF1' };
@@ -3271,30 +3272,30 @@ function renderPayOpts(opts) {
     if (opt.method === 'upi') {
       body = '<div style="text-align:center;margin-bottom:14px"><div style="font-family:var(--mono);font-size:18px;font-weight:800;background:#f3f4f6;display:inline-block;padding:8px 18px;border-radius:9px">' + esc(d.upi_id || d.upiId || '') + '</div>'
         + '<div style="font-size:12.5px;color:var(--ink3);margin-top:6px">Send <strong>\u20B9' + amount + '</strong> to this UPI ID</div></div>'
-        + '<button onclick="copyText(\'' + esc(d.upi_id || d.upiId || '') + '\',\'UPI ID\')" class="copy-btn" style="width:100%;padding:9px;border-radius:8px;font-size:13px;margin-bottom:10px">Copy UPI ID</button>';
+        + '<button onclick="copyText(\'' + esc(d.upi_id || d.upiId || '') + '\',\'UPI ID\')" class="copy-btn" style="width:100%;padding:9px;border-radius:8px;font-size:16px;margin-bottom:10px">Copy UPI ID</button>';
     } else if (opt.method === 'bank') {
       const rows = [['Account Name', d.account_name || d.accountName], ['Account No', d.account_no || d.accountNo], ['IFSC', d.ifsc], ['Bank', d.bank_name || d.bankName], ['Branch', d.branch]].filter(([,v]) => v);
       body = '<div style="background:#faf9f7;border-radius:9px;padding:4px 14px;margin-bottom:12px">'
         + rows.map(([l,v]) => '<div class="bank-row"><div><div class="bank-lbl">' + esc(l) + '</div><div class="bank-val">' + esc(v) + '</div></div><button class="copy-btn" onclick="copyText(\'' + esc(v) + '\',\'' + esc(l) + '\')">Copy</button></div>').join('') + '</div>';
     } else if (opt.method === 'mobile') {
       body = '<div style="text-align:center;margin-bottom:14px"><div style="font-family:var(--mono);font-size:22px;font-weight:800;background:#f3f4f6;display:inline-block;padding:8px 20px;border-radius:9px">' + esc(d.mobileNo || d.mobile_no || '') + '</div>'
-        + '<div style="font-size:13px;font-weight:600;margin-top:4px">' + esc(d.holderName || d.holder_name || '') + '</div></div>'
-        + '<button onclick="copyText(\'' + esc(d.mobileNo || d.mobile_no || '') + '\',\'Number\')" class="copy-btn" style="width:100%;padding:9px;border-radius:8px;font-size:13px;margin-bottom:10px">Copy Number</button>';
+        + '<div style="font-size:16px;font-weight:600;margin-top:4px">' + esc(d.holderName || d.holder_name || '') + '</div></div>'
+        + '<button onclick="copyText(\'' + esc(d.mobileNo || d.mobile_no || '') + '\',\'Number\')" class="copy-btn" style="width:100%;padding:9px;border-radius:8px;font-size:16px;margin-bottom:10px">Copy Number</button>';
     } else if (opt.method === 'qr') {
       const qrUrl = d.qr_url || d.qrUrl || '';
       body = (qrUrl ? '<div style="text-align:center;margin-bottom:14px"><img src="' + esc(qrUrl) + '" alt="QR" style="width:180px;height:180px;object-fit:contain;border:2px solid var(--border);border-radius:var(--radius);padding:10px;background:#fff"></div>' : '')
-        + '<div style="text-align:center;font-size:13px;color:var(--ink3)">Scan QR code and pay <strong>\u20B9' + amount + '</strong></div>';
+        + '<div style="text-align:center;font-size:16px;color:var(--ink3)">Scan QR code and pay <strong>\u20B9' + amount + '</strong></div>';
     }
     body += (opt.notes ? '<div class="pay-notes-banner">' + esc(opt.notes) + '</div>' : '');
     body += '<div style="margin-top:14px;padding-top:12px;border-top:1px dashed #e5e7eb">'
-      + '<div style="font-size:11px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">📤 Submit Payment Proof</div>'
-      + '<div style="margin-bottom:8px"><input type="file" id="payProofFile_' + i + '" accept="image/*,.pdf" class="finp" style="font-size:12px;padding:6px;border-color:#fde68a"></div>'
-      + '<div style="margin-bottom:8px"><input class="finp" id="payTxnRef_' + i + '" placeholder="Transaction Ref / UPI ID (optional)" style="font-size:12px;padding:8px;border-color:#fde68a"></div>'
+      + '<div style="font-size:17px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">📤 Submit Payment Proof</div>'
+      + '<div style="margin-bottom:8px"><input type="file" id="payProofFile_' + i + '" accept="image/*,.pdf" class="finp" style="font-size:15px;padding:6px;border-color:#fde68a"></div>'
+      + '<div style="margin-bottom:8px"><input class="finp" id="payTxnRef_' + i + '" placeholder="Transaction Ref / UPI ID (optional)" style="font-size:15px;padding:8px;border-color:#fde68a"></div>'
       + '<button class="pay-i-paid-btn" onclick="markPaidWithProof(\'' + esc(opt.opt_id) + '\',' + i + ')">📤 I\'ve Paid - Submit Proof & Notify Admin</button>'
       + '</div>';
     return '<div class="pay-opt-card" id="payOptCard_' + i + '"><div class="pay-opt-header" onclick="togglePayOpt(' + i + ')">'
       + '<div style="width:36px;height:36px;border-radius:9px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">' + (mIcon[opt.method] || '') + '</div>'
-      + '<div style="flex:1"><div style="font-weight:700;font-size:13.5px">' + esc(opt.label) + '</div><div style="font-size:12px;color:var(--ink3);margin-top:1px">' + esc(mLabel[opt.method] || opt.method) + '</div></div>'
+      + '<div style="flex:1"><div style="font-weight:700;font-size:13.5px">' + esc(opt.label) + '</div><div style="font-size:15px;color:var(--ink3);margin-top:1px">' + esc(mLabel[opt.method] || opt.method) + '</div></div>'
       + '<svg id="payOptChevron_' + i + '" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--ink4);transition:transform .2s"><polyline points="6 9 12 15 18 9"/></svg>'
       + '</div><div class="pay-opt-body" id="payOptBody_' + i + '">' + body + '</div></div>';
   }).join('');
@@ -3395,7 +3396,7 @@ function installImpersonationGuard() {
   bar.id = 'impersonationBar';
   bar.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99998;' +
     'background:linear-gradient(135deg,#b91c1c,#7f1d1d);color:#fff;' +
-    'padding:6px 12px;text-align:center;font-size:12px;font-weight:600;' +
+    'padding:6px 12px;text-align:center;font-size:15px;font-weight:600;' +
     'letter-spacing:0.3px;box-shadow:0 2px 6px rgba(0,0,0,0.2);' +
     'font-family:system-ui,sans-serif';
   bar.innerHTML = '&#128274; Admin session &middot; auto-logout in <span id="impCount">--:--</span>';
@@ -3587,7 +3588,7 @@ async function initPointsBuy(pkgId) {
       });
       document.body.appendChild(form); form.submit();
     } else {
-      if (msg) msg.innerHTML = `<strong>Manual Payment</strong><br>Pay ₹${d.amount} via UPI/bank transfer.<br>Reference ID: <strong>${d.txn_id}</strong><br>Share screenshot with admin — they will credit your points within a few hours.`;
+      if (msg) { msg.style.background='#fef2f2'; msg.style.borderColor='#fecaca'; msg.style.color='#991b1b'; msg.textContent = d.error || 'Payment gateway unavailable. Please contact admin.'; }
     }
   } catch(e) { if (msg) msg.textContent = 'Network error. Try again.'; }
 }
