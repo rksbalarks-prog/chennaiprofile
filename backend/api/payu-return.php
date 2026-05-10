@@ -4,10 +4,10 @@
 // Both surl and furl point to this file; we branch on the `status` field.
 
 require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../payu-config.php';
+@include_once __DIR__ . '/../payu-config.php';
 
 $r = $_POST ?: [];
-if (!$r) {
+if (!$r || !defined('PAYU_KEY')) {
     header('Location: ../user-panel.php?pay=failure&reason=empty');
     exit;
 }

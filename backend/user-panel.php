@@ -69,6 +69,28 @@ try {
     $_pkgRows = $_updb->query("SELECT pkg_id, points, price, label, badge FROM point_packages WHERE active=1 ORDER BY sort_order ASC, id ASC")->fetchAll();
     if ($_pkgRows) $_pointPackages = $_pkgRows;
 } catch (Exception $_e) {}
+
+// Pre-fetch receipt data when returning from PayU success redirect
+$_receiptData = null;
+if (!empty($_GET['pay']) && $_GET['pay'] === 'success' && !empty($_GET['order_id'])) {
+    try {
+        $_rdb  = getDB();
+        $_rStmt = $_rdb->prepare("
+            SELECT o.id AS order_id, o.mobile, o.plan, o.amount, o.txn_ref, o.processed_at,
+                   p.name, p.cp_id,
+                   b.id AS bill_id, b.billed_date, b.expiry, b.plan_name
+            FROM user_orders o
+            LEFT JOIN profiles p ON p.mobile = o.mobile
+            LEFT JOIN bills b ON b.mobile = o.mobile
+                               AND DATE(b.billed_date) = CURDATE()
+                               AND ROUND(b.amount,2) = ROUND(o.amount,2)
+            WHERE o.id = :id AND o.status = 'approved'
+            LIMIT 1
+        ");
+        $_rStmt->execute([':id' => (int)$_GET['order_id']]);
+        $_receiptData = $_rStmt->fetch() ?: null;
+    } catch (\Throwable $_re) {}
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -369,6 +391,33 @@ input,select,textarea{outline:none}
   .modal-body input,.modal-body select,.modal-body textarea{font-size:17px!important;padding:8px 10px!important}
   .modal-body .sec-title{font-size:15px!important;padding:5px 10px!important}
 }
+
+/* ── Payment Receipt ─────────────────────────────────────────────────── */
+.rcpt-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9500;display:flex;align-items:center;justify-content:center;padding:14px;animation:fadeIn .2s}
+.rcpt-box{background:#fff;border-radius:18px;max-width:460px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.32);display:flex;flex-direction:column}
+.rcpt-head{background:linear-gradient(135deg,#0D7B6A,#6B3FA0);padding:28px 24px 22px;border-radius:18px 18px 0 0;text-align:center;color:#fff}
+.rcpt-check{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.25);display:inline-flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:10px}
+.rcpt-title{font-size:20px;font-weight:800;margin-bottom:3px}
+.rcpt-sub{font-size:14px;opacity:.85}
+.rcpt-body{padding:20px 22px}
+.rcpt-row{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:1px solid #f0f0f0;gap:10px}
+.rcpt-row:last-child{border-bottom:none}
+.rcpt-label{font-size:13px;color:#6b7280;font-weight:500;flex-shrink:0}
+.rcpt-val{font-size:14px;color:#1A1A2E;font-weight:700;text-align:right;word-break:break-all}
+.rcpt-badge{display:inline-block;background:#E8F5F2;color:#0D7B6A;font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid #C8EDE6}
+.rcpt-actions{display:flex;gap:8px;padding:16px 22px 22px;flex-wrap:wrap}
+.rcpt-btn{flex:1;min-width:90px;padding:11px 10px;border-radius:10px;border:none;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity .15s}
+.rcpt-btn:hover{opacity:.88}
+.rcpt-btn-share{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff}
+.rcpt-btn-print{background:linear-gradient(135deg,#0D7B6A,#6B3FA0);color:#fff}
+.rcpt-btn-close{background:#f3f4f6;color:#374151}
+@media print{
+  body>*{display:none!important}
+  #rcptPrintArea{display:block!important;position:fixed;inset:0;background:#fff;z-index:99999;padding:30px;font-family:Arial,sans-serif}
+  #rcptPrintArea .rcpt-head{background:#0D7B6A!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #rcptPrintArea .rcpt-actions{display:none}
+}
+#rcptPrintArea{display:none}
 </style>
 </head>
 <body>
@@ -3454,7 +3503,7 @@ function installImpersonationGuard() {
       const params = new URLSearchParams(window.location.search);
       const payCpId = params.get('pay');
       if (payCpId === 'success') {
-        showPopup('ok', 'Payment Successful', 'Your plan has been activated. Welcome aboard!');
+        // Receipt modal is rendered server-side (window.__receipt) — no popup needed here.
         history.replaceState({}, '', location.pathname);
       } else if (payCpId === 'failure') {
         const reason = params.get('reason') || 'cancelled';
@@ -3918,6 +3967,101 @@ async function initPointsBuy(pkgId) {
   function init(){ MODALS.forEach(id => transformModal(id)); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
+})();
+</script>
+<!-- Payment Receipt Modal -->
+<div id="rcptPrintArea"></div>
+<script>window.__receipt = <?= json_encode($_receiptData) ?>;</script>
+<script>
+(function(){
+  const rcpt = window.__receipt;
+  if (!rcpt) return;
+
+  const fmt = (d) => {
+    if (!d) return '—';
+    const dt = new Date(d.replace(' ','T'));
+    return dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  };
+  const billDate   = fmt(rcpt.billed_date || rcpt.processed_at);
+  const expiry     = fmt(rcpt.expiry);
+  const planName   = rcpt.plan_name || rcpt.plan || '—';
+  const amount     = rcpt.amount ? '₹' + parseFloat(rcpt.amount).toLocaleString('en-IN',{minimumFractionDigits:0}) : '—';
+  const name       = rcpt.name || '—';
+  const cpId       = rcpt.cp_id || '—';
+  const txnRef     = rcpt.txn_ref || '—';
+  const billNo     = rcpt.bill_id ? 'BILL-' + String(rcpt.bill_id).padStart(5,'0') : 'ORD-' + rcpt.order_id;
+
+  const shareText = encodeURIComponent(
+    `✅ Payment Successful!\nChennai Profile Matrimony\n\nBill: ${billNo}\nPlan: ${planName}\nAmount: ${amount}\nDate: ${billDate}\nValid till: ${expiry}\n\nProfile: ${cpId}`
+  );
+
+  const html = `
+<div class="rcpt-overlay" id="rcptOverlay" onclick="if(event.target===this)rcptClose()">
+  <div class="rcpt-box" id="rcptBox">
+    <div class="rcpt-head">
+      <div class="rcpt-check">✅</div>
+      <div class="rcpt-title">Payment Successful!</div>
+      <div class="rcpt-sub">Your plan has been activated</div>
+    </div>
+    <div class="rcpt-body">
+      <div class="rcpt-row"><span class="rcpt-label">Bill No.</span><span class="rcpt-val"><span class="rcpt-badge">${billNo}</span></span></div>
+      <div class="rcpt-row"><span class="rcpt-label">Date</span><span class="rcpt-val">${billDate}</span></div>
+      <div class="rcpt-row"><span class="rcpt-label">Name</span><span class="rcpt-val">${name}</span></div>
+      <div class="rcpt-row"><span class="rcpt-label">Profile ID</span><span class="rcpt-val">${cpId}</span></div>
+      <div class="rcpt-row"><span class="rcpt-label">Plan</span><span class="rcpt-val">${planName}</span></div>
+      <div class="rcpt-row"><span class="rcpt-label">Amount Paid</span><span class="rcpt-val" style="color:#0D7B6A;font-size:17px">${amount}</span></div>
+      <div class="rcpt-row"><span class="rcpt-label">Valid Till</span><span class="rcpt-val">${expiry}</span></div>
+      <div class="rcpt-row"><span class="rcpt-label">Transaction ID</span><span class="rcpt-val" style="font-size:12px;color:#6b7280">${txnRef}</span></div>
+    </div>
+    <div class="rcpt-actions">
+      <button class="rcpt-btn rcpt-btn-share" onclick="rcptShare()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 0C5.373 0 0 5.373 0 12c0 2.117.553 4.104 1.518 5.83L0 24l6.335-1.652A11.956 11.956 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 11.999 0zM12 22c-1.846 0-3.575-.498-5.066-1.367l-.363-.215-3.762.981.999-3.661-.236-.375A9.944 9.944 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+        Share
+      </button>
+      <button class="rcpt-btn rcpt-btn-print" onclick="rcptPrint()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Print / Save PDF
+      </button>
+      <button class="rcpt-btn rcpt-btn-close" onclick="rcptClose()">✕ Close</button>
+    </div>
+  </div>
+</div>`;
+
+  document.body.insertAdjacentHTML('beforeend', html);
+  history.replaceState({}, '', location.pathname);
+
+  // Fill print area
+  document.getElementById('rcptPrintArea').innerHTML = `
+    <div class="rcpt-box" style="max-width:460px;margin:0 auto">
+      <div class="rcpt-head" style="padding:24px;text-align:center;color:#fff;background:#0D7B6A;border-radius:8px 8px 0 0">
+        <div style="font-size:28px;margin-bottom:6px">✅</div>
+        <div style="font-size:20px;font-weight:800">Payment Successful</div>
+        <div style="font-size:13px;opacity:.9">Chennai Profile Matrimony</div>
+      </div>
+      <div class="rcpt-body">
+        <div class="rcpt-row"><span class="rcpt-label">Bill No.</span><span class="rcpt-val">${billNo}</span></div>
+        <div class="rcpt-row"><span class="rcpt-label">Date</span><span class="rcpt-val">${billDate}</span></div>
+        <div class="rcpt-row"><span class="rcpt-label">Name</span><span class="rcpt-val">${name}</span></div>
+        <div class="rcpt-row"><span class="rcpt-label">Profile ID</span><span class="rcpt-val">${cpId}</span></div>
+        <div class="rcpt-row"><span class="rcpt-label">Plan</span><span class="rcpt-val">${planName}</span></div>
+        <div class="rcpt-row"><span class="rcpt-label">Amount Paid</span><span class="rcpt-val">${amount}</span></div>
+        <div class="rcpt-row"><span class="rcpt-label">Valid Till</span><span class="rcpt-val">${expiry}</span></div>
+        <div class="rcpt-row"><span class="rcpt-label">Transaction ID</span><span class="rcpt-val">${txnRef}</span></div>
+      </div>
+    </div>`;
+
+  window.rcptClose = function(){
+    const ov = document.getElementById('rcptOverlay');
+    if (ov) ov.remove();
+  };
+  window.rcptPrint = function(){
+    document.getElementById('rcptPrintArea').style.display = 'block';
+    window.print();
+    setTimeout(() => { document.getElementById('rcptPrintArea').style.display = 'none'; }, 500);
+  };
+  window.rcptShare = function(){
+    window.open('https://wa.me/?text=' + shareText, '_blank');
+  };
 })();
 </script>
 </body>
