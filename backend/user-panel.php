@@ -514,7 +514,7 @@ input,select,textarea{outline:none}
       <div class="sb-grp">Points</div>
       <button class="sb-btn" data-page="page_points" onclick="showSec('myPoints',this)">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-        My Points <span id="sbPointsBadge" style="margin-left:auto;background:#FFD700;color:#8B0000;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;display:none"></span>
+        My Points <span id="sbPointsBadge" style="margin-left:auto;background:#FFD700;color:#0D7B6A;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;display:none"></span>
       </button>
       <div class="sb-grp">Settings</div>
       <button class="sb-btn" data-page="page_settings" onclick="showSec('mySettings',this)">
@@ -680,11 +680,11 @@ input,select,textarea{outline:none}
       </div>
       <div class="u-section" id="myPointsSection">
         <div class="u-card" style="margin-bottom:16px">
-          <div class="u-card-head" style="background:linear-gradient(135deg,#8B0000,#C41E3A)">
+          <div class="u-card-head" style="background:linear-gradient(135deg,#0D7B6A,#6B3FA0)">
             <span class="u-card-title" style="color:#fff">🪙 My Points Balance</span>
           </div>
           <div class="u-card-body" style="padding:20px;text-align:center">
-            <div style="font-size:42px;font-weight:900;color:#8B0000" id="ptsBalance">—</div>
+            <div style="font-size:42px;font-weight:900;color:#0D7B6A" id="ptsBalance">—</div>
             <div style="font-size:16px;color:#888;margin-top:4px">Available Points</div>
             <div style="display:flex;justify-content:center;gap:24px;margin-top:16px;flex-wrap:wrap">
               <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#333" id="ptsBought">—</div><div style="font-size:17px;color:#aaa">Total Purchased</div></div>
@@ -698,12 +698,12 @@ input,select,textarea{outline:none}
           <div class="u-card-body" style="padding:16px">
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px">
               <?php $pkgIdx=0; foreach($_pointPackages as $pkg): $pkgId = htmlspecialchars($pkg['pkg_id']); $badge = htmlspecialchars($pkg['badge']); $isFirst = $pkgIdx===0; ?>
-              <div style="border:2px solid <?= $isFirst ? '#16a34a' : ($badge ? '#8B0000' : '#e5e7eb') ?>;border-radius:12px;padding:14px;text-align:center;cursor:pointer;position:relative;transition:all .2s;background:<?= $isFirst ? '#f0fdf4' : '#fff' ?>"
+              <div style="border:2px solid <?= $isFirst ? '#16a34a' : ($badge ? '#0D7B6A' : '#e5e7eb') ?>;border-radius:12px;padding:14px;text-align:center;cursor:pointer;position:relative;transition:all .2s;background:<?= $isFirst ? '#f0fdf4' : '#fff' ?>"
                 onclick="initPointsBuy('<?= $pkgId ?>')">
-                <?php if($isFirst): ?><div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#16a34a;color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap">✓ Recommended</div><?php elseif($badge): ?><div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#8B0000;color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap"><?= $badge ?></div><?php endif; ?>
-                <div style="font-size:22px;font-weight:900;color:<?= $isFirst ? '#15803d' : '#8B0000' ?>"><?= (int)$pkg['points'] ?></div>
+                <?php if($isFirst): ?><div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#16a34a;color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap">✓ Recommended</div><?php elseif($badge): ?><div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#0D7B6A;color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap"><?= $badge ?></div><?php endif; ?>
+                <div style="font-size:22px;font-weight:900;color:<?= $isFirst ? '#15803d' : '#0D7B6A' ?>"><?= (int)$pkg['points'] ?></div>
                 <div style="font-size:17px;color:#888;margin:2px 0">points</div>
-                <div style="background:<?= $isFirst ? '#16a34a' : '#8B0000' ?>;color:#fff;border-radius:8px;padding:5px 12px;font-size:16px;font-weight:700;margin-top:8px;display:inline-block">₹<?= number_format((float)$pkg['price'], 0) ?></div>
+                <div style="background:<?= $isFirst ? '#16a34a' : '#0D7B6A' ?>;color:#fff;border-radius:8px;padding:5px 12px;font-size:16px;font-weight:700;margin-top:8px;display:inline-block">₹<?= number_format((float)$pkg['price'], 0) ?></div>
               </div>
               <?php $pkgIdx++; endforeach; ?>
             </div>
@@ -733,7 +733,7 @@ input,select,textarea{outline:none}
     <div class="u-section" id="addProfileSection">
       <div id="upApResult" style="display:none;margin-bottom:16px"></div>
       <div class="profile-card" style="border:1px solid rgba(196,30,58,0.12)">
-        <div style="background:linear-gradient(135deg,#8B0000,#C41E3A);padding:18px 22px;display:flex;align-items:center;gap:12px">
+        <div style="background:linear-gradient(135deg,#0D7B6A,#6B3FA0);padding:18px 22px;display:flex;align-items:center;gap:12px">
           <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:16px">👤</div>
           <div>
             <div style="color:white;font-family:var(--serif);font-size:1.1rem">Create New Profile</div>
@@ -742,7 +742,7 @@ input,select,textarea{outline:none}
         </div>
         <div style="padding:20px 22px">
           <!-- Personal -->
-          <div class="msec" style="background:linear-gradient(90deg,#8B0000,#C41E3A 70%,transparent);border-radius:5px;color:white">👤 Personal Details</div>
+          <div class="msec" style="background:linear-gradient(90deg,#0D7B6A,#6B3FA0 70%,transparent);border-radius:5px;color:white">👤 Personal Details</div>
           <div class="fg" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 0.5fr;gap:0 10px">
             <div class="fg"><label class="flbl">Mobile <span class="req">*</span></label><input class="finp" id="up_ap_mobile" placeholder="10-digit mobile" type="tel" maxlength="10" style="border-color:#D4A0A8"></div>
             <div class="fg"><label class="flbl">Name <span class="req">*</span></label><input class="finp" id="up_ap_name" placeholder="Full name" style="border-color:#D4A0A8"></div>
@@ -769,21 +769,21 @@ input,select,textarea{outline:none}
             <div class="fg"><label class="flbl">Blood Group</label><select class="fsel" id="up_ap_blood" style="border-color:#D4A0A8"><option value="">— Select —</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>O+</option><option>O-</option><option>AB+</option><option>AB-</option></select></div>
           </div>
           <!-- Physical -->
-          <div class="msec" style="background:linear-gradient(90deg,#8B0000,#C41E3A 70%,transparent);border-radius:5px;color:white">⚖️ Physical Attributes</div>
+          <div class="msec" style="background:linear-gradient(90deg,#0D7B6A,#6B3FA0 70%,transparent);border-radius:5px;color:white">⚖️ Physical Attributes</div>
           <div class="fg3">
             <div class="fg"><label class="flbl">Height</label><select class="fsel" id="up_ap_height" style="border-color:#D4A0A8"><option value="">— Select —</option><option>4ft 5in</option><option>4ft 6in</option><option>4ft 7in</option><option>4ft 8in</option><option>4ft 9in</option><option>4ft 10in</option><option>4ft 11in</option><option>5ft 0in</option><option>5ft 1in</option><option>5ft 2in</option><option>5ft 3in</option><option>5ft 4in</option><option>5ft 5in</option><option>5ft 6in</option><option>5ft 7in</option><option>5ft 8in</option><option>5ft 9in</option><option>5ft 10in</option><option>5ft 11in</option><option>6ft 0in</option><option>6ft 1in</option><option>6ft 2in</option><option>6ft 3in</option><option>6ft 4in</option><option>6ft 5in</option></select></div>
             <div class="fg"><label class="flbl">Weight</label><select class="fsel" id="up_ap_weight" style="border-color:#D4A0A8"><option value="">— Select —</option><option>40 kg</option><option>42 kg</option><option>45 kg</option><option>48 kg</option><option>50 kg</option><option>52 kg</option><option>55 kg</option><option>56 kg</option><option>58 kg</option><option>60 kg</option><option>62 kg</option><option>63 kg</option><option>65 kg</option><option>67 kg</option><option>68 kg</option><option>69 kg</option><option>70 kg</option><option>71 kg</option><option>72 kg</option><option>73 kg</option><option>75 kg</option><option>78 kg</option><option>80 kg</option><option>82 kg</option><option>85 kg</option><option>88 kg</option><option>90 kg</option><option>95 kg</option><option>100 kg</option><option>105 kg</option><option>110 kg</option></select></div>
             <div class="fg"><label class="flbl">Diet</label><select class="fsel" id="up_ap_diet" style="border-color:#D4A0A8"><option>Vegetarian</option><option>Non-Vegetarian</option><option>Eggetarian</option></select></div>
           </div>
           <!-- Education -->
-          <div class="msec" style="background:linear-gradient(90deg,#8B0000,#C41E3A 70%,transparent);border-radius:5px;color:white">🎓 Education & Occupation</div>
+          <div class="msec" style="background:linear-gradient(90deg,#0D7B6A,#6B3FA0 70%,transparent);border-radius:5px;color:white">🎓 Education & Occupation</div>
           <div class="fg3">
             <div class="fg"><label class="flbl">Qualification</label><select class="fsel" id="up_ap_qual" style="border-color:#D4A0A8"><option value="">— Select —</option><optgroup label="Below 10th"><option>Below 10th</option><option>10th / SSLC</option></optgroup><optgroup label="Higher Secondary"><option>12th / HSC</option><option>ITI</option><option>Diploma</option></optgroup><optgroup label="Undergraduate"><option>B.A</option><option>B.Sc</option><option>B.Com</option><option>B.E / B.Tech</option><option>B.B.A</option><option>B.C.A</option><option>B.Ed</option><option>B.L / L.L.B</option><option>B.Arch</option><option>B.Pharm</option><option>B.D.S</option><option>M.B.B.S</option><option>B.V.Sc</option><option>B.P.T</option><option>B.Sc (Nursing)</option><option>B.S.W</option><option>B.F.A</option><option>B.Des</option></optgroup><optgroup label="Postgraduate"><option>M.A</option><option>M.Sc</option><option>M.Com</option><option>M.E / M.Tech</option><option>M.B.A</option><option>M.C.A</option><option>M.Ed</option><option>M.L / L.L.M</option><option>M.Pharm</option><option>M.D</option><option>M.S (Medical)</option><option>M.D.S</option><option>M.P.T</option><option>M.S.W</option><option>M.Des</option></optgroup><optgroup label="Doctorate / Research"><option>M.Phil</option><option>Ph.D</option><option>D.M</option><option>D.Litt</option></optgroup><optgroup label="Professional / Other"><option>C.A</option><option>C.S</option><option>I.C.W.A / C.M.A</option><option>C.F.A</option><option>I.A.S / I.P.S / I.F.S</option><option>Others</option></optgroup></select></div>
             <div class="fg"><label class="flbl">Occupation</label><select class="fsel" id="up_ap_job" style="border-color:#D4A0A8"><option value="">— Select —</option><optgroup label="Government / Public Sector"><option>Central Govt Employee</option><option>State Govt Employee</option><option>PSU Employee</option><option>Defense - Army</option><option>Defense - Navy</option><option>Defense - Air Force</option><option>Police / CRPF / BSF</option><option>IAS / IPS / IFS Officer</option><option>Railway Employee</option><option>Postal Employee</option><option>TNPSC Group Service</option></optgroup><optgroup label="IT / Software"><option>Software Engineer</option><option>Software Developer</option><option>Data Analyst</option><option>Data Scientist</option><option>System Administrator</option><option>Network Engineer</option><option>Web Developer</option><option>UI/UX Designer</option><option>IT Manager</option><option>Cyber Security Analyst</option></optgroup><optgroup label="Engineering / Manufacturing"><option>Mechanical Engineer</option><option>Civil Engineer</option><option>Electrical Engineer</option><option>Electronics Engineer</option><option>Chemical Engineer</option><option>Production Engineer</option><option>Site Engineer</option><option>Quality Engineer</option><option>Project Manager</option></optgroup><optgroup label="Medical / Healthcare"><option>Doctor</option><option>Surgeon</option><option>Dentist</option><option>Pharmacist</option><option>Nurse</option><option>Physiotherapist</option><option>Lab Technician</option><option>Ayurveda / Siddha / Homeopathy</option></optgroup><optgroup label="Education / Teaching"><option>Professor</option><option>Lecturer</option><option>School Teacher</option><option>Private Tutor</option><option>Research Scholar</option></optgroup><optgroup label="Banking / Finance"><option>Bank Manager</option><option>Bank Employee</option><option>Chartered Accountant</option><option>Financial Analyst</option><option>Insurance Agent</option><option>Auditor</option><option>Tax Consultant</option></optgroup><optgroup label="Legal"><option>Advocate / Lawyer</option><option>Judge</option><option>Legal Advisor</option><option>Notary</option></optgroup><optgroup label="Business / Entrepreneurship"><option>Business Owner</option><option>Shopkeeper</option><option>Trader / Merchant</option><option>Real Estate Business</option><option>Exporter / Importer</option><option>Contractor</option><option>Freelancer</option><option>Startup Founder</option></optgroup><optgroup label="Agriculture / Farming"><option>Farmer / Agriculturist</option><option>Dairy Farmer</option><option>Plantation Owner</option><option>Agricultural Officer</option></optgroup><optgroup label="Skilled Trades"><option>Electrician</option><option>Plumber</option><option>Carpenter</option><option>Welder</option><option>Mechanic</option><option>Tailor</option><option>Goldsmith</option><option>Mason</option></optgroup><optgroup label="Media / Creative"><option>Journalist</option><option>Content Writer</option><option>Photographer</option><option>Graphic Designer</option><option>Film / TV Professional</option></optgroup><optgroup label="Abroad / NRI"><option>Working in Gulf</option><option>Working in USA</option><option>Working in UK</option><option>Working in Canada</option><option>Working in Australia</option><option>Working in Singapore</option><option>Working in Malaysia</option><option>Merchant Navy</option></optgroup><optgroup label="Other"><option>Private Company Employee</option><option>Supervisor / Foreman</option><option>Driver</option><option>Chef / Cook</option><option>Security Guard</option><option>Home Maker</option><option>Retired</option><option>Student</option><option>Not Employed</option><option>Others</option></optgroup></select></div>
             <div class="fg"><label class="flbl">Monthly Income (₹)</label><input class="finp" id="up_ap_income" placeholder="e.g. 35000" style="border-color:#D4A0A8"></div>
           </div>
           <!-- Astrology -->
-          <div class="msec" style="background:linear-gradient(90deg,#8B0000,#C41E3A 70%,transparent);border-radius:5px;color:white">🪐 Astrology</div>
+          <div class="msec" style="background:linear-gradient(90deg,#0D7B6A,#6B3FA0 70%,transparent);border-radius:5px;color:white">🪐 Astrology</div>
           <div class="fg3">
             <div class="fg"><label class="flbl">Star</label><select class="fsel" id="up_ap_star" style="border-color:#D4A0A8"><option value="">— Select —</option><option>Ashwini</option><option>Bharani</option><option>Karthigai</option><option>Rohini</option><option>Mirigasirisham</option><option>Thiruvathirai</option><option>Punarpoosam</option><option>Poosam</option><option>Ayilyam</option><option>Makam</option><option>Pooram</option><option>Uthiram</option><option>Hastham</option><option>Chithirai</option><option>Swathi</option><option>Visakam</option><option>Anusham</option><option>Kettai</option><option>Moolam</option><option>Pooradam</option><option>Uthradam</option><option>Thiruvonam</option><option>Avittam</option><option>Sadhayam</option><option>Puratathi</option><option>Uthirattathi</option><option>Revathi</option></select></div>
             <div class="fg"></div>
@@ -795,17 +795,17 @@ input,select,textarea{outline:none}
           </div>
           <div class="fg3"><div class="fg" id="up_ap_dosham_type_wrap" style="display:none"><label class="flbl">Dosham Type</label><select class="fsel" id="up_ap_dosham_type" style="border-color:#D4A0A8"><option value="">— Select Dosham Type —</option></select></div><div class="fg"></div><div class="fg"></div></div>
           <!-- Plan -->
-          <div class="msec" style="background:linear-gradient(90deg,#8B0000,#C41E3A 70%,transparent);border-radius:5px;color:white">🛒 Select Plan</div>
+          <div class="msec" style="background:linear-gradient(90deg,#0D7B6A,#6B3FA0 70%,transparent);border-radius:5px;color:white">🛒 Select Plan</div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px">
-            <div class="up-ap-plan" data-plan="free" onclick="upApSelectPlan('free')" style="border:2px solid #E0C0C8;border-radius:10px;padding:13px 12px;cursor:pointer;background:#FFFAF9;transition:all .2s;text-align:center;position:relative"><div style="font-size:20px;margin-bottom:6px">🆓</div><div style="font-weight:700;color:#5A0010;font-size:0.85rem">Free</div><div style="font-weight:800;color:#78716c;font-size:1rem">₹0</div><div style="font-size:0.65rem;color:#9A7080">3 months</div></div>
-            <div class="up-ap-plan" data-plan="silver" onclick="upApSelectPlan('silver')" style="border:2px solid #E0C0C8;border-radius:10px;padding:13px 12px;cursor:pointer;background:#FFFAF9;transition:all .2s;text-align:center;position:relative"><div style="font-size:20px;margin-bottom:6px">🥈</div><div style="font-weight:700;color:#5A0010;font-size:0.85rem">Silver</div><div style="font-weight:800;color:#64748b;font-size:1rem">₹999</div><div style="font-size:0.65rem;color:#9A7080">6 months</div></div>
-            <div class="up-ap-plan" data-plan="gold" onclick="upApSelectPlan('gold')" style="border:2px solid #E0C0C8;border-radius:10px;padding:13px 12px;cursor:pointer;background:#FFFAF9;transition:all .2s;text-align:center;position:relative"><div style="font-size:20px;margin-bottom:6px">🥇</div><div style="font-weight:700;color:#5A0010;font-size:0.85rem">Gold</div><div style="font-weight:800;color:#C9913A;font-size:1rem">₹1,999</div><div style="font-size:0.65rem;color:#9A7080">1 year</div></div>
-            <div class="up-ap-plan" data-plan="premium" onclick="upApSelectPlan('premium')" style="border:2px solid #E0C0C8;border-radius:10px;padding:13px 12px;cursor:pointer;background:#FFFAF9;transition:all .2s;text-align:center;position:relative"><div style="font-size:20px;margin-bottom:6px">💎</div><div style="font-weight:700;color:#5A0010;font-size:0.85rem">Premium</div><div style="font-weight:800;color:#8B0000;font-size:1rem">₹2,999</div><div style="font-size:0.65rem;color:#9A7080">2 years</div></div>
+            <div class="up-ap-plan" data-plan="free" onclick="upApSelectPlan('free')" style="border:2px solid #C8EDE6;border-radius:10px;padding:13px 12px;cursor:pointer;background:#FFFAF9;transition:all .2s;text-align:center;position:relative"><div style="font-size:20px;margin-bottom:6px">🆓</div><div style="font-weight:700;color:#5A0010;font-size:0.85rem">Free</div><div style="font-weight:800;color:#78716c;font-size:1rem">₹0</div><div style="font-size:0.65rem;color:#9A7080">3 months</div></div>
+            <div class="up-ap-plan" data-plan="silver" onclick="upApSelectPlan('silver')" style="border:2px solid #C8EDE6;border-radius:10px;padding:13px 12px;cursor:pointer;background:#FFFAF9;transition:all .2s;text-align:center;position:relative"><div style="font-size:20px;margin-bottom:6px">🥈</div><div style="font-weight:700;color:#5A0010;font-size:0.85rem">Silver</div><div style="font-weight:800;color:#64748b;font-size:1rem">₹999</div><div style="font-size:0.65rem;color:#9A7080">6 months</div></div>
+            <div class="up-ap-plan" data-plan="gold" onclick="upApSelectPlan('gold')" style="border:2px solid #C8EDE6;border-radius:10px;padding:13px 12px;cursor:pointer;background:#FFFAF9;transition:all .2s;text-align:center;position:relative"><div style="font-size:20px;margin-bottom:6px">🥇</div><div style="font-weight:700;color:#5A0010;font-size:0.85rem">Gold</div><div style="font-weight:800;color:#C9913A;font-size:1rem">₹1,999</div><div style="font-size:0.65rem;color:#9A7080">1 year</div></div>
+            <div class="up-ap-plan" data-plan="premium" onclick="upApSelectPlan('premium')" style="border:2px solid #C8EDE6;border-radius:10px;padding:13px 12px;cursor:pointer;background:#FFFAF9;transition:all .2s;text-align:center;position:relative"><div style="font-size:20px;margin-bottom:6px">💎</div><div style="font-weight:700;color:#5A0010;font-size:0.85rem">Premium</div><div style="font-weight:800;color:#0D7B6A;font-size:1rem">₹2,999</div><div style="font-size:0.65rem;color:#9A7080">2 years</div></div>
           </div>
           <input type="hidden" id="up_ap_plan" value="free">
           <div class="action-row" style="justify-content:flex-end;border-top:1px solid rgba(196,30,58,0.12);padding-top:14px">
             <button class="btn btn-outline" onclick="upApReset()">↺ Reset</button>
-            <button class="btn btn-primary" style="background:linear-gradient(135deg,#8B0000,#C41E3A);border-color:#8B0000" onclick="upApSubmit()">✦ Create Profile</button>
+            <button class="btn btn-primary" style="background:linear-gradient(135deg,#0D7B6A,#6B3FA0);border-color:#0D7B6A" onclick="upApSubmit()">✦ Create Profile</button>
           </div>
         </div>
       </div>
@@ -1606,11 +1606,11 @@ function upApSelectPlan(plan) {
   document.getElementById('up_ap_plan').value = plan;
   document.querySelectorAll('.up-ap-plan').forEach(c => {
     const sel = c.dataset.plan === plan;
-    c.style.border = sel ? '2px solid #8B0000' : '2px solid #E0C0C8';
-    c.style.background = sel ? 'linear-gradient(135deg,#FFF0F2,#FFF8F5)' : '#FFFAF9';
+    c.style.border = sel ? '2px solid #0D7B6A' : '2px solid #C8EDE6';
+    c.style.background = sel ? 'linear-gradient(135deg,#E8F5F2,#F4FAF8)' : '#FFFAF9';
     c.style.boxShadow = sel ? '0 4px 14px rgba(139,0,0,0.16)' : 'none';
     const ex = c.querySelector('.up-ap-badge'); if (ex) ex.remove();
-    if (sel) { const b = document.createElement('div'); b.className='up-ap-badge'; b.style.cssText='position:absolute;top:-9px;right:10px;background:linear-gradient(135deg,#8B0000,#C41E3A);color:white;font-size:0.62rem;font-weight:700;padding:2px 8px;border-radius:20px'; b.textContent='✦ SELECTED'; c.appendChild(b); }
+    if (sel) { const b = document.createElement('div'); b.className='up-ap-badge'; b.style.cssText='position:absolute;top:-9px;right:10px;background:linear-gradient(135deg,#0D7B6A,#6B3FA0);color:white;font-size:0.62rem;font-weight:700;padding:2px 8px;border-radius:20px'; b.textContent='✦ SELECTED'; c.appendChild(b); }
   });
 }
 function upApReset() {
@@ -1698,7 +1698,7 @@ async function upApSubmit() {
     ].filter(([,v]) => v);
     const rows = fields.map(([k,v],i) => `<tr><td style="padding:9px 16px;font-size:0.78rem;font-weight:700;color:#7A1020;text-transform:uppercase;border-bottom:1px solid #F0E0E4;background:${i%2===0?'white':'#FFFAF9'}">${k}</td><td style="padding:9px 16px;font-size:0.88rem;color:#2A0A0E;border-bottom:1px solid #F0E0E4;background:${i%2===0?'white':'#FFFAF9'}">${v}</td></tr>`).join('');
     const el = document.getElementById('upApResult');
-    el.innerHTML = `<div style="background:white;border-radius:14px;box-shadow:var(--shadow);border:1px solid rgba(196,30,58,0.12);overflow:hidden"><div style="background:linear-gradient(135deg,#8B0000,#C41E3A);padding:13px 20px;display:flex;align-items:center;gap:9px"><span style="font-size:16px">✅</span><span style="color:white;font-family:var(--serif);font-size:1rem">Profile Submitted — Registration Summary</span></div><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr style="background:#FFF0F2"><th style="padding:9px 16px;text-align:left;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#8B0000;border-bottom:1px solid #E0C0C8;width:38%">Field</th><th style="padding:9px 16px;text-align:left;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#8B0000;border-bottom:1px solid #E0C0C8">Value</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+    el.innerHTML = `<div style="background:white;border-radius:14px;box-shadow:var(--shadow);border:1px solid rgba(196,30,58,0.12);overflow:hidden"><div style="background:linear-gradient(135deg,#0D7B6A,#6B3FA0);padding:13px 20px;display:flex;align-items:center;gap:9px"><span style="font-size:16px">✅</span><span style="color:white;font-family:var(--serif);font-size:1rem">Profile Submitted — Registration Summary</span></div><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr style="background:#FFF0F2"><th style="padding:9px 16px;text-align:left;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#0D7B6A;border-bottom:1px solid #C8EDE6;width:38%">Field</th><th style="padding:9px 16px;text-align:left;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#0D7B6A;border-bottom:1px solid #C8EDE6">Value</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
     el.style.display='block';
     el.scrollIntoView({behavior:'smooth',block:'start'});
     FormAutoSave.clear('up_quick_create');
@@ -1898,8 +1898,8 @@ function upAoSelectPlan(el, plan, price, period) {
   document.getElementById('up_ao_amt').value = price + ' / ' + period;
   document.querySelectorAll('.up-ao-plan').forEach(c => {
     const sel = c.dataset.plan === plan;
-    c.style.border = sel ? '2px solid #8B0000' : '2px solid #E0C0C8';
-    c.style.background = sel ? 'linear-gradient(135deg,#FFF0F2,#FFF8F5)' : '#FFFAF9';
+    c.style.border = sel ? '2px solid #0D7B6A' : '2px solid #C8EDE6';
+    c.style.background = sel ? 'linear-gradient(135deg,#E8F5F2,#F4FAF8)' : '#FFFAF9';
     c.style.boxShadow = sel ? '0 4px 14px rgba(139,0,0,0.16)' : 'none';
   });
 }
@@ -1909,7 +1909,7 @@ function upAoReset() {
   document.getElementById('up_ao_method').selectedIndex=0;
   document.getElementById('up_ao_plan').value='';
   upAoSelectedPlan='';
-  document.querySelectorAll('.up-ao-plan').forEach(c => { c.style.border='2px solid #E0C0C8'; c.style.background='#FFFAF9'; c.style.boxShadow='none'; });
+  document.querySelectorAll('.up-ao-plan').forEach(c => { c.style.border='2px solid #C8EDE6'; c.style.background='#FFFAF9'; c.style.boxShadow='none'; });
   document.getElementById('upAoResult').style.display='none';
 }
 async function upAoSubmit() {
@@ -1940,7 +1940,7 @@ async function upAoSubmit() {
   ];
   const rows = orderData.map(([k,v],i) => `<tr><td style="padding:9px 16px;font-size:0.78rem;font-weight:700;color:#7A1020;text-transform:uppercase;border-bottom:1px solid #F0E0E4;background:${i%2===0?'white':'#FFFAF9'}">${k}</td><td style="padding:9px 16px;font-size:0.88rem;color:#2A0A0E;border-bottom:1px solid #F0E0E4;background:${i%2===0?'white':'#FFFAF9'}">${v}</td></tr>`).join('');
   const el = document.getElementById('upAoResult');
-  el.innerHTML = `<div style="background:white;border-radius:14px;box-shadow:var(--shadow);border:1px solid rgba(196,30,58,0.12);overflow:hidden"><div style="background:linear-gradient(135deg,#8B0000,#C41E3A);padding:13px 20px;display:flex;align-items:center;gap:9px"><span style="font-size:16px">✅</span><span style="color:white;font-family:var(--serif);font-size:1rem">Order Placed — Order Summary</span></div><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr style="background:#FFF0F2"><th style="padding:9px 16px;text-align:left;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#8B0000;border-bottom:1px solid #E0C0C8;width:38%">Field</th><th style="padding:9px 16px;text-align:left;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#8B0000;border-bottom:1px solid #E0C0C8">Value</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+  el.innerHTML = `<div style="background:white;border-radius:14px;box-shadow:var(--shadow);border:1px solid rgba(196,30,58,0.12);overflow:hidden"><div style="background:linear-gradient(135deg,#0D7B6A,#6B3FA0);padding:13px 20px;display:flex;align-items:center;gap:9px"><span style="font-size:16px">✅</span><span style="color:white;font-family:var(--serif);font-size:1rem">Order Placed — Order Summary</span></div><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr style="background:#FFF0F2"><th style="padding:9px 16px;text-align:left;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#0D7B6A;border-bottom:1px solid #C8EDE6;width:38%">Field</th><th style="padding:9px 16px;text-align:left;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#0D7B6A;border-bottom:1px solid #C8EDE6">Value</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
   el.style.display='block';
   el.scrollIntoView({behavior:'smooth',block:'start'});
   popup('ok','Success','Order placed successfully! Admin will verify your payment.');
@@ -2802,7 +2802,7 @@ function renderSuggestionsUI() {
 
   // Fallback: if none of the primary sections produced cards, show all profiles
   if (!html && sgData.allProfiles && sgData.allProfiles.length > 0) {
-    html = section('🌟', 'All Profiles', 'Browse all available profiles', sgData.allProfiles, '#8B0000');
+    html = section('🌟', 'All Profiles', 'Browse all available profiles', sgData.allProfiles, '#0D7B6A');
   }
 
   container.innerHTML = html || '<div style="text-align:center;padding:30px;color:var(--ink3)">No profiles match this filter</div>';
@@ -2827,9 +2827,9 @@ function _viewToggleHtml(countLabel, onToggle) {
   return `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px">
     <span style="font-size:15px;color:var(--ink3);font-weight:600">${countLabel}</span>
     <div style="display:flex;gap:0;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden">
-      <button onclick="${onToggle}('table')" style="padding:5px 12px;font-size:15px;font-weight:600;border:none;cursor:pointer;background:${isTable?'#8B0000':'#fff'};color:${isTable?'#fff':'#374151'}">
+      <button onclick="${onToggle}('table')" style="padding:5px 12px;font-size:15px;font-weight:600;border:none;cursor:pointer;background:${isTable?'#0D7B6A':'#fff'};color:${isTable?'#fff':'#374151'}">
         ☰ Table</button>
-      <button onclick="${onToggle}('cards')" style="padding:5px 12px;font-size:15px;font-weight:600;border:none;border-left:1px solid #e5e7eb;cursor:pointer;background:${!isTable?'#8B0000':'#fff'};color:${!isTable?'#fff':'#374151'}">
+      <button onclick="${onToggle}('cards')" style="padding:5px 12px;font-size:15px;font-weight:600;border:none;border-left:1px solid #e5e7eb;cursor:pointer;background:${!isTable?'#0D7B6A':'#fff'};color:${!isTable?'#fff':'#374151'}">
         ⊞ Cards</button>
     </div>
   </div>`;
@@ -2849,13 +2849,13 @@ function _profileTableRow(p, i) {
     <td style="padding:7px 8px">${thumb}</td>
     <td style="padding:7px 8px">
       <div style="font-weight:700;font-size:12.5px;color:#1a1a2e">${esc(p.name)}</div>
-      <div style="font-size:10.5px;color:#8B0000;font-weight:600">${esc(p.cp_id)}</div>
+      <div style="font-size:10.5px;color:#0D7B6A;font-weight:600">${esc(p.cp_id)}</div>
     </td>
     <td style="padding:7px 8px;font-size:11.5px;color:var(--ink2)">${p.age||'-'} yrs<br><span style="color:var(--ink4)">${esc(p.height||'-')}</span></td>
     <td style="padding:7px 8px;font-size:11.5px;color:var(--ink2)">${esc(p.caste||'-')}<br><span style="color:var(--ink4)">${esc(p.religion||'')}</span></td>
     <td style="padding:7px 8px;font-size:17px;color:var(--ink3);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc([p.qualification,p.job].filter(Boolean).join(' · ')||'-')}</td>
     <td style="padding:7px 8px;font-size:17px;color:var(--ink3)">${esc(loc||'-')}</td>
-    <td style="padding:7px 8px"><a href="/detail/${esc(p.cp_id)}" target="_blank" style="font-size:17px;font-weight:600;color:#8B0000;text-decoration:none;white-space:nowrap">View →</a></td>
+    <td style="padding:7px 8px"><a href="/detail/${esc(p.cp_id)}" target="_blank" style="font-size:17px;font-weight:600;color:#0D7B6A;text-decoration:none;white-space:nowrap">View →</a></td>
   </tr>`;
 }
 
@@ -2964,14 +2964,14 @@ async function renderAllProfiles() {
         ${imgHtml}${fallback}
         <div style="flex:1;min-width:0">
           <div style="font-weight:700;font-size:16px;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.name)}</div>
-          <div style="font-size:17px;color:#8B0000;font-weight:600;margin:1px 0">${esc(p.cp_id)}</div>
+          <div style="font-size:17px;color:#0D7B6A;font-weight:600;margin:1px 0">${esc(p.cp_id)}</div>
           <div style="font-size:17px;color:var(--ink3)">${[p.age?p.age+' yrs':'',p.caste,p.marital].filter(Boolean).join(' · ')}</div>
           <div style="font-size:10.5px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc([p.qualification,p.job].filter(Boolean).join(' · '))}</div>
         </div>
       </div>`;
     };
     grid.innerHTML = profiles.map(card).join('');
-    if (more) more.innerHTML = `<a href="/" target="_blank" style="font-size:16px;color:#8B0000;font-weight:600;text-decoration:none">View all profiles on home page →</a>`;
+    if (more) more.innerHTML = `<a href="/" target="_blank" style="font-size:16px;color:#0D7B6A;font-weight:600;text-decoration:none">View all profiles on home page →</a>`;
   } catch(e) {
     grid.innerHTML = '<div style="padding:24px;text-align:center;color:var(--ink3);grid-column:1/-1">Could not load profiles.</div>';
   }
@@ -3178,7 +3178,7 @@ function renderPayPlans() {
     paid:    { grad: 'linear-gradient(135deg,#3b82f6,#1d4ed8)', icon: '💳', tag: '' },
     silver:  { grad: 'linear-gradient(135deg,#94a3b8,#64748b)', icon: '🥈', tag: '' },
     gold:    { grad: 'linear-gradient(135deg,#f59e0b,#d97706)', icon: '🥇', tag: 'Best value' },
-    premium: { grad: 'linear-gradient(135deg,#8B0000,#C41E3A)', icon: '👑', tag: 'Most popular' },
+    premium: { grad: 'linear-gradient(135deg,#0D7B6A,#6B3FA0)', icon: '👑', tag: 'Most popular' },
     vip:     { grad: 'linear-gradient(135deg,#7c3aed,#5b21b6)', icon: '💎', tag: 'VIP' },
     custom:  { grad: 'linear-gradient(135deg,#0f766e,#134e4a)', icon: '🎁', tag: '' },
   };
@@ -3541,7 +3541,7 @@ FormAutoSave.track('up_quick_create', { container: '#addProfileSection', fieldPr
 // ===== POINTS SYSTEM =====
 async function renderMyPoints() {
   try {
-    const r = await fetch('/backend/api/points.php?action=balance', { credentials:'include' });
+    const r = await fetch('api/points.php?action=balance', { credentials:'include' });
     const d = await r.json();
     if (d.ok) {
       document.getElementById('ptsBalance').textContent = d.balance;
@@ -3552,7 +3552,7 @@ async function renderMyPoints() {
     }
   } catch(e) {}
   try {
-    const r = await fetch('/backend/api/points.php?action=history', { credentials:'include' });
+    const r = await fetch('api/points.php?action=history', { credentials:'include' });
     const d = await r.json();
     const tb = document.getElementById('ptsTxnTbody');
     if (!tb) return;
@@ -3572,7 +3572,7 @@ async function initPointsBuy(pkgId) {
   const msg = document.getElementById('ptsPayMsg');
   if (msg) { msg.style.display=''; msg.textContent = 'Initiating payment…'; }
   try {
-    const r = await fetch('/backend/api/points.php?action=buy_init', {
+    const r = await fetch('api/points.php?action=buy_init', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ pkg_id: pkg }), credentials:'include'
     });
@@ -3596,7 +3596,7 @@ async function initPointsBuy(pkgId) {
 // Auto-load points balance on page load
 (async () => {
   try {
-    const r = await fetch('/backend/api/points.php?action=balance', { credentials:'include' });
+    const r = await fetch('api/points.php?action=balance', { credentials:'include' });
     const d = await r.json();
     if (d.ok && d.balance > 0) {
       const badge = document.getElementById('sbPointsBadge');
