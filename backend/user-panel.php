@@ -828,6 +828,31 @@ input,select,textarea{outline:none}
           </div>
         </div>
         <div style="padding:20px 22px">
+          <!-- Photos -->
+          <div class="msec" style="background:linear-gradient(90deg,#0D7B6A,#6B3FA0 70%,transparent);border-radius:5px;color:white">📸 Profile Photographs</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+            <div style="flex:1;min-width:120px">
+              <label class="flbl">Photo 1</label>
+              <div style="height:110px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--bg);overflow:hidden" onclick="this.querySelector('input').click()">
+                <img id="up_ap_photo1_prev" style="display:none;width:100%;height:100%;object-fit:cover"><span id="up_ap_photo1_ph" style="color:var(--ink4);font-size:17px;text-align:center">📷 Upload Photo</span>
+                <input type="file" id="up_ap_photo1_file" accept="image/*" style="display:none" onchange="upPhotoPreview(this,'up_ap_photo1')">
+              </div>
+            </div>
+            <div style="flex:1;min-width:120px">
+              <label class="flbl">Photo 2</label>
+              <div style="height:110px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--bg);overflow:hidden" onclick="this.querySelector('input').click()">
+                <img id="up_ap_photo2_prev" style="display:none;width:100%;height:100%;object-fit:cover"><span id="up_ap_photo2_ph" style="color:var(--ink4);font-size:17px;text-align:center">📷 Upload Photo</span>
+                <input type="file" id="up_ap_photo2_file" accept="image/*" style="display:none" onchange="upPhotoPreview(this,'up_ap_photo2')">
+              </div>
+            </div>
+            <div style="flex:1;min-width:120px">
+              <label class="flbl">Photo 3</label>
+              <div style="height:110px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--bg);overflow:hidden" onclick="this.querySelector('input').click()">
+                <img id="up_ap_photo3_prev" style="display:none;width:100%;height:100%;object-fit:cover"><span id="up_ap_photo3_ph" style="color:var(--ink4);font-size:17px;text-align:center">📷 Upload Photo</span>
+                <input type="file" id="up_ap_photo3_file" accept="image/*" style="display:none" onchange="upPhotoPreview(this,'up_ap_photo3')">
+              </div>
+            </div>
+          </div>
           <!-- Personal -->
           <div class="msec" style="background:linear-gradient(90deg,#0D7B6A,#6B3FA0 70%,transparent);border-radius:5px;color:white">👤 Personal Details</div>
           <div class="fg" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 0.5fr;gap:0 10px">
@@ -881,6 +906,14 @@ input,select,textarea{outline:none}
             <div class="fg"><label class="flbl">Dosham</label><select class="fsel" id="up_ap_dosham" style="border-color:#D4A0A8"><option>No</option><option>Yes</option><option>Partial</option></select></div>
           </div>
           <div class="fg3"><div class="fg" id="up_ap_dosham_type_wrap" style="display:none"><label class="flbl">Dosham Type</label><select class="fsel" id="up_ap_dosham_type" style="border-color:#D4A0A8"><option value="">— Select Dosham Type —</option></select></div><div class="fg"></div><div class="fg"></div></div>
+          <!-- Partner Preferences -->
+          <div class="msec" style="background:linear-gradient(90deg,#0D7B6A,#6B3FA0 70%,transparent);border-radius:5px;color:white">💑 Partner Preferences</div>
+          <div class="fg" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0 10px">
+            <div class="fg"><label class="flbl">Partner Age From</label><input class="finp" id="up_ap_p_age_from" type="number" min="18" max="80" placeholder="e.g. 22" style="border-color:#D4A0A8"></div>
+            <div class="fg"><label class="flbl">Partner Age To</label><input class="finp" id="up_ap_p_age_to" type="number" min="18" max="80" placeholder="e.g. 30" style="border-color:#D4A0A8"></div>
+            <div class="fg"><label class="flbl">Partner Caste</label><select class="fsel" id="up_ap_p_caste" style="border-color:#D4A0A8" onchange="populateSubcaste('up_ap_p_caste','up_ap_p_subcaste','')"><option value="">— Any Caste —</option></select></div>
+            <div class="fg"><label class="flbl">Partner Sub Caste</label><select class="fsel" id="up_ap_p_subcaste" style="border-color:#D4A0A8"><option value="">— Select —</option></select></div>
+          </div>
           <!-- Plan -->
           <div class="msec" style="background:linear-gradient(90deg,#0D7B6A,#6B3FA0 70%,transparent);border-radius:5px;color:white">🛒 Select Plan</div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px">
@@ -1701,9 +1734,10 @@ function upApSelectPlan(plan) {
   });
 }
 function upApReset() {
-  ['up_ap_name','up_ap_place_birth','up_ap_nativity','up_ap_qual','up_ap_job','up_ap_income','up_ap_subcaste'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
-  ['up_ap_gender','up_ap_tongue','up_ap_marital','up_ap_blood','up_ap_height','up_ap_weight','up_ap_diet','up_ap_caste','up_ap_star','up_ap_raasi','up_ap_lagnam','up_ap_dosham'].forEach(id => { const el=document.getElementById(id); if(el) el.selectedIndex=0; });
+  ['up_ap_name','up_ap_place_birth','up_ap_nativity','up_ap_qual','up_ap_job','up_ap_income','up_ap_subcaste','up_ap_p_age_from','up_ap_p_age_to'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  ['up_ap_gender','up_ap_tongue','up_ap_marital','up_ap_blood','up_ap_height','up_ap_weight','up_ap_diet','up_ap_caste','up_ap_star','up_ap_raasi','up_ap_lagnam','up_ap_dosham','up_ap_p_caste','up_ap_p_subcaste'].forEach(id => { const el=document.getElementById(id); if(el) el.selectedIndex=0; });
   document.getElementById('up_ap_dob').value='';
+  ['up_ap_photo1','up_ap_photo2','up_ap_photo3'].forEach(p => { const prev=document.getElementById(p+'_prev'); const ph=document.getElementById(p+'_ph'); const fi=document.getElementById(p+'_file'); if(prev){prev.style.display='none';prev.src='';} if(ph)ph.style.display=''; if(fi)fi.value=''; delete _processedPhotos[p]; });
   upApSelectPlan('free');
   document.getElementById('upApResult').style.display='none';
 }
@@ -1755,6 +1789,11 @@ async function upApSubmit() {
     fd.append('raasi', document.getElementById('up_ap_raasi')?.value || '');
     fd.append('laknam', document.getElementById('up_ap_lagnam')?.value || '');
     fd.append('dosham', document.getElementById('up_ap_dosham')?.value || '');
+    fd.append('partnerAgeFrom', document.getElementById('up_ap_p_age_from')?.value || '');
+    fd.append('partnerAgeTo', document.getElementById('up_ap_p_age_to')?.value || '');
+    fd.append('partnerCaste', document.getElementById('up_ap_p_caste')?.value || '');
+    fd.append('partnerSubCaste', document.getElementById('up_ap_p_subcaste')?.value || '');
+    ['up_ap_photo1','up_ap_photo2','up_ap_photo3'].forEach((p,i) => { if(_processedPhotos[p]) fd.append('photo'+(i+1), _processedPhotos[p]); });
     fd.append('scheme', upApSelectedPlan || 'free');
 
     const resp = await fetch(API + 'public.php', { method: 'POST', body: fd, credentials: 'same-origin' });
@@ -1780,6 +1819,10 @@ async function upApSubmit() {
       ['Raasi', document.getElementById('up_ap_raasi')?.value],
       ['Lagnam', document.getElementById('up_ap_lagnam')?.value],
       ['Dosham', document.getElementById('up_ap_dosham')?.value],
+      ['Partner Age From', document.getElementById('up_ap_p_age_from')?.value],
+      ['Partner Age To', document.getElementById('up_ap_p_age_to')?.value],
+      ['Partner Caste', document.getElementById('up_ap_p_caste')?.value],
+      ['Partner Sub Caste', document.getElementById('up_ap_p_subcaste')?.value],
       ['Plan Selected', upApSelectedPlan],
       ['CP ID', data.cp_id || ''],
     ].filter(([,v]) => v);
@@ -1789,6 +1832,7 @@ async function upApSubmit() {
     el.style.display='block';
     el.scrollIntoView({behavior:'smooth',block:'start'});
     FormAutoSave.clear('up_quick_create');
+    ['up_ap_photo1','up_ap_photo2','up_ap_photo3'].forEach(p => { delete _processedPhotos[p]; });
     popup('ok','Success','Profile created successfully! CP ID: ' + (data.cp_id || ''));
 
     // Reload profile if this is the logged-in user's mobile
@@ -2048,7 +2092,16 @@ function showSec(name, btn) {
   const renderers = { myProfile: renderMyProfile, suggestions: renderSuggestions, basicMatches: () => renderMatches('basic'), mutualMatches: () => renderMatches('mutual'), allProfiles: renderAllProfiles, myBills: renderMyBills, payuPayments: renderPayuPayments, addOrder: renderMyOrders, myActivity: renderMyActivity, loginHistory: renderLoginHistory, myReports: renderMyReports, profileViewLog: renderUserProfileViewLog, contactLog: renderUserContactLog, mySettings: renderSettings, myPoints: renderMyPoints };
   if (renderers[name]) renderers[name]();
   // Show autosave restore banner for add profile section
-  if (name === 'addProfile') FormAutoSave.showRestoreBanner('up_quick_create', '#addProfileSection .profile-card > div:nth-child(2)', () => toast('Draft restored'));
+  if (name === 'addProfile') FormAutoSave.showRestoreBanner('up_quick_create', '#addProfileSection .profile-card > div:nth-child(2)', () => {
+    try {
+      const raw = JSON.parse(localStorage.getItem('matrimony_draft_up_quick_create') || '{}');
+      const casteVal = document.getElementById('up_ap_caste')?.value;
+      if (casteVal) populateSubcaste('up_ap_caste', 'up_ap_subcaste', raw.up_ap_subcaste || '');
+      const pCasteVal = document.getElementById('up_ap_p_caste')?.value;
+      if (pCasteVal) populateSubcaste('up_ap_p_caste', 'up_ap_p_subcaste', raw.up_ap_p_subcaste || '');
+    } catch(e) {}
+    toast('Draft restored');
+  });
 }
 
 function setActions(sec) {
@@ -3715,7 +3768,7 @@ DobAge.init('cp_dob', 'cp_age_display', 'cp_age', 'cp_gender', 'cp_age_input');
 ['up_ap_workplace','ep_workplace','cp_workplace'].forEach(id => populateCountry(id, 'India'));
 
 // ===== CASTE DROPDOWN INITIALIZATION =====
-['up_ap_caste','ep_caste','cp_caste'].forEach(id => populateCasteDropdown(id, ''));
+['up_ap_caste','up_ap_p_caste','ep_caste','cp_caste'].forEach(id => populateCasteDropdown(id, ''));
 
 // ===== PLACE AUTOCOMPLETE INITIALIZATION =====
 ['up_ap_place_birth','up_ap_nativity','ep_place_birth','ep_nativity','ep_place_job','cp_place_birth','cp_nativity','cp_place_job'].forEach(id => PlaceSuggest.attach(id));
