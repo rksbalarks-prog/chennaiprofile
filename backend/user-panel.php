@@ -1023,7 +1023,7 @@ input,select,textarea{outline:none}
       </div>
       <input type="hidden" id="ep_age" value="">
       <div class="fg3">
-        <div class="fg"><label class="flbl">Place of Birth</label><input class="finp" id="ep_place_birth" placeholder="e.g. Pondicherry"></div>
+        <div class="fg"><label class="flbl">Place of Birth</label><input class="finp" id="ep_place_birth" placeholder="e.g. Puducherry"></div>
         <div class="fg"><label class="flbl">Nativity</label><input class="finp" id="ep_nativity" list="nativity_list" placeholder="Type or select"></div>
         <div class="fg"><label class="flbl">Present Country</label><select class="fsel" id="ep_workplace"><option value="">-</option></select></div>
       </div>
@@ -1228,7 +1228,7 @@ input,select,textarea{outline:none}
         <div class="fg"></div>
       </div>
       <div class="fg3">
-        <div class="fg"><label class="flbl">Place of Birth</label><input class="finp" id="cp_place_birth" placeholder="e.g. Pondicherry"></div>
+        <div class="fg"><label class="flbl">Place of Birth</label><input class="finp" id="cp_place_birth" placeholder="e.g. Puducherry"></div>
         <div class="fg"><label class="flbl">Nativity</label><input class="finp" id="cp_nativity" list="nativity_list" placeholder="Type or select"></div>
         <div class="fg"><label class="flbl">Present Country</label><select class="fsel" id="cp_workplace"><option value="">-</option></select></div>
       </div>

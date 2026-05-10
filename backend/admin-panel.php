@@ -3868,7 +3868,7 @@ input[type="date"].filter-select { padding:8px 10px; cursor:pointer; }
         <div class="form-row"><label class="input-label">AM / PM</label><select class="input" id="a_birth_ampm"><option>AM</option><option>PM</option></select></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 12px">
-        <div class="form-row"><label class="input-label">Place of Birth</label><input class="input" id="a_pob" placeholder="e.g. Pondicherry"></div>
+        <div class="form-row"><label class="input-label">Place of Birth</label><input class="input" id="a_pob" placeholder="e.g. Puducherry"></div>
         <div class="form-row"><label class="input-label">Nativity</label><input class="input" id="a_nativity" list="admin_nativity_list" placeholder="Type or select"></div>
         <div class="form-row"><label class="input-label">Present Country</label><select class="input" id="a_workplace"><option value="">— Select —</option></select></div>
       </div>
@@ -4073,7 +4073,7 @@ input[type="date"].filter-select { padding:8px 10px; cursor:pointer; }
         <div class="form-row"><label class="input-label">AM / PM</label><select class="input" id="e_birth_ampm"><option>AM</option><option>PM</option></select></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 12px">
-        <div class="form-row"><label class="input-label">Place of Birth</label><input class="input" id="e_pob" placeholder="e.g. Pondicherry"></div>
+        <div class="form-row"><label class="input-label">Place of Birth</label><input class="input" id="e_pob" placeholder="e.g. Puducherry"></div>
         <div class="form-row"><label class="input-label">Nativity</label><input class="input" id="e_nativity" list="admin_nativity_list" placeholder="Type or select"></div>
         <div class="form-row"><label class="input-label">Present Country</label><select class="input" id="e_workplace"><option value="">— Select —</option></select></div>
       </div>
@@ -4660,9 +4660,19 @@ input[type="date"].filter-select { padding:8px 10px; cursor:pointer; }
             <div style="margin-bottom:13px"><label style="display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#7A1020;margin-bottom:4px">Age</label><input class="input" id="ap_age_input" readonly style="border-color:#D4A0A8;background:#f0fdf4;font-weight:700;text-align:center;font-size:15px"></div>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 16px">
-            <div style="margin-bottom:13px"><label style="display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#7A1020;margin-bottom:4px">Place of Birth</label><input class="input" id="ap_place_birth" placeholder="e.g. Chennai" style="border-color:#D4A0A8;background:#FFFAF9"></div>
+            <div style="margin-bottom:13px"><label style="display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#7A1020;margin-bottom:4px">Place of Birth</label><input class="input" id="ap_place_birth" placeholder="e.g. Puducherry" style="border-color:#D4A0A8;background:#FFFAF9"></div>
             <div style="margin-bottom:13px"><label style="display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#7A1020;margin-bottom:4px">Nativity</label><input class="input" id="ap_nativity" placeholder="Town & District" style="border-color:#D4A0A8;background:#FFFAF9"></div>
             <div style="margin-bottom:13px"><label style="display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#7A1020;margin-bottom:4px">Present Country</label><select class="input" id="ap_workplace" style="border-color:#D4A0A8;background:#FFFAF9"><option value="">— Select —</option></select></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 16px">
+            <div style="margin-bottom:13px"><label style="display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#7A1020;margin-bottom:4px">Area</label><input class="input" id="ap_present_area" placeholder="e.g. Anna Nagar" style="border-color:#D4A0A8;background:#FFFAF9"></div>
+            <div style="margin-bottom:13px"><label style="display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#7A1020;margin-bottom:4px">City</label><input class="input" id="ap_present_city" placeholder="e.g. Chennai" style="border-color:#D4A0A8;background:#FFFAF9"></div>
+            <div style="margin-bottom:13px"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 16px">
+            <div style="margin-bottom:13px"><label style="display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#7A1020;margin-bottom:4px">State</label><select class="input" id="ap_present_state" style="border-color:#D4A0A8;background:#FFFAF9"><option value="">— Select —</option></select></div>
+            <div style="margin-bottom:13px"><label style="display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#7A1020;margin-bottom:4px">District</label><select class="input" id="ap_present_district" style="border-color:#D4A0A8;background:#FFFAF9"><option value="">— Select —</option></select></div>
+            <div></div>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 16px">
             <div style="margin-bottom:13px"><label style="display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#7A1020;margin-bottom:4px">Mobile <span style="color:#C41E3A">*</span></label><input class="input" id="ap_mobile" type="tel" maxlength="10" placeholder="10-digit" style="border-color:#D4A0A8;background:#FFFAF9"></div>
@@ -5179,13 +5189,15 @@ function apSelectPlan(plan) {
 }
 
 function apReset() {
-  ['ap_name','ap_mobile','ap_place_birth','ap_nativity','ap_qual','ap_job','ap_income','ap_subcaste'].forEach(id => {
+  ['ap_name','ap_mobile','ap_place_birth','ap_nativity','ap_qual','ap_job','ap_income','ap_subcaste','ap_present_area','ap_present_city'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
   ['ap_gender','ap_tongue','ap_marital','ap_blood','ap_height','ap_weight','ap_diet','ap_caste','ap_star','ap_raasi','ap_lagnam','ap_dosham'].forEach(id => {
     const el = document.getElementById(id); if (el) el.selectedIndex = 0;
   });
   document.getElementById('ap_dob').value = '';
+  populateStateDropdown('ap_present_state', 'Tamil Nadu');
+  populateDistrictDropdown('ap_present_district', '', 'ap_present_state');
   apSelectPlan('free');
   document.getElementById('apResult').style.display = 'none';
 }
@@ -5209,6 +5221,10 @@ async function apSubmit() {
     dob: DobAge.getIso('ap_dob'),
     place_birth: document.getElementById('ap_place_birth').value,
     nativity: document.getElementById('ap_nativity').value,
+    present_area: document.getElementById('ap_present_area')?.value || '',
+    present_city: document.getElementById('ap_present_city')?.value || '',
+    present_state: document.getElementById('ap_present_state')?.value || '',
+    present_district: document.getElementById('ap_present_district')?.value || '',
     mother_tongue: document.getElementById('ap_tongue').value,
     marital: document.getElementById('ap_marital').value,
     blood_group: document.getElementById('ap_blood').value,
@@ -13911,7 +13927,10 @@ DobAge.init('ap_dob', 'ap_age_display', null, 'ap_gender', 'ap_age_input');
 ['a_workplace','e_workplace','ap_workplace'].forEach(id => populateCountry(id, 'India'));
 
 // ===== PLACE AUTOCOMPLETE INITIALIZATION =====
-['a_pob','a_nativity','a_place_job','e_pob','e_nativity','e_place_job','ap_place_birth','ap_nativity'].forEach(id => PlaceSuggest.attach(id));
+['a_pob','a_nativity','a_place_job','e_pob','e_nativity','e_place_job','ap_place_birth','ap_nativity','ap_present_area','ap_present_city'].forEach(id => PlaceSuggest.attach(id));
+populateStateDropdown('ap_present_state', 'Tamil Nadu');
+populateDistrictDropdown('ap_present_district', '', 'ap_present_state');
+bindStateToDistrict('ap_present_state', 'ap_present_district');
 
 // ===== GOTHRAM AUTOCOMPLETE INITIALIZATION =====
 ['a_gothram','e_gothram'].forEach(id => GothramSuggest.attach(id));
