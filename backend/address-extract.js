@@ -6,7 +6,7 @@ const INDIAN_STATES_LIST = [
   "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
   "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand",
   "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur",
-  "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Pondicherry",
+  "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Puducherry",
   "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana",
   "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"
 ];
@@ -23,7 +23,7 @@ const TN_DISTRICTS_LIST = [
 ];
 
 const STATE_DISTRICTS = {
-  "Pondicherry": ["Pondicherry","Karaikal","Mahe","Yanam"],
+  "Puducherry": ["Puducherry","Karaikal","Mahe","Yanam"],
   "Tamil Nadu": TN_DISTRICTS_LIST,
   "Kerala": ["Thiruvananthapuram","Kollam","Pathanamthitta","Alappuzha","Kottayam","Idukki","Ernakulam","Thrissur","Palakkad","Malappuram","Kozhikode","Wayanad","Kannur","Kasaragod"],
   "Karnataka": ["Bangalore Urban","Bangalore Rural","Belgaum","Bellary","Bidar","Bijapur","Chamarajanagar","Chikkaballapur","Chikkamagaluru","Chitradurga","Dakshina Kannada","Davangere","Dharwad","Gadag","Hassan","Haveri","Kolar","Koppal","Mandya","Mysore","Raichur","Ramanagara","Shimoga","Tumkur","Udupi","Uttara Kannada","Yadgir"],

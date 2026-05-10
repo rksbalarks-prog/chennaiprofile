@@ -29,7 +29,7 @@ const PlaceSuggest = (() => {
     "Mettur", "Musiri", "Nagercoil", "Nandivaram", "Natham",
     "Neyveli", "Omalur", "Ooty", "Palani", "Palladam",
     "Pallavaram", "Panruti", "Paramakudi", "Pattukkottai",
-    "Perambalur", "Perundurai", "Pollachi", "Pondicherry",
+    "Perambalur", "Perundurai", "Pollachi", "Puducherry",
     "Poonamallee", "Pudukkottai", "Pullambadi",
     "Rajapalayam", "Ramanathapuram", "Rasipuram",
     "Sankarankovil", "Sankari", "Sathyamangalam", "Sendurai",
@@ -44,7 +44,13 @@ const PlaceSuggest = (() => {
   ];
 
   // Union Territories
-  const UT = ["Pondicherry", "Karaikal", "Mahe", "Yanam"];
+  const UT = ["Puducherry", "Karaikal", "Mahe", "Yanam"];
+
+  // Aliases: alternative spellings that search-match but save the canonical value
+  const PLACE_ALIASES = [
+    { label: 'Pondicherry', value: 'Puducherry' },
+    { label: 'Pondy',       value: 'Puducherry' },
+  ];
 
   // Other Indian State Capitals & Major Cities
   const INDIAN_CITIES = [
@@ -114,30 +120,35 @@ const PlaceSuggest = (() => {
     if (!query || query.length < 1) { dd.style.display = 'none'; return; }
 
     const q = query.toLowerCase();
-    // Prioritize starts-with matches, then contains matches
-    const startsWith = ALL_PLACES.filter(p => p.toLowerCase().startsWith(q));
-    const contains = ALL_PLACES.filter(p => !p.toLowerCase().startsWith(q) && p.toLowerCase().includes(q));
-    const matches = [...startsWith, ...contains].slice(0, 12);
+    // Standard place matches (label === value)
+    const startsWith = ALL_PLACES.filter(p => p.toLowerCase().startsWith(q)).map(p => ({ label: p, value: p }));
+    const contains   = ALL_PLACES.filter(p => !p.toLowerCase().startsWith(q) && p.toLowerCase().includes(q)).map(p => ({ label: p, value: p }));
+    // Alias matches (label differs from canonical value)
+    const aliasStarts   = PLACE_ALIASES.filter(a => a.label.toLowerCase().startsWith(q));
+    const aliasContains = PLACE_ALIASES.filter(a => !a.label.toLowerCase().startsWith(q) && a.label.toLowerCase().includes(q));
+
+    const matches = [...startsWith, ...aliasStarts, ...contains, ...aliasContains].slice(0, 12);
 
     if (matches.length === 0) { dd.style.display = 'none'; return; }
 
     positionDropdown(input);
     dd.innerHTML = matches.map((m, i) => {
-      // Highlight matching part
-      const idx = m.toLowerCase().indexOf(q);
-      const before = m.slice(0, idx);
-      const match = m.slice(idx, idx + q.length);
-      const after = m.slice(idx + q.length);
+      const label = m.label;
+      const idx = label.toLowerCase().indexOf(q);
+      const before = label.slice(0, idx);
+      const match  = label.slice(idx, idx + q.length);
+      const after  = label.slice(idx + q.length);
+      const hint   = m.value !== label ? ' <span style="color:#9ca3af;font-size:11px">→ ' + m.value + '</span>' : '';
       return '<div class="ps-item" data-idx="' + i + '" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid #f3f4f6;transition:background .1s"'
         + ' onmouseenter="this.style.background=\'#f0f4ff\'" onmouseleave="this.style.background=\'#fff\'">'
-        + before + '<strong style="color:#1d4ed8">' + match + '</strong>' + after + '</div>';
+        + before + '<strong style="color:#1d4ed8">' + match + '</strong>' + after + hint + '</div>';
     }).join('');
     dd.style.display = 'block';
 
-    // Click handler for items
+    // Click handler — always saves the canonical value
     dd.querySelectorAll('.ps-item').forEach((item, i) => {
       item.onclick = () => {
-        input.value = matches[i];
+        input.value = matches[i].value;
         dd.style.display = 'none';
         input.dispatchEvent(new Event('input', { bubbles: true }));
         input.dispatchEvent(new Event('change', { bubbles: true }));

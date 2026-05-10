@@ -607,7 +607,7 @@ input,select,textarea{outline:none}
       <option value="Late"><option value="Expired"><option value="Not Applicable">
     </datalist>
     <datalist id="nativity_list">
-      <option value="India"><option value="Pondicherry"><option value="Chennai"><option value="Tamil Nadu">
+      <option value="India"><option value="Puducherry"><option value="Chennai"><option value="Tamil Nadu">
       <option value="France"><option value="Singapore"><option value="Malaysia"><option value="UAE">
       <option value="Kuwait"><option value="Saudi Arabia"><option value="Qatar"><option value="Bahrain">
       <option value="Oman"><option value="USA"><option value="UK"><option value="Canada">
@@ -879,6 +879,12 @@ input,select,textarea{outline:none}
             <div class="fg"><label class="flbl">Nativity</label><input class="finp" id="up_ap_nativity" list="nativity_list" placeholder="Type or select" style="border-color:#D4A0A8"></div>
             <div class="fg"><label class="flbl">Present Country</label><select class="fsel" id="up_ap_workplace" style="border-color:#D4A0A8"><option value="">— Select —</option></select></div>
             <div class="fg"><label class="flbl">Blood Group</label><select class="fsel" id="up_ap_blood" style="border-color:#D4A0A8"><option value="">— Select —</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>O+</option><option>O-</option><option>AB+</option><option>AB-</option></select></div>
+          </div>
+          <div class="fg" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0 10px">
+            <div class="fg"><label class="flbl">Area</label><input class="finp" id="up_ap_present_area" placeholder="e.g. Anna Nagar" style="border-color:#D4A0A8"></div>
+            <div class="fg"><label class="flbl">City</label><input class="finp" id="up_ap_present_city" placeholder="e.g. Chennai" style="border-color:#D4A0A8"></div>
+            <div class="fg"><label class="flbl">State</label><select class="fsel" id="up_ap_present_state" style="border-color:#D4A0A8"><option value="">— Select —</option></select></div>
+            <div class="fg"><label class="flbl">District</label><select class="fsel" id="up_ap_present_district" style="border-color:#D4A0A8"><option value="">— Select —</option></select></div>
           </div>
           <!-- Physical -->
           <div class="msec" style="background:linear-gradient(90deg,#0D7B6A,#6B3FA0 70%,transparent);border-radius:5px;color:white">⚖️ Physical Attributes</div>
@@ -1734,8 +1740,10 @@ function upApSelectPlan(plan) {
   });
 }
 function upApReset() {
-  ['up_ap_name','up_ap_place_birth','up_ap_nativity','up_ap_qual','up_ap_job','up_ap_income','up_ap_subcaste','up_ap_p_age_from','up_ap_p_age_to'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  ['up_ap_name','up_ap_place_birth','up_ap_nativity','up_ap_qual','up_ap_job','up_ap_income','up_ap_subcaste','up_ap_p_age_from','up_ap_p_age_to','up_ap_present_area','up_ap_present_city'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
   ['up_ap_gender','up_ap_tongue','up_ap_marital','up_ap_blood','up_ap_height','up_ap_weight','up_ap_diet','up_ap_caste','up_ap_star','up_ap_raasi','up_ap_lagnam','up_ap_dosham','up_ap_p_caste','up_ap_p_subcaste'].forEach(id => { const el=document.getElementById(id); if(el) el.selectedIndex=0; });
+  populateStateDropdown('up_ap_present_state', 'Tamil Nadu');
+  populateDistrictDropdown('up_ap_present_district', '', 'up_ap_present_state');
   document.getElementById('up_ap_dob').value='';
   ['up_ap_photo1','up_ap_photo2','up_ap_photo3'].forEach(p => { const prev=document.getElementById(p+'_prev'); const ph=document.getElementById(p+'_ph'); const fi=document.getElementById(p+'_file'); if(prev){prev.style.display='none';prev.src='';} if(ph)ph.style.display=''; if(fi)fi.value=''; delete _processedPhotos[p]; });
   upApSelectPlan('free');
@@ -1789,6 +1797,10 @@ async function upApSubmit() {
     fd.append('raasi', document.getElementById('up_ap_raasi')?.value || '');
     fd.append('laknam', document.getElementById('up_ap_lagnam')?.value || '');
     fd.append('dosham', document.getElementById('up_ap_dosham')?.value || '');
+    fd.append('presentArea', document.getElementById('up_ap_present_area')?.value || '');
+    fd.append('presentCity', document.getElementById('up_ap_present_city')?.value || '');
+    fd.append('presentState', document.getElementById('up_ap_present_state')?.value || '');
+    fd.append('presentDistrict', document.getElementById('up_ap_present_district')?.value || '');
     fd.append('partnerAgeFrom', document.getElementById('up_ap_p_age_from')?.value || '');
     fd.append('partnerAgeTo', document.getElementById('up_ap_p_age_to')?.value || '');
     fd.append('partnerCaste', document.getElementById('up_ap_p_caste')?.value || '');
@@ -1807,6 +1819,10 @@ async function upApSubmit() {
       ['Mother Tongue', tongue], ['Marital Status', marital],
       ['Place of Birth', document.getElementById('up_ap_place_birth')?.value],
       ['Nativity', document.getElementById('up_ap_nativity')?.value],
+      ['Area', document.getElementById('up_ap_present_area')?.value],
+      ['City', document.getElementById('up_ap_present_city')?.value],
+      ['State', document.getElementById('up_ap_present_state')?.value],
+      ['District', document.getElementById('up_ap_present_district')?.value],
       ['Blood Group', document.getElementById('up_ap_blood')?.value],
       ['Height', document.getElementById('up_ap_height')?.value],
       ['Weight', document.getElementById('up_ap_weight')?.value],
@@ -2095,10 +2111,14 @@ function showSec(name, btn) {
   if (name === 'addProfile') FormAutoSave.showRestoreBanner('up_quick_create', '#addProfileSection .profile-card > div:nth-child(2)', () => {
     try {
       const raw = JSON.parse(localStorage.getItem('matrimony_draft_up_quick_create') || '{}');
+      // Subcaste options depend on caste selection (onChange doesn't fire on restore)
       const casteVal = document.getElementById('up_ap_caste')?.value;
       if (casteVal) populateSubcaste('up_ap_caste', 'up_ap_subcaste', raw.up_ap_subcaste || '');
       const pCasteVal = document.getElementById('up_ap_p_caste')?.value;
       if (pCasteVal) populateSubcaste('up_ap_p_caste', 'up_ap_p_subcaste', raw.up_ap_p_subcaste || '');
+      // District options depend on state selection
+      const stateVal = document.getElementById('up_ap_present_state')?.value;
+      if (stateVal) populateDistrictDropdown('up_ap_present_district', raw.up_ap_present_district || '', 'up_ap_present_state');
     } catch(e) {}
     toast('Draft restored');
   });
@@ -3771,7 +3791,7 @@ DobAge.init('cp_dob', 'cp_age_display', 'cp_age', 'cp_gender', 'cp_age_input');
 ['up_ap_caste','up_ap_p_caste','ep_caste','cp_caste'].forEach(id => populateCasteDropdown(id, ''));
 
 // ===== PLACE AUTOCOMPLETE INITIALIZATION =====
-['up_ap_place_birth','up_ap_nativity','ep_place_birth','ep_nativity','ep_place_job','cp_place_birth','cp_nativity','cp_place_job'].forEach(id => PlaceSuggest.attach(id));
+['up_ap_place_birth','up_ap_nativity','ep_place_birth','ep_nativity','ep_place_job','cp_place_birth','cp_nativity','cp_place_job','up_ap_present_area','up_ap_present_city'].forEach(id => PlaceSuggest.attach(id));
 
 // ===== GOTHRAM AUTOCOMPLETE INITIALIZATION =====
 ['ep_gothram','cp_gothram'].forEach(id => GothramSuggest.attach(id));
@@ -3782,6 +3802,10 @@ MobileCheck.attach('cp_mobile', null);
 // ===== ADDRESS LOCATION INITIALIZATION =====
 setupAddressExtract('ep', 'ep_present_addr');
 setupAddressExtract('cp', 'cp_present_addr');
+// Add profile: no address textarea, just initialise dropdowns and bind
+populateStateDropdown('up_ap_present_state', 'Tamil Nadu');
+populateDistrictDropdown('up_ap_present_district', '', 'up_ap_present_state');
+bindStateToDistrict('up_ap_present_state', 'up_ap_present_district');
 
 // ===== PARTNER CASTE PREFERENCE INITIALIZATION =====
 PartnerCaste.build('ep_p_caste_box', 'ep_p_caste');

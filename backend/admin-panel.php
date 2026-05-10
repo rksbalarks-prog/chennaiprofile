@@ -3754,7 +3754,7 @@ input[type="date"].filter-select { padding:8px 10px; cursor:pointer; }
   <option value="Late"><option value="Expired"><option value="Not Applicable">
 </datalist>
 <datalist id="admin_nativity_list">
-  <option value="India"><option value="Pondicherry"><option value="Chennai"><option value="Tamil Nadu">
+  <option value="India"><option value="Puducherry"><option value="Pondicherry"><option value="Chennai"><option value="Tamil Nadu">
   <option value="France"><option value="Singapore"><option value="Malaysia"><option value="UAE">
   <option value="Kuwait"><option value="Saudi Arabia"><option value="Qatar"><option value="Bahrain">
   <option value="Oman"><option value="USA"><option value="UK"><option value="Canada">
