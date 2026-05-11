@@ -3049,8 +3049,8 @@ input[type="date"].filter-select { padding:8px 10px; cursor:pointer; }
         <option value="resolved">Resolved</option>
         <option value="dismissed">Dismissed</option>
       </select>
-      <input class="filter-select" id="prDateFrom" type="date" title="From" onchange="renderProfileReports()" style="font-size:12px">
-      <input class="filter-select" id="prDateTo" type="date" title="To" onchange="renderProfileReports()" style="font-size:12px">
+      <label style="font-size:11px;color:#6b7280;display:flex;align-items:center;gap:4px">From:<input class="filter-select" id="prDateFrom" type="date" onchange="renderProfileReports()" style="font-size:12px;margin:0"></label>
+      <label style="font-size:11px;color:#6b7280;display:flex;align-items:center;gap:4px">To:<input class="filter-select" id="prDateTo" type="date" onchange="renderProfileReports()" style="font-size:12px;margin:0"></label>
       <button class="btn btn-ghost btn-sm" onclick="clearPrFilters()">✕ Clear</button>
       <span class="badge badge-gray" id="prCount" style="margin-left:auto">0</span>
     </div>
@@ -4945,6 +4945,9 @@ const FIELD_MAP = {
   has_photo:'hasPhoto', duplicate_photo:'duplicatePhoto', duplicate_with:'duplicateWith', req_id:'reqId', activity_type:'activityType', target_cp_id:'targetCpId', user_visible:'userVisible',
   birth_hour:'birthHour', birth_min:'birthMin', birth_ampm:'birthAmpm', place_birth:'placeBirth', own_house:'ownHouse', born_as:'bornAs',
   time_spent:'timeSpent', scroll_depth:'scrollDepth',
+  reported_at:'reportedAt', reporter_mobile:'reporterMobile',
+  profile_name:'profileName', profile_mobile:'profileMobile',
+  resolved_at:'resolvedAt', resolved_by:'resolvedBy',
 };
 function mapRow(row) {
   if (!row || typeof row !== 'object') return row;
@@ -8879,6 +8882,14 @@ async function toggleDirectLogin(id, newStatus) {
   } catch(e) { toast('Error', 'error'); }
 }
 
+function fmtDT(s) {
+  if (!s) return '—';
+  const d = new Date(s.replace(' ', 'T'));
+  if (isNaN(d)) return s;
+  return d.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })
+       + ', ' + d.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', hour12:true });
+}
+
 function _prFilter() {
   const q = (document.getElementById('prSearch')?.value || '').toLowerCase();
   const reasonF = document.getElementById('prReasonFilter')?.value || '';
@@ -8924,13 +8935,13 @@ function renderProfileReports() {
     const resolvedAt = r.resolvedAt || r.resolved_at || '';
     return `<tr>
       <td>${i+1}</td>
-      <td style="font-size:12px;white-space:nowrap">${r.reportedAt || r.reported_at || '-'}</td>
+      <td style="font-size:12px;white-space:nowrap">${fmtDT(r.reportedAt || r.reported_at)}</td>
       <td><code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${r.cpId || r.cp_id || ''}</code></td>
       <td>${r.profileName || r.profile_name || '-'}</td>
       <td style="font-size:12px;color:#c0392b;font-weight:600">${r.profileMobile || r.profile_mobile || '-'}</td>
       <td style="font-size:12px">${r.reporterMobile || r.reporter_mobile || '-'}</td>
       <td>${reasonBadge}</td>
-      <td>${statusBadge}${adminNote ? `<div style="font-size:10px;color:#6b7280;margin-top:3px">${adminNote}</div>` : ''}${resolvedBy ? `<div style="font-size:10px;color:#2563eb;margin-top:2px">by <b>${resolvedBy}</b></div>` : ''}${resolvedAt ? `<div style="font-size:10px;color:#9ca3af">${resolvedAt}</div>` : ''}</td>
+      <td>${statusBadge}${adminNote ? `<div style="font-size:10px;color:#6b7280;margin-top:3px">${adminNote}</div>` : ''}${resolvedBy ? `<div style="font-size:10px;color:#2563eb;margin-top:2px">by <b>${resolvedBy}</b></div>` : ''}${resolvedAt ? `<div style="font-size:10px;color:#9ca3af">${fmtDT(resolvedAt)}</div>` : ''}</td>
       <td>
         ${r.status === 'pending' ? `<div style="display:flex;gap:4px">
           <button class="btn btn-sm" onclick="openResolvePopup(${r.id})" style="background:#dcfce7;color:#16a34a;border:1px solid #bbf7d0;font-size:11px;padding:4px 8px">Resolve</button>
@@ -8951,9 +8962,18 @@ function openResolvePopup(id, action) {
   const title = action === 'dismiss' ? 'Dismiss Report' : 'Resolve Report';
   const cpId = r ? (r.cpId || r.cp_id) : '';
   const name = r ? (r.profileName || r.profile_name) : '';
+  const reasonLabel = r ? ({
+    already_married: '💍 Already Married',
+    fraud: '🚨 Fraud',
+    misinformation: '⚠️ Misinformation',
+  }[r.reason] || r.reason) : '';
 
+  const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   document.getElementById('resolvePopupTitle').textContent = title;
-  document.getElementById('resolvePopupInfo').textContent = `${cpId} — ${name}`;
+  document.getElementById('resolvePopupInfo').innerHTML =
+    `<b>${esc(cpId)}</b> — ${esc(name) || '—'}`
+    + (reasonLabel ? `<br><span style="font-size:11px;color:#6b7280;font-weight:400">Reported for: <b>${esc(reasonLabel)}</b></span>` : '')
+    + (r?.reporterMobile || r?.reporter_mobile ? `<br><span style="font-size:11px;color:#6b7280;font-weight:400">By: ${esc(r.reporterMobile||r.reporter_mobile)}</span>` : '');
   document.getElementById('resolveReason').value = '';
   openModal('resolvePopupOverlay');
 }
@@ -9140,7 +9160,7 @@ function renderUserResponse() {
           + '<td>' + (reporterCpId ? '<code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">' + reporterCpId + '</code>' : '<span style="color:var(--text-secondary);font-size:11.5px">—</span>') + '</td>'
           + '<td style="font-size:12.5px">' + (r.reason || '—') + '</td>'
           + '<td>' + statusBadge + '</td>'
-          + '<td style="font-size:12px;color:var(--text-secondary);white-space:nowrap">' + (r.reportedAt || r.reported_at || '—') + '</td>'
+          + '<td style="font-size:12px;color:var(--text-secondary);white-space:nowrap">' + fmtDT(r.reportedAt || r.reported_at) + '</td>'
           + '</tr>';
       }).join('');
 }
@@ -9266,7 +9286,7 @@ function renderUserActivity() {
           + '<td style="font-size:12.5px">' + reportedName + '</td>'
           + '<td style="font-size:12.5px">' + (r.reason || '—') + '</td>'
           + '<td>' + statusBadge + '</td>'
-          + '<td style="font-size:12px;color:var(--text-secondary);white-space:nowrap">' + (r.reportedAt || r.reported_at || '—') + '</td>'
+          + '<td style="font-size:12px;color:var(--text-secondary);white-space:nowrap">' + fmtDT(r.reportedAt || r.reported_at) + '</td>'
           + '</tr>';
       }).join('');
 }

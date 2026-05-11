@@ -12,11 +12,11 @@ RewriteRule ^ - [L]
 # Don't rewrite backend API calls
 RewriteRule ^backend/ - [L]
 
-# Rewrite assets to frontend/dist/assets
-RewriteRule ^assets/(.*)$ frontend/dist/assets/$1 [L]
+# Rewrite assets to frontend/dist/assets (also handles /subroute/assets/ from relative base)
+RewriteRule ^(?:[^/]+/)?assets/(.*)$ frontend/dist/assets/$1 [L]
 
-# Rewrite models to frontend/dist/models
-RewriteRule ^models/(.*)$ frontend/dist/models/$1 [L]
+# Rewrite models to frontend/dist/models (also handles /subroute/models/)
+RewriteRule ^(?:[^/]+/)?models/(.*)$ frontend/dist/models/$1 [L]
 
 # Route all other requests to React SPA
 RewriteRule ^ frontend/dist/index.html [L]

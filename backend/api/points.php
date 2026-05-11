@@ -101,7 +101,14 @@ if ($act === 'balance') {
 if ($act === 'history') {
     $mobile = $_SESSION['mobile'] ?? '';
     if (!$mobile) json_err('Not logged in.', 401);
-    $r = $db->prepare("SELECT type, points, balance_after, description, ref_id, created_at FROM point_transactions WHERE mobile = :m ORDER BY id DESC LIMIT 50");
+    $r = $db->prepare("
+        SELECT pt.type, pt.points, pt.balance_after, pt.description, pt.ref_id, pt.created_at,
+               COALESCE(po.target_cp_id, '') AS target_cp_id
+        FROM point_transactions pt
+        LEFT JOIN point_orders po ON po.txn_id = pt.ref_id AND po.mobile = pt.mobile
+        WHERE pt.mobile = :m
+        ORDER BY pt.id DESC LIMIT 50
+    ");
     $r->execute([':m' => $mobile]);
     json_ok(['history' => $r->fetchAll()]);
 }
@@ -114,9 +121,10 @@ if ($act === 'buy_init' && $method === 'POST') {
     $pkgs  = pts_get_packages($db);
     if (!isset($pkgs[$pkgId])) json_err('Invalid package.');
 
-    $pkg    = $pkgs[$pkgId];
-    $amount = number_format($pkg['price'], 2, '.', '');
-    $txnId  = 'PTS' . time() . '_' . bin2hex(random_bytes(4));
+    $pkg      = $pkgs[$pkgId];
+    $amount   = number_format($pkg['price'], 2, '.', '');
+    $txnId    = 'PTS' . time() . '_' . bin2hex(random_bytes(4));
+    $returnCp = preg_replace('/[^A-Z0-9]/', '', strtoupper($b['return_cp'] ?? ''));
 
     // Fetch profile info for PayU
     $prof = $db->prepare("SELECT cp_id, name, email FROM profiles WHERE mobile = :m LIMIT 1");
@@ -124,8 +132,8 @@ if ($act === 'buy_init' && $method === 'POST') {
     $profile = $prof->fetch();
 
     // Save pending order
-    $db->prepare("INSERT INTO point_orders (mobile, txn_id, pkg_id, points, amount, status) VALUES (:m, :t, :pk, :pts, :a, 'pending')")
-       ->execute([':m' => $mobile, ':t' => $txnId, ':pk' => $pkgId, ':pts' => $pkg['points'], ':a' => $pkg['price']]);
+    $db->prepare("INSERT INTO point_orders (mobile, txn_id, pkg_id, points, amount, status, target_cp_id) VALUES (:m, :t, :pk, :pts, :a, 'pending', :cp)")
+       ->execute([':m' => $mobile, ':t' => $txnId, ':pk' => $pkgId, ':pts' => $pkg['points'], ':a' => $pkg['price'], ':cp' => $returnCp]);
 
     // If PayU config available, build redirect params
     @include_once __DIR__ . '/../payu-config.php';
@@ -147,6 +155,7 @@ if ($act === 'buy_init' && $method === 'POST') {
             'udf1'         => $txnId,
             'udf2'         => $mobile,
             'udf3'         => $pkgId,
+            'udf4'         => $returnCp,
             'service_provider' => 'payu_paisa',
         ];
         $params['hash'] = payuRequestHash($params);
@@ -165,12 +174,13 @@ function _handle_buy_return(): void {
     $base = function_exists('payuBaseUrl') ? str_replace('/backend', '', payuBaseUrl()) : '';
     if (!defined('PAYU_KEY') || PAYU_KEY === '') { header('Location: ' . $base . '/backend/user-panel.php?pay=pts_fail'); exit; }
 
-    $status  = $_POST['status']  ?? '';
-    $txnId   = $_POST['udf1']    ?? '';
-    $mobile  = $_POST['udf2']    ?? '';
-    $pkgId   = $_POST['udf3']    ?? '';
-    $payuTxn = $_POST['mihpayid'] ?? '';
-    $hash    = $_POST['hash']    ?? '';
+    $status   = $_POST['status']   ?? '';
+    $txnId    = $_POST['udf1']     ?? '';
+    $mobile   = $_POST['udf2']     ?? '';
+    $pkgId    = $_POST['udf3']     ?? '';
+    $returnCp = preg_replace('/[^A-Z0-9]/', '', strtoupper($_POST['udf4'] ?? ''));
+    $payuTxn  = $_POST['mihpayid'] ?? '';
+    $hash     = $_POST['hash']     ?? '';
 
     if (!$txnId || !$mobile || !$pkgId) { header('Location: ' . $base . '/backend/user-panel.php?pay=pts_fail'); exit; }
 
@@ -181,7 +191,7 @@ function _handle_buy_return(): void {
     $db = getDB();
 
     // Mark order
-    $ord = $db->prepare("SELECT id, points, status FROM point_orders WHERE txn_id = :t AND mobile = :m LIMIT 1");
+    $ord = $db->prepare("SELECT id, points, status, target_cp_id FROM point_orders WHERE txn_id = :t AND mobile = :m LIMIT 1");
     $ord->execute([':t' => $txnId, ':m' => $mobile]);
     $order = $ord->fetch();
     if (!$order || $order['status'] !== 'pending') { header('Location: ' . $base . '/backend/user-panel.php?pay=pts_done'); exit; }
@@ -189,7 +199,12 @@ function _handle_buy_return(): void {
     if ($status === 'success') {
         $db->prepare("UPDATE point_orders SET status='success', updated_at=NOW() WHERE txn_id=:t")
            ->execute([':t' => $txnId]);
+        // ref_id: PayU txn ID stored so the history JOIN (on ref_id = txn_id) resolves target_cp_id
         pts_credit($db, $mobile, (int)$order['points'], 'purchase', 'Purchased ' . $order['points'] . ' pts', $payuTxn ?: $txnId);
+        if ($returnCp) {
+            // Redirect back to the profile detail page where payment was triggered
+            header('Location: ' . $base . '/detail/' . $returnCp . '?pay=pts_ok&pts=' . $order['points']); exit;
+        }
         header('Location: ' . $base . '/backend/user-panel.php?pay=pts_ok&pts=' . $order['points']); exit;
     }
 

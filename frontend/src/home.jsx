@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { API_BASE, PHOTO_BASE, PHOTO_BASE_OLD, UPLOADS_PREFIX, USER_PANEL_URL, getPhotoUrls, IS_CHENNAI_PROFILE, POINTS_PER_CONTACT, POINTS_API } from './config';
+import { API_BASE, PHOTO_BASE, PHOTO_BASE_OLD, UPLOADS_PREFIX, USER_PANEL_URL, getPhotoUrls, IS_CHENNAI_PROFILE, POINTS_PER_CONTACT, POINTS_API, PREFIX } from './config';
 import { buildSummary } from './profileSummary';
 
 const mapP = (p) => ({
@@ -360,6 +360,7 @@ export default function Home() {
 
       if (res.status === 402 && tv && tv.need_points) {
         setPointsBalance(tv.balance ?? 0);
+        setPendingContactId(profileId);
         setShowPointsModal(true);
         return;
       }
@@ -425,7 +426,7 @@ export default function Home() {
     <div style={{ position:'relative', display:'flex', background:'#fff', borderRadius:12, overflow:'hidden', boxShadow:'0 1px 6px rgba(0,0,0,0.06)', border:'1px solid #f0f0f0', cursor:'pointer' }}
       onMouseEnter={() => setSlide(1)}
       onMouseLeave={() => setSlide(0)}
-      onClick={() => navigate(`/detail/${p.id}`, { state: { profile: p } })}>
+      onClick={() => window.open(`${PREFIX}/detail/${p.id}`, '_blank')}>
       {(() => {
         const svgFallback = p.gender === 'Male' ? '/default-male.png' : '/default-female.png';
         // When the profile has no photo, show a random blurred same-gender
@@ -483,7 +484,7 @@ export default function Home() {
             <div style={{ fontSize:17, fontWeight:700, color:'#222', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', paddingRight:26 }}>{p.name}</div>
             <div style={{ display:'flex', alignItems:'center', gap:5, flexWrap:'wrap' }}>
               <span style={{ fontSize:11, color: isViewed ? '#16a34a' : '#0D7B6A', fontWeight:600, background: isViewed ? '#f0fdf4' : '#E8F5F2', padding:'1px 6px', borderRadius:3 }}>{p.cpId}</span>
-              <span style={{ fontSize:11, color:'#0D7B6A', fontWeight:600, cursor:'pointer' }} onClick={e=>{e.stopPropagation();navigate(`/detail/${p.id}`,{state:{profile:p}});}}>View →</span>
+              <span style={{ fontSize:11, color:'#0D7B6A', fontWeight:600, cursor:'pointer' }} onClick={e=>{e.stopPropagation();window.open(`${PREFIX}/detail/${p.id}`,'_blank');}}>View →</span>
               <span
                 role="button"
                 tabIndex={0}
@@ -517,8 +518,10 @@ export default function Home() {
             </div>
             <div style={{ marginTop:2 }}>
               <a
-                href={`/detail/${p.id}`}
-                onClick={e => { e.stopPropagation(); e.preventDefault(); navigate(`/detail/${p.id}`, { state: { profile: p } }); }}
+                href={`${PREFIX}/detail/${p.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={e => { e.stopPropagation(); }}
                 style={{ fontSize:15, fontWeight:700, color:'#0D7B6A', textDecoration:'none' }}
               >
                 {isTa ? 'மேலும் படிக்க →' : 'Read more →'}
@@ -539,9 +542,12 @@ export default function Home() {
             if (revealedContactId === p.id) {
               const num = revealedPhones[p.id] || p.phone || '';
               if (num) return (
-                <a href={`tel:${num}`} onClick={e=>e.stopPropagation()} style={{ flex:'1 1 0', minWidth:0, padding:'5px 0', background:'#1a6ea8', color:'#fff', borderRadius:6, fontSize:15, fontWeight:700, textAlign:'center', textDecoration:'none', display:'block', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                  Call: {num}
-                </a>
+                <div style={{ flex:'1 1 0', minWidth:0, display:'flex', flexDirection:'column', gap:2 }}>
+                  <span style={{ fontSize:10, fontWeight:700, color:'#166534', background:'#dcfce7', borderRadius:4, padding:'1px 6px', textAlign:'center', letterSpacing:0.3 }}>✅ Contact Viewed</span>
+                  <a href={`tel:${num}`} onClick={e=>e.stopPropagation()} style={{ padding:'4px 0', background:'#1a6ea8', color:'#fff', borderRadius:6, fontSize:14, fontWeight:700, textAlign:'center', textDecoration:'none', display:'block', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                    📞 {num}
+                  </a>
+                </div>
               );
               return unavailableBtn;
             }
@@ -982,7 +988,8 @@ export default function Home() {
                 {buyPackages.map((pkg, idx) => {
                   const isDefault = idx === 0;
                   return (
-                    <a key={pkg.id} href={`${USER_PANEL_URL}?buy_pkg=${pkg.id}`}
+                    <a key={pkg.id}
+                      href={`${USER_PANEL_URL}?buy_pkg=${pkg.id}${pendingContactId ? '&return_cp=' + encodeURIComponent(pendingContactId) : ''}`}
                       style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 16px', border:`2px solid ${isDefault ? '#16a34a' : '#0D7B6A'}`, borderRadius:10, background: isDefault ? '#f0fdf4' : '#fff', textDecoration:'none', cursor:'pointer', position:'relative' }}>
                       {isDefault && <span style={{ position:'absolute', top:-9, left:12, fontSize:10, background:'#16a34a', color:'#fff', borderRadius:6, padding:'1px 8px', fontWeight:700 }}>✓ Recommended</span>}
                       <div>

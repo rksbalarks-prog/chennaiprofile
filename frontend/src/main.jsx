@@ -67,11 +67,20 @@ function App() {
 }
 
 // Detect base path so React Router works both at root (production)
-// and in a subdirectory (local XAMPP at /ChennaiMatrimony/frontend/dist/).
+// and in a subdirectory (local XAMPP at /ChennaiMatrimony/).
 const getBasename = () => {
   const path = window.location.pathname;
-  const match = path.match(/^(\/.*?\/frontend\/dist)/);
-  return match ? match[1] : '/';
+  // Direct file serving (e.g. /ChennaiMatrimony/frontend/dist/...)
+  const distMatch = path.match(/^(\/.*?\/frontend\/dist)/);
+  if (distMatch) return distMatch[1];
+  // Subdirectory SPA: detect base by finding the first known route segment
+  const knownRoutes = ['/detail/', '/registration', '/search', '/contact',
+    '/privacy-policy', '/about-us', '/terms-and-conditions', '/google-form'];
+  for (const route of knownRoutes) {
+    const idx = path.indexOf(route);
+    if (idx > 0) return path.slice(0, idx);
+  }
+  return '/';
 };
 
 ReactDOM.createRoot(document.getElementById('root')).render(

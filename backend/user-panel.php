@@ -701,7 +701,7 @@ input,select,textarea{outline:none}
           </div>
           <div class="u-tw">
             <table class="u-tbl">
-              <thead><tr><th>#</th><th>Date</th><th>Description</th><th>Points</th><th>Balance After</th><th>Ref&nbsp;ID</th><th>Status</th></tr></thead>
+              <thead><tr><th>#</th><th>Date</th><th>Description</th><th>Points</th><th>Balance After</th><th>Ref&nbsp;ID</th><th>Profile</th><th>Status</th></tr></thead>
               <tbody id="payuPtsTbody"></tbody>
             </table>
           </div>
@@ -798,10 +798,24 @@ input,select,textarea{outline:none}
           </div>
         </div>
         <div class="u-card">
-          <div class="u-card-head"><span class="u-card-title">Transaction History</span></div>
+          <div class="u-card-head" style="background:linear-gradient(135deg,#0D7B6A,#1e40af)">
+            <span class="u-card-title" style="color:#fff">Points Statement</span>
+            <span style="margin-left:auto;font-size:13px;color:rgba(255,255,255,0.75);font-weight:500">Last 50 transactions</span>
+          </div>
+          <div id="ptsStmtSummary" style="display:none;background:#f8fafc;border-bottom:1px solid #e5e7eb;padding:12px 16px;gap:20px;flex-wrap:wrap;align-items:center"></div>
           <div class="u-tw">
-            <table class="u-tbl">
-              <thead><tr><th>#</th><th>Type</th><th>Points</th><th>Balance After</th><th>Description</th><th>Date</th></tr></thead>
+            <table class="u-tbl" style="font-size:13.5px">
+              <thead>
+                <tr>
+                  <th style="width:32px">#</th>
+                  <th style="min-width:130px">Date &amp; Time</th>
+                  <th>Description</th>
+                  <th style="min-width:110px">Profile</th>
+                  <th style="text-align:right;color:#166534;min-width:80px">Points In</th>
+                  <th style="text-align:right;color:#991b1b;min-width:80px">Points Out</th>
+                  <th style="text-align:right;min-width:80px">Balance</th>
+                </tr>
+              </thead>
               <tbody id="ptsTxnTbody"></tbody>
             </table>
           </div>
@@ -1416,6 +1430,7 @@ input,select,textarea{outline:none}
 <script src="address-extract.js"></script>
 <script src="combobox.js?v=1"></script>
 <script>
+const FRONTEND_PREFIX = <?= json_encode((str_contains($_SERVER['HTTP_HOST'] ?? '', 'localhost') || str_contains($_SERVER['HTTP_HOST'] ?? '', '127.0.0.1')) ? '/ChennaiMatrimony' : '') ?>;
 // ===== PHOTO PREVIEW HELPER (with face detection + compression) =====
 // Store processed files for form submission
 const _processedPhotos = {};
@@ -2124,6 +2139,50 @@ function showSec(name, btn) {
   });
 }
 
+function openPrintForm() { window.open('print-profile-form.php', '_blank'); }
+
+function toggleShareMenu(evt) {
+  evt.stopPropagation();
+  const existing = document.getElementById('shareDrop');
+  if (existing) { existing.remove(); return; }
+  const btn = evt.currentTarget;
+  const cpId = profile?.cp_id || '';
+  const profileUrl = window.location.origin + FRONTEND_PREFIX + '/detail/' + cpId;
+
+  const drop = document.createElement('div');
+  drop.id = 'shareDrop';
+  drop.style.cssText = 'position:fixed;background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.18);padding:6px;z-index:9999;min-width:196px;';
+
+  const mkItem = (icon, label, fn) => {
+    const d = document.createElement('button');
+    d.innerHTML = '<span style="width:22px;display:inline-block;text-align:center">' + icon + '</span> ' + label;
+    d.style.cssText = 'display:block;width:100%;padding:9px 14px;border:none;background:transparent;cursor:pointer;font-size:14px;font-weight:600;color:#1a1a1a;border-radius:8px;text-align:left;white-space:nowrap;';
+    d.onmouseover = () => d.style.background = '#f0fdf4';
+    d.onmouseout  = () => d.style.background = 'transparent';
+    d.onclick = () => { fn(); drop.remove(); };
+    drop.appendChild(d);
+  };
+
+  mkItem('📄', 'Download PDF',      () => window.open('print-profile-form.php?share=pdf', '_blank'));
+  mkItem('🖼️', 'Save as Image',     () => window.open('print-profile-form.php?share=img', '_blank'));
+  mkItem('🔗', 'Copy Profile Link', () => {
+    if (navigator.clipboard) navigator.clipboard.writeText(profileUrl).then(() => toast('Link copied!'));
+    else prompt('Copy link:', profileUrl);
+  });
+  mkItem('💬', 'WhatsApp',          () => window.open('https://wa.me/?text=' + encodeURIComponent(profileUrl), '_blank'));
+
+  const r = btn.getBoundingClientRect();
+  drop.style.top   = (r.bottom + 4) + 'px';
+  drop.style.right = (window.innerWidth - r.right) + 'px';
+  document.body.appendChild(drop);
+
+  setTimeout(() => {
+    document.addEventListener('click', function h(e) {
+      if (!drop.contains(e.target)) { drop.remove(); document.removeEventListener('click', h); }
+    });
+  }, 50);
+}
+
 function setActions(sec) {
   const acts = document.getElementById('topbarActions');
   if (sec === 'myProfile' && profile) {
@@ -2134,7 +2193,8 @@ function setActions(sec) {
     let html = '';
     if (isFree && !isPending) html += '<button class="btn btn-sm btn-primary" onclick="goToPayment()" style="background:linear-gradient(135deg,#f59e0b,#d97706);border-color:#d97706">Pay Now</button>';
     if (canEdit) html += '<button class="btn btn-outline btn-sm" onclick="openEdit()">Edit</button>';
-    html += '<button class="btn btn-outline btn-sm" onclick="window.print()">Print</button>';
+    html += '<button class="btn btn-outline btn-sm" onclick="openPrintForm()">🖨️ Print Form</button>';
+    html += '<button class="btn btn-outline btn-sm" onclick="toggleShareMenu(event)" style="position:relative">🔗 Share</button>';
     if (canDelete) html += '<button class="btn btn-danger btn-sm" onclick="deleteProf()">Delete</button>';
     acts.innerHTML = html;
   } else if (sec === 'myProfile' && !profile) {
@@ -2797,16 +2857,24 @@ async function renderPayuPayments() {
   // --- Points table ---
   document.getElementById('payuPtsBadge').textContent = ptsHistory.length;
   document.getElementById('payuPtsTbody').innerHTML = ptsHistory.length === 0
-    ? `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--ink3)">No points purchases yet</td></tr>`
-    : ptsHistory.map((t, i) => `<tr>
-        <td style="color:var(--ink4);font-size:13px">${i+1}</td>
-        <td style="font-size:13px;white-space:nowrap">${esc((t.created_at||'-').slice(0,16))}</td>
-        <td style="font-size:14px">${esc(t.description||'-')}</td>
-        <td style="font-weight:700;color:#6B3FA0;font-size:15px">+${t.points} pts</td>
-        <td style="font-weight:700;color:#0D7B6A">${t.balance_after} pts</td>
-        <td style="font-size:11px;color:var(--ink3);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(t.ref_id||'')}">${esc(t.ref_id||'—')}</td>
-        <td><span style="background:#dcfce7;color:#16a34a;padding:3px 10px;border-radius:20px;font-size:13px;font-weight:700">✅ Success</span></td>
-      </tr>`).join('');
+    ? `<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--ink3)">No points purchases yet</td></tr>`
+    : ptsHistory.map((t, i) => {
+        const targetCp = (t.target_cp_id || '').trim();
+        const profileCell = targetCp
+          ? `<span style="font-size:12px;color:var(--ink2);font-weight:600">${esc(targetCp)}</span>
+             <a href="${FRONTEND_PREFIX}/detail/${esc(targetCp)}" target="_blank" style="margin-left:6px;padding:2px 10px;background:#0D7B6A;color:#fff;border:none;border-radius:14px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block">View</a>`
+          : `<span style="color:#ccc;font-size:12px">—</span>`;
+        return `<tr>
+          <td style="color:var(--ink4);font-size:13px">${i+1}</td>
+          <td style="font-size:13px;white-space:nowrap">${esc((t.created_at||'-').slice(0,16))}</td>
+          <td style="font-size:14px">${esc(t.description||'-')}</td>
+          <td style="font-weight:700;color:#6B3FA0;font-size:15px">+${t.points} pts</td>
+          <td style="font-weight:700;color:#0D7B6A">${t.balance_after} pts</td>
+          <td style="font-size:11px;color:var(--ink3);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(t.ref_id||'')}">${esc(t.ref_id||'—')}</td>
+          <td style="white-space:nowrap">${profileCell}</td>
+          <td><span style="background:#dcfce7;color:#16a34a;padding:3px 10px;border-radius:20px;font-size:13px;font-weight:700">✅ Success</span></td>
+        </tr>`;
+      }).join('');
 }
 
 function payuShowReceipt(o) {
@@ -3031,8 +3099,8 @@ function renderSuggestionsUI() {
 
     return `<div class="sg-card" data-tag="${currentTag}" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:white;border-radius:10px;border:1.5px solid ${tagBorder};transition:all .2s"
       onmouseover="this.style.boxShadow='0 4px 12px rgba(139,0,0,0.1)'" onmouseout="this.style.boxShadow='none'">
-      <div style="cursor:pointer;flex-shrink:0" onclick="window.open('/detail/${esc(p.cp_id)}','_blank')">${imgHtml}${fallback}</div>
-      <div style="flex:1;min-width:0;cursor:pointer" onclick="window.open('/detail/${esc(p.cp_id)}','_blank')">
+      <div style="cursor:pointer;flex-shrink:0" onclick="window.open(FRONTEND_PREFIX+'/detail/${esc(p.cp_id)}','_blank')">${imgHtml}${fallback}</div>
+      <div style="flex:1;min-width:0;cursor:pointer" onclick="window.open(FRONTEND_PREFIX+'/detail/${esc(p.cp_id)}','_blank')">
         <div style="font-weight:700;font-size:16px;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.name)}</div>
         <div style="font-size:17px;color:var(--ink3)">${esc(p.cp_id)} · ${p.age||''} yrs · ${esc(p.caste||'')}</div>
         <div style="margin-top:3px">${starRating(score)}</div>
@@ -3125,7 +3193,7 @@ function _profileTableRow(p, i) {
     ? `<img src="${src}" style="width:40px;height:48px;object-fit:cover;border-radius:6px;display:block" onerror="this.style.display='none'">`
     : `<div style="width:40px;height:48px;border-radius:6px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px;color:#9ca3af">${esc((p.name||'?').charAt(0))}</div>`;
   const loc = [p.present_city||p.present_district, p.nativity].filter(Boolean).join(', ');
-  return `<tr style="cursor:pointer" onclick="window.open('/detail/${esc(p.cp_id)}','_blank')"
+  return `<tr style="cursor:pointer" onclick="window.open(FRONTEND_PREFIX+'/detail/${esc(p.cp_id)}','_blank')"
     onmouseover="this.style.background='#fef9f9'" onmouseout="this.style.background=''">
     <td style="padding:7px 8px;color:var(--ink4);font-size:17px;text-align:center">${i+1}</td>
     <td style="padding:7px 8px">${thumb}</td>
@@ -3137,7 +3205,7 @@ function _profileTableRow(p, i) {
     <td style="padding:7px 8px;font-size:11.5px;color:var(--ink2)">${esc(p.caste||'-')}<br><span style="color:var(--ink4)">${esc(p.religion||'')}</span></td>
     <td style="padding:7px 8px;font-size:17px;color:var(--ink3);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc([p.qualification,p.job].filter(Boolean).join(' · ')||'-')}</td>
     <td style="padding:7px 8px;font-size:17px;color:var(--ink3)">${esc(loc||'-')}</td>
-    <td style="padding:7px 8px"><a href="/detail/${esc(p.cp_id)}" target="_blank" style="font-size:17px;font-weight:600;color:#0D7B6A;text-decoration:none;white-space:nowrap">View →</a></td>
+    <td style="padding:7px 8px"><a href="${FRONTEND_PREFIX}/detail/${esc(p.cp_id)}" target="_blank" style="font-size:17px;font-weight:600;color:#0D7B6A;text-decoration:none;white-space:nowrap">View →</a></td>
   </tr>`;
 }
 
@@ -3157,7 +3225,7 @@ function _profileCardHtml(list) {
     const fallback = `<div style="${src?'display:none;':'display:flex;'}width:54px;height:54px;border-radius:50%;background:var(--bg);align-items:center;justify-content:center;font-size:16px;color:var(--ink3);font-weight:700;border:2px solid #e5e7eb">${esc((p.name||'?').charAt(0))}</div>`;
     const where = [p.present_city, p.present_district].filter(Boolean).join(', ');
     return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border-radius:10px;border:1.5px solid #f0e0e4;cursor:pointer"
-      onclick="window.open('/detail/${esc(p.cp_id)}','_blank')"
+      onclick="window.open(FRONTEND_PREFIX+'/detail/${esc(p.cp_id)}','_blank')"
       onmouseover="this.style.boxShadow='0 4px 12px rgba(139,0,0,0.1)'" onmouseout="this.style.boxShadow='none'">
       <div style="flex-shrink:0">${imgHtml}${fallback}</div>
       <div style="flex:1;min-width:0">
@@ -3229,7 +3297,7 @@ async function renderAllProfiles() {
   try {
     const resp = await fetch('api/public.php?action=bootstrap&limit=24', { credentials:'same-origin' });
     const data = await resp.json();
-    const profiles = [...(data.female || []), ...(data.male || [])];
+    const profiles = [...(data.female?.profiles || data.female || []), ...(data.male?.profiles || data.male || [])];
     if (!profiles.length) { grid.innerHTML = '<div style="padding:24px;text-align:center;color:var(--ink3);grid-column:1/-1">No profiles found.</div>'; return; }
     const photoBase = 'api/uploads/';
     const card = (p) => {
@@ -3240,7 +3308,7 @@ async function renderAllProfiles() {
         : '';
       const fallback = `<div style="${src?'display:none;':'display:flex;'}width:60px;height:72px;border-radius:8px;background:#f3f4f6;align-items:center;justify-content:center;font-size:22px;color:#9ca3af;font-weight:700;flex-shrink:0">${esc((p.name||'?').charAt(0))}</div>`;
       return `<div style="display:flex;gap:12px;align-items:center;padding:12px;background:#fff;border-radius:10px;border:1px solid #e5e7eb;cursor:pointer"
-        onclick="window.open('/detail/${esc(p.cp_id)}','_blank')"
+        onclick="window.open(FRONTEND_PREFIX+'/detail/${esc(p.cp_id)}','_blank')"
         onmouseover="this.style.boxShadow='0 4px 12px rgba(139,0,0,0.1)';this.style.borderColor='#c4b5a0'"
         onmouseout="this.style.boxShadow='none';this.style.borderColor='#e5e7eb'">
         ${imgHtml}${fallback}
@@ -3300,7 +3368,7 @@ async function renderUserProfileViewLog() {
       ? emp(4, 'No profiles viewed yet')
       : pv.map((v, i) => `<tr>
           <td style="color:var(--ink4)">${i+1}</td>
-          <td><a href="/detail/${esc(v.target_cp_id)}" target="_blank" rel="noopener" style="text-decoration:none"><code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-size:11.5px;color:#1d4ed8;cursor:pointer">${esc(v.target_cp_id)}</code></a></td>
+          <td><a href="${FRONTEND_PREFIX}/detail/${esc(v.target_cp_id)}" target="_blank" rel="noopener" style="text-decoration:none"><code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-size:11.5px;color:#1d4ed8;cursor:pointer">${esc(v.target_cp_id)}</code></a></td>
           <td style="font-size:15px">${esc(v.target_name || '-')}</td>
           <td style="font-size:11.5px">${esc(v.datetime)}</td>
         </tr>`).join('');
@@ -3333,7 +3401,7 @@ async function renderUserContactLog() {
       ? emp(4, 'No contacts viewed yet')
       : cv.map((v, i) => `<tr>
           <td style="color:var(--ink4)">${i+1}</td>
-          <td><a href="/detail/${esc(v.target_cp_id)}" target="_blank" rel="noopener" style="text-decoration:none"><code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-size:11.5px;color:#1d4ed8;cursor:pointer">${esc(v.target_cp_id)}</code></a></td>
+          <td><a href="${FRONTEND_PREFIX}/detail/${esc(v.target_cp_id)}" target="_blank" rel="noopener" style="text-decoration:none"><code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-size:11.5px;color:#1d4ed8;cursor:pointer">${esc(v.target_cp_id)}</code></a></td>
           <td style="font-size:15px">${esc(v.target_name || '-')}</td>
           <td style="font-size:11.5px">${esc(v.datetime)}</td>
         </tr>`).join('');
@@ -3842,17 +3910,82 @@ async function renderMyPoints() {
     const d = await r.json();
     const tb = document.getElementById('ptsTxnTbody');
     if (!tb) return;
-    if (!d.ok || !d.history?.length) { tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:16px">No transactions yet.</td></tr>'; return; }
-    tb.innerHTML = d.history.map((t,i) => {
-      const sign   = t.points > 0 ? '+' : '';
-      const color  = t.points > 0 ? '#166534' : '#991b1b';
-      const typeLabel = {purchase:'Purchase',deduct:'Contact View',admin_credit:'Admin Credit',admin_debit:'Admin Debit'}[t.type] || t.type;
-      return `<tr><td>${i+1}</td><td>${typeLabel}</td><td style="color:${color};font-weight:700">${sign}${t.points}</td><td>${t.balance_after}</td><td>${t.description||'-'}</td><td>${t.created_at?.slice(0,16)||'-'}</td></tr>`;
+    if (!d.ok || !d.history?.length) { tb.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:20px">No transactions yet.</td></tr>'; return; }
+
+    // Summary counts
+    let totalIn = 0, totalOut = 0;
+    d.history.forEach(t => { if (t.points > 0) totalIn += t.points; else totalOut += Math.abs(t.points); });
+    const summary = document.getElementById('ptsStmtSummary');
+    if (summary) {
+      summary.style.cssText += ';display:flex';
+      summary.innerHTML = `
+        <div style="display:flex;align-items:center;gap:6px;font-size:13px">
+          <span style="width:10px;height:10px;border-radius:50%;background:#166534;display:inline-block"></span>
+          <span style="color:#555">Total Credits:</span>
+          <strong style="color:#166534">+${totalIn} pts</strong>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:13px">
+          <span style="width:10px;height:10px;border-radius:50%;background:#991b1b;display:inline-block"></span>
+          <span style="color:#555">Total Debits:</span>
+          <strong style="color:#991b1b">-${totalOut} pts</strong>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:13px;margin-left:auto">
+          <span style="color:#555">Transactions shown:</span>
+          <strong style="color:#1e40af">${d.history.length}</strong>
+        </div>`;
+    }
+
+    const TYPE_ICON = { purchase:'🛒', deduct:'👁️', admin_credit:'🎁', admin_debit:'⚠️' };
+    const TYPE_LABEL = { purchase:'Points Purchase', deduct:'Contact View', admin_credit:'Admin Credit', admin_debit:'Admin Debit' };
+
+    tb.innerHTML = d.history.map((t, i) => {
+      const isCredit = t.points > 0;
+      const pts = Math.abs(t.points);
+      const icon = TYPE_ICON[t.type] || '•';
+      const label = TYPE_LABEL[t.type] || t.type;
+      const dt = t.created_at ? t.created_at.slice(0,16).replace('T',' ') : '-';
+
+      // Profile column — show CP ID link for contact-view deductions
+      let profileCell = '<span style="color:#ccc">—</span>';
+      if (t.type === 'deduct' && t.ref_id && /^[A-Z]{2}\d+$/.test(t.ref_id)) {
+        profileCell = `<a href="${FRONTEND_PREFIX}/detail/${t.ref_id}" target="_blank" style="color:#0D7B6A;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:3px">
+          ${t.ref_id}
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>`;
+      } else if (t.type === 'purchase' && t.ref_id) {
+        profileCell = `<span style="color:#888;font-size:11px" title="${t.ref_id}">${t.ref_id.slice(0,12)}…</span>`;
+      }
+
+      const inCell  = isCredit
+        ? `<td style="text-align:right;font-weight:700;color:#166534;background:#f0fdf4">+${pts}</td>`
+        : `<td style="text-align:right;color:#ccc">—</td>`;
+      const outCell = !isCredit
+        ? `<td style="text-align:right;font-weight:700;color:#991b1b;background:#fef2f2">-${pts}</td>`
+        : `<td style="text-align:right;color:#ccc">—</td>`;
+
+      const rowBg = i % 2 === 0 ? '' : 'style="background:#fafafa"';
+      return `<tr ${rowBg}>
+        <td style="color:#aaa;font-size:12px">${i+1}</td>
+        <td style="font-size:12.5px;color:#555;white-space:nowrap">${dt}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:5px">
+            <span style="font-size:15px">${icon}</span>
+            <div>
+              <div style="font-weight:600;font-size:13px;color:#222">${label}</div>
+              ${t.description && t.description !== label ? `<div style="font-size:11.5px;color:#888">${t.description}</div>` : ''}
+            </div>
+          </div>
+        </td>
+        <td>${profileCell}</td>
+        ${inCell}
+        ${outCell}
+        <td style="text-align:right;font-weight:700;color:#1e40af;white-space:nowrap">${t.balance_after} pts</td>
+      </tr>`;
     }).join('');
   } catch(e) {}
 }
 
-async function initPointsBuy(pkgId) {
+async function initPointsBuy(pkgId, returnCp) {
   const pkg = pkgId;
   if (!pkg) return;
   const msg = document.getElementById('ptsPayMsg');
@@ -3860,7 +3993,7 @@ async function initPointsBuy(pkgId) {
   try {
     const r = await fetch('api/points.php?action=buy_init', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ pkg_id: pkg }), credentials:'include'
+      body: JSON.stringify({ pkg_id: pkg, return_cp: returnCp || '' }), credentials:'include'
     });
     const d = await r.json();
     if (!d.ok) { if (msg) msg.textContent = d.error || 'Error'; return; }
@@ -3895,11 +4028,12 @@ async function initPointsBuy(pkgId) {
 (function() {
   const p = new URLSearchParams(location.search);
   const pkgId = p.get('buy_pkg') || {100:'p100',500:'p500',1000:'p1000'}[parseInt(p.get('buy_pts')||'0')] || null;
+  const returnCp = p.get('return_cp') || '';
   if (pkgId) {
     document.addEventListener('DOMContentLoaded', () => {
       const btns = document.querySelectorAll('[data-page="page_points"]');
       if (btns[0]) btns[0].click();
-      setTimeout(() => initPointsBuy(pkgId), 400);
+      setTimeout(() => initPointsBuy(pkgId, returnCp), 400);
     });
   }
   // Handle PayU return

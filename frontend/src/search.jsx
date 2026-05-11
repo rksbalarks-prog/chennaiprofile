@@ -258,7 +258,7 @@ export default function MatrimonySearch() {
       ) : (
         <div style={{ padding:12, display:'flex', flexDirection:'column', gap:14, maxWidth:560, margin:'0 auto' }}>
           {paged.map(p => {
-            const goDetail = () => navigate(`/detail/${p.id}`, { state: { profile: p } });
+            const goDetail = () => window.open(`/detail/${p.id}`, '_blank');
             const genderFallback = p.gender === 'Male' ? '/default-male.png' : '/default-female.png';
             const urls = p.photo ? getPhotoUrls(p.photoRaw) : null;
             const locationStr = [p.city, p.district, p.state].filter(Boolean).join(', ');

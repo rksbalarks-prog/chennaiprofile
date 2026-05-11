@@ -107,7 +107,9 @@ export default function Detail() {
   const [gateState, setGateState] = useState({ returning:false, anonViewsUsed:0, anonViewsLimit:5, gateRequired:false, anonWindowSec:24*3600, anonWindowStart:0 });
   const [gatePromptMsg, setGatePromptMsg] = useState('');
   const [pointsBalance, setPointsBalance] = useState(null);
+  const [paymentSuccessMsg, setPaymentSuccessMsg] = useState('');
   const [showPointsModal, setShowPointsModal] = useState(false);
+  const [autoReveal, setAutoReveal] = useState(false);
   const [buyPackages, setBuyPackages] = useState([
     {id:'p100', pts:100, price:100, badge:''},
     {id:'p500', pts:500, price:500, badge:'Popular'},
@@ -156,6 +158,16 @@ export default function Detail() {
       .then(r => r.json()).then(d => {
         if (d?.ok && d.packages?.length) setBuyPackages(d.packages.map(p => ({ id:p.id||p.pkg_id, pts:p.points, price:parseFloat(p.price), badge:p.badge||'' })));
       }).catch(() => {});
+    // Detect return from PayU payment — refresh balance and show success banner
+    const qp = new URLSearchParams(window.location.search);
+    if (qp.get('pay') === 'pts_ok') {
+      const pts = qp.get('pts') || '';
+      setPaymentSuccessMsg(`✅ ${pts ? pts + ' points' : 'Points'} added! Revealing contact…`);
+      window.history.replaceState({}, '', window.location.pathname);
+      setAutoReveal(true);
+      fetch(`${POINTS_API}?action=balance`, { credentials:'include' })
+        .then(r => r.json()).then(d => { if (d?.ok) setPointsBalance(d.balance); }).catch(() => {});
+    }
   }, []);
 
   useEffect(() => {
@@ -366,6 +378,14 @@ export default function Detail() {
     })();
   }, [id]);
 
+  // Auto-reveal contact after successful PayU return
+  useEffect(() => {
+    if (!autoReveal || !profile) return;
+    setAutoReveal(false);
+    revealContact();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoReveal, profile]);
+
   if (loading) return (
     <div style={{ minHeight:'100vh', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:14, color:'#888' }}>
       <span style={{ width:34, height:34, border:'3px solid rgba(139,0,0,0.18)', borderTopColor:'#0D7B6A', borderRadius:'50%', animation:'spin 0.8s linear infinite' }} />
@@ -408,6 +428,14 @@ export default function Detail() {
 
   return (
     <div style={{ background:'#F4FAF8', minHeight:'100vh', paddingBottom:70 }}>
+
+      {/* Payment success banner */}
+      {paymentSuccessMsg && (
+        <div style={{ background:'#f0fdf4', border:'1px solid #86efac', borderRadius:10, margin:'10px 12px 0', padding:'12px 16px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:10 }}>
+          <span style={{ fontSize:15, fontWeight:600, color:'#15803d' }}>{paymentSuccessMsg}</span>
+          <button onClick={() => setPaymentSuccessMsg('')} style={{ background:'none', border:'none', cursor:'pointer', fontSize:18, color:'#15803d', lineHeight:1 }}>×</button>
+        </div>
+      )}
 
       {/* Back button — always visible (desktop + mobile) */}
       <div style={{ padding:'10px 12px', background:'#fff', borderBottom:'1px solid #f0f0f0' }}>
@@ -512,7 +540,10 @@ export default function Detail() {
         <div style={{ background:'#fff', borderRadius:12, padding:'14px 18px', marginBottom:10, boxShadow:'0 1px 4px rgba(0,0,0,0.04)', border:'1px solid #f0f0f0' }}>
           {showContact ? (
             <div>
-              <div style={{ fontSize:16, fontWeight:600, color:'#999', textTransform:'uppercase', marginBottom:8 }}>Contact Details</div>
+              <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:10 }}>
+                <span style={{ background:'#dcfce7', color:'#166534', fontWeight:700, fontSize:13, padding:'3px 10px', borderRadius:20, border:'1px solid #bbf7d0' }}>✅ Contact Viewed</span>
+                <span style={{ fontSize:12, color:'#aaa' }}>10 pts deducted</span>
+              </div>
               <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
                 {revealedContact?.phone && (
                   <a href={`tel:${revealedContact.phone}`} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 14px', background:'#f0fdf4', borderRadius:8, textDecoration:'none', border:'1px solid #bbf7d0' }}>
@@ -701,6 +732,35 @@ export default function Detail() {
         </Section>
 
 
+        {/* View Contact — repeated at the bottom for easy access after scrolling */}
+        <div style={{ background:'#fff', borderRadius:12, padding:'14px 18px', marginBottom:10, boxShadow:'0 1px 4px rgba(0,0,0,0.04)', border:'1px solid #f0f0f0' }}>
+          {showContact ? (
+            <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+              <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:4 }}>
+                <span style={{ background:'#dcfce7', color:'#166534', fontWeight:700, fontSize:13, padding:'3px 10px', borderRadius:20, border:'1px solid #bbf7d0' }}>✅ Contact Viewed</span>
+                <span style={{ fontSize:12, color:'#aaa' }}>10 pts deducted</span>
+              </div>
+              {revealedContact?.phone && (
+                <a href={`tel:${revealedContact.phone}`} style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:10, padding:'12px', background:'linear-gradient(135deg,#16a34a,#15803d)', color:'#fff', borderRadius:10, textDecoration:'none', fontSize:18, fontWeight:700, letterSpacing:1 }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  📞 Call {revealedContact.phone}
+                </a>
+              )}
+              {revealedContact?.altMobile && (
+                <a href={`tel:${revealedContact.altMobile}`} style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:10, padding:'10px', background:'#eff6ff', color:'#2563eb', borderRadius:10, textDecoration:'none', fontSize:16, fontWeight:700, border:'1px solid #bfdbfe' }}>
+                  📞 {revealedContact.altMobile} (Alt)
+                </a>
+              )}
+            </div>
+          ) : (
+            <button onClick={revealContact}
+              style={{ width:'100%', padding:'14px', background:'linear-gradient(135deg,#16a34a,#15803d)', color:'#fff', border:'none', borderRadius:10, fontSize:18, fontWeight:700, cursor:'pointer', letterSpacing:0.3, display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              {IS_CHENNAI_PROFILE ? `View Contact (${POINTS_PER_CONTACT} pts)` : 'View Free Contact'}
+            </button>
+          )}
+        </div>
+
         {/* Report Profile */}
         <div style={{ padding:'0 0 10px', display:'flex', gap:8, justifyContent:'center' }}>
           <button onClick={() => setShowReportModal(true)}
@@ -828,7 +888,7 @@ export default function Detail() {
                 {buyPackages.map((pkg, idx) => {
                   const isDefault = idx === 0;
                   return (
-                    <a key={pkg.id} href={`${USER_PANEL_URL}?buy_pkg=${pkg.id}`}
+                    <a key={pkg.id} href={`${USER_PANEL_URL}?buy_pkg=${pkg.id}&return_cp=${encodeURIComponent(id)}`}
                       style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 16px', border:`2px solid ${isDefault ? '#16a34a' : '#0D7B6A'}`, borderRadius:10, background: isDefault ? '#f0fdf4' : '#fff', textDecoration:'none', cursor:'pointer', position:'relative' }}>
                       {isDefault && <span style={{ position:'absolute', top:-9, left:12, fontSize:10, background:'#16a34a', color:'#fff', borderRadius:6, padding:'1px 8px', fontWeight:700 }}>✓ Recommended</span>}
                       <div>
