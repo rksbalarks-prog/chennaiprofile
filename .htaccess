@@ -100,6 +100,9 @@ RewriteRule ^ frontend/dist/index.html [L]
 # No directory listings
 Options -Indexes
 
+# Serve the SPA index when accessing the app root as a directory
+DirectoryIndex frontend/dist/index.html index.html
+
 # Block access to source/config files
 <FilesMatch "\.(sql|log|env|zip|tar|bak|ini|conf)$">
     Require all denied

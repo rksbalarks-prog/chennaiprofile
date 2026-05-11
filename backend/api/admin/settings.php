@@ -451,7 +451,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             json_err('Unknown panel ctrl action.');
         }
 
-        // ── OTP Ban/Unban ──
+        // ── OTP Ban/Unban + Remark ──
         case 'otpLogs': {
             if ($action === 'toggleBan') {
                 $mobile = str_clean($b['mobile'] ?? '', 15);
@@ -461,6 +461,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $isBanned = $r && (int)$r['banned'];
                 pushAdminLog($isBanned?'Banned User':'Unbanned User', $mobile, 'ban', $admin);
                 json_ok(['msg' => $isBanned ? 'Banned.' : 'Unbanned.', 'banned' => $isBanned]);
+            }
+            if ($action === 'setRemark') {
+                $mobile = str_clean($b['mobile'] ?? '', 15);
+                $allowed = ['', 'Interested', 'Not Interested', 'Visitor', 'Ring'];
+                $remark  = in_array($b['remark'] ?? '', $allowed) ? ($b['remark'] ?? '') : '';
+                $db->prepare("UPDATE otp_logs SET remark=:r WHERE mobile=:m")->execute([':r'=>$remark, ':m'=>$mobile]);
+                json_ok(['msg' => 'Remark saved.', 'remark' => $remark]);
             }
             json_err('Unknown otp action.');
         }

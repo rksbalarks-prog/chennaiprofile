@@ -415,6 +415,8 @@ select.input { cursor: pointer; }
   border-radius: 16px;
   padding: 28px;
   width: 360px;
+  max-height: 92vh;
+  overflow-y: auto;
   box-shadow: 0 20px 60px rgba(26,26,46,0.2);
   animation: modalIn 0.2s ease;
 }
@@ -777,7 +779,7 @@ select.input { cursor: pointer; }
   .reports-grid { grid-template-columns: 1fr; }
   .stories-grid { grid-template-columns: 1fr; }
   .page-header { flex-direction: column; align-items: flex-start; gap: 10px; }
-  .modal { width: calc(100vw - 32px); padding: 20px; }
+  .modal { width: calc(100vw - 32px); padding: 20px; max-height: 92vh; overflow-y: auto; }
   .settings-grid { grid-template-columns: 1fr; }
   .search-bar { flex-direction: column; align-items: stretch; }
   .search-input { min-width: 0; }
@@ -1507,7 +1509,7 @@ input[type="date"].filter-select { padding:8px 10px; cursor:pointer; }
               <th>Status</th>
               <th>Plan</th>
               <th>Created</th>
-              <th>Approved</th>
+              <th>Approved By</th>
               <th>Expiry</th>
               <th>Actions</th>
             </tr>
@@ -1594,7 +1596,7 @@ input[type="date"].filter-select { padding:8px 10px; cursor:pointer; }
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>CP ID</th><th>Member</th><th>Type</th><th>Admin</th><th>Date</th><th>Notes</th><th>Action</th></tr></thead>
+          <thead><tr><th>CP ID</th><th>Member</th><th>Mobile</th><th>Type</th><th>Admin</th><th>Date</th><th>Notes</th><th>Action</th></tr></thead>
           <tbody id="todayFollowTable"></tbody>
         </table>
       </div>
@@ -1608,7 +1610,7 @@ input[type="date"].filter-select { padding:8px 10px; cursor:pointer; }
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>CP ID</th><th>Member</th><th>Type</th><th>Admin</th><th>Date</th><th>Notes</th><th>Action</th></tr></thead>
+          <thead><tr><th>CP ID</th><th>Member</th><th>Mobile</th><th>Type</th><th>Admin</th><th>Date</th><th>Notes</th><th>Action</th></tr></thead>
           <tbody id="pastFollowTable"></tbody>
         </table>
       </div>
@@ -1622,7 +1624,7 @@ input[type="date"].filter-select { padding:8px 10px; cursor:pointer; }
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>CP ID</th><th>Member</th><th>Type</th><th>Admin</th><th>Date</th><th>Notes</th><th>Action</th></tr></thead>
+          <thead><tr><th>CP ID</th><th>Member</th><th>Mobile</th><th>Type</th><th>Admin</th><th>Date</th><th>Notes</th><th>Action</th></tr></thead>
           <tbody id="futureFollowTable"></tbody>
         </table>
       </div>
@@ -1636,7 +1638,7 @@ input[type="date"].filter-select { padding:8px 10px; cursor:pointer; }
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>CP ID</th><th>Member</th><th>Type</th><th>Admin</th><th>Closed On</th><th>Notes</th><th>Action</th></tr></thead>
+          <thead><tr><th>CP ID</th><th>Member</th><th>Mobile</th><th>Type</th><th>Admin</th><th>Closed On</th><th>Notes</th><th>Action</th></tr></thead>
           <tbody id="closedFollowTable"></tbody>
         </table>
       </div>
@@ -3222,6 +3224,7 @@ input[type="date"].filter-select { padding:8px 10px; cursor:pointer; }
               <th>Sl.No</th>
               <th>Mobile</th>
               <th>CP ID</th>
+              <th>Remarks</th>
               <th>Name</th>
               <th>OTP Requested</th>
               <th>Live OTP</th>
@@ -4538,6 +4541,10 @@ input[type="date"].filter-select { padding:8px 10px; cursor:pointer; }
       <input class="input" id="ef_member" readonly style="background:#f3f4f6">
     </div>
     <div class="form-row">
+      <label class="input-label">Mobile</label>
+      <input class="input" id="ef_mobile" readonly style="background:#f3f4f6">
+    </div>
+    <div class="form-row">
       <label class="input-label">Follow-up Type</label>
       <select class="input" id="ef_type">
         <option value="data">📋 Data</option>
@@ -5369,11 +5376,17 @@ function show(s, btn) {
       return;
     }
   }
+  localStorage.setItem('admin_section', s);
   document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
   const sec = document.getElementById(s + 'Section');
   if (sec) sec.classList.add('active');
   if (btn) btn.classList.add('active');
+  if (!btn) {
+    // highlight correct sidebar button when restoring from localStorage
+    const nb = document.querySelector(`.nav-btn[onclick*="show('${s}'"]`);
+    if (nb) nb.classList.add('active');
+  }
   if (['profile','manage','bill','usage','deleted'].includes(s)) render();
   if (s === 'bill')        { renderBills(); renderBillHistory(); }
   if (s === 'follow')      renderFollowTables();
@@ -5780,6 +5793,20 @@ function render() {
         </div>`;
     }
 
+    const approvedBy = bill ? (bill.billedBy || bill.billed_by || '—') : '—';
+    const expiryVal  = bill ? (bill.expiry   || '—')                   : '—';
+    const approvedByCell = approvedBy === '—'
+      ? `<span style="color:#d1d5db;font-size:12px">—</span>`
+      : `<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#1e40af;background:#eff6ff;border:1px solid #bfdbfe;padding:3px 8px;border-radius:12px;font-weight:600">🛡 ${approvedBy}</span>`;
+    const expiryCell = expiryVal === '—'
+      ? `<span style="color:#d1d5db;font-size:12px">—</span>`
+      : (() => {
+          const today = new Date().toISOString().split('T')[0];
+          const color = expiryVal < today ? '#dc2626' : '#16a34a';
+          const bg    = expiryVal < today ? '#fef2f2' : '#f0fdf4';
+          const border= expiryVal < today ? '#fecaca' : '#bbf7d0';
+          return `<span style="font-size:12px;font-weight:600;color:${color};background:${bg};border:1px solid ${border};padding:3px 8px;border-radius:12px">${expiryVal}</span>`;
+        })();
     return `<tr data-created="${p.created||''}">
       <td><code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${p.cpId}</code></td>
       <td><div class="name-cell"><div class="avatar">${initials(p.name)}</div>${p.name}</div></td>
@@ -5788,8 +5815,8 @@ function render() {
       <td>${statusBadge(p.status)}</td>
       <td>${planBadge(p.plan)}</td>
       <td style="font-size:12px">${p.created||'-'}</td>
-      <td style="font-size:12px">${p.approved||'-'}</td>
-      <td style="font-size:12px">${p.expiry||'-'}</td>
+      <td>${approvedByCell}</td>
+      <td>${expiryCell}</td>
       <td>
         <div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
           <!-- Workflow stepper -->
@@ -6997,9 +7024,11 @@ function typeBadge(type) {
 function followRow(f, fi, showEdit=true, showUndo=false) {
   const editBtn  = showEdit  ? `<button class="btn btn-outline btn-sm" onclick="openEditFollow(${fi})">✏️ Edit</button>` : '';
   const undoBtn  = showUndo  ? `<button class="btn btn-green btn-sm" onclick="undoClosedFollow(${fi})">↩ Undo</button>` : '';
+  const mob = f.mobile || (f.cpId && profiles.find(p=>p.cpId===f.cpId)?.mobile) || '—';
   return `<tr>
     <td><code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${f.cpId}</code></td>
     <td><div class="name-cell"><div class="avatar" style="font-size:10px;width:26px;height:26px">${initials(f.memberName||'?')}</div>${f.memberName||f.mobile}</div></td>
+    <td style="font-size:13px;font-weight:500;color:var(--text-primary)">${mob}</td>
     <td>${typeBadge(f.type)}</td>
     <td><span style="font-weight:500;font-size:13px">${f.admin||'—'}</span></td>
     <td style="font-size:13px">${f.date}</td>
@@ -7031,7 +7060,7 @@ function renderFollowTables() {
 
   function renderTable(tbodyId, list, showEdit, showUndo, emptyIcon, emptyMsg) {
     document.getElementById(tbodyId).innerHTML = list.length === 0
-      ? emptyRow(7, emptyIcon, emptyMsg)
+      ? emptyRow(8, emptyIcon, emptyMsg)
       : list.map(f => {
           const fi = followUps.indexOf(f);
           return followRow(f, fi, showEdit, showUndo);
@@ -7061,6 +7090,8 @@ function openEditFollow(fi) {
   const todayStr = new Date().toISOString().split('T')[0];
   document.getElementById('ef_cpid').value   = f.cpId;
   document.getElementById('ef_member').value = f.memberName || f.mobile;
+  const efMob = f.mobile || (f.cpId && profiles.find(p=>p.cpId===f.cpId)?.mobile) || '—';
+  document.getElementById('ef_mobile').value = efMob;
   document.getElementById('ef_type').value   = f.type;
   document.getElementById('ef_date').value   = f.date >= todayStr ? f.date : todayStr;
   document.getElementById('ef_date').min     = todayStr;
@@ -11028,10 +11059,14 @@ function renderOtp() {
     const liveOtpCell = liveOtpRaw && !liveOtpExpiredClient
       ? `<span style="font-family:var(--mono,monospace);font-weight:700;font-size:14px;color:#047857;background:#ecfdf5;padding:3px 9px;border-radius:6px;letter-spacing:2px" title="Expires ${liveExp}">${liveOtpRaw}</span>`
       : `<span style="color:#d1d5db;font-size:12px">—</span>`;
+    const remarkOpts = ['','Interested','Not Interested','Visitor','Ring'];
+    const remarkSel = `<select onchange="setOtpRemark(${realIdx},this.value)" style="font-size:12px;padding:3px 6px;border-radius:6px;border:1.5px solid #e0e0e0;background:#fff;cursor:pointer;min-width:110px;color:${o.remark?'#0D7B6A':'#aaa'}" title="Set remark">
+      ${remarkOpts.map(r=>`<option value="${r}" ${o.remark===r?'selected':''}>${r||'— Remark —'}</option>`).join('')}
+    </select>`;
     return `<tr style="${o.banned?'background:#fff8f8;':''}">
       <td style="font-size:12px;color:var(--text-secondary);text-align:center">${i+1}</td>
       <td>${mobileCell}</td>
-      <td>${cpCell}</td><td>${nameCell}</td>
+      <td>${cpCell}</td><td>${remarkSel}</td><td>${nameCell}</td>
       <td style="font-size:12px;white-space:nowrap;color:var(--text-secondary)">🕐 ${o.otpRequestedAt}</td>
       <td style="text-align:center">${liveOtpCell}</td>
       <td>${vBadge}</td>
@@ -11041,7 +11076,7 @@ function renderOtp() {
     </tr>`;
   });
   const np=paginate(rows,_pg.otp,PER_PAGE,'otpTable','otpPg',
-    `<tr><td colspan="11"><div class="empty-state"><div class="icon">🔐</div><p>No OTP records found</p></div></td></tr>`);
+    `<tr><td colspan="12"><div class="empty-state"><div class="icon">🔐</div><p>No OTP records found</p></div></td></tr>`);
   if(np) _pg.otp=np;
 }
 
@@ -11075,6 +11110,20 @@ function toggleBan(i) {
     action === 'ban' ? '🚫 User banned' : '✅ User unbanned',
     o.mobile + (o.name ? ' · ' + o.name : '') + ' has been ' + action + 'ned.'
   );
+}
+
+async function setOtpRemark(idx, val) {
+  const o = otpLogs[idx];
+  if (!o) return;
+  otpLogs[idx].remark = val; // optimistic update
+  renderOtp();
+  try {
+    await fetch('api/admin/settings.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ section: 'otpLogs', action: 'setRemark', mobile: o.mobile, remark: val })
+    });
+  } catch(e) { toast('Failed to save remark', 'error'); }
 }
 
 // ──────────────────────────────────────────────
@@ -12347,6 +12396,11 @@ async function completeLogin() {
 
   // Apply role-based restrictions
   applyRoleRestrictions();
+
+  // Restore the last-visited section (or default to 'profile')
+  const lastSection = localStorage.getItem('admin_section') || 'profile';
+  show(lastSection);
+
   toast('Welcome, ' + aName + '!');
 }
 

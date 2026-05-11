@@ -76,7 +76,6 @@ export default function Navbar() {
     try { sessionStorage.removeItem('cc_v1'); } catch (e) {}
     setVerified(false); setVerifiedMobile('');
     navigate('/');
-    window.location.reload();
   };
 
   const handleLanguageChange = (lng) => {

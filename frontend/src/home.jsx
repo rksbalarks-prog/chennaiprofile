@@ -83,6 +83,12 @@ export default function Home() {
   const GATE_WINDOW_MS  = 24 * 60 * 60 * 1000;
   const [nowTick, setNowTick] = useState(Date.now());
   const [searchQuery, setSearchQuery] = useState('');
+  const [suggList, setSuggList]     = useState([]);
+  const [showSugg, setShowSugg]     = useState(false);
+  const [suggIdx, setSuggIdx]       = useState(-1);
+  const [suggLoading, setSuggLoading] = useState(false);
+  const suggRef    = useRef(null);
+  const debounceRef = useRef(null);
   const [visibleCards, setVisibleCards] = useState(20);
   // Server-side pagination state for infinite scroll
   const PAGE_SIZE = 20;
@@ -375,6 +381,39 @@ export default function Home() {
     } catch(e) {}
   };
 
+  // Autocomplete: fetch suggestions as user types
+  const fetchSuggestions = (q) => {
+    clearTimeout(debounceRef.current);
+    if (q.trim().length < 2) { setSuggList([]); setShowSugg(false); setSuggLoading(false); return; }
+    setSuggLoading(true);
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const r = await fetch(`${API_BASE}?action=search&q=${encodeURIComponent(q.trim())}&limit=7`);
+        const d = await r.json();
+        if (d.ok && d.profiles) { setSuggList(d.profiles.map(mapP)); setShowSugg(true); }
+      } catch(e) {}
+      setSuggLoading(false);
+    }, 280);
+  };
+
+  const handleSuggKey = (e) => {
+    if (!showSugg || !suggList.length) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); setSuggIdx(i => Math.min(i + 1, suggList.length - 1)); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setSuggIdx(i => Math.max(i - 1, -1)); }
+    else if (e.key === 'Enter' && suggIdx >= 0) {
+      window.open(`${PREFIX}/detail/${suggList[suggIdx].id}`, '_blank');
+      setShowSugg(false); setSearchQuery(''); setSuggIdx(-1);
+    }
+    else if (e.key === 'Escape') setShowSugg(false);
+  };
+
+  // Close suggestion dropdown when clicking outside
+  useEffect(() => {
+    const h = (e) => { if (suggRef.current && !suggRef.current.contains(e.target)) setShowSugg(false); };
+    document.addEventListener('mousedown', h);
+    return () => document.removeEventListener('mousedown', h);
+  }, []);
+
   // Get profiles for active tab AND search filter.
   // For registered users the server already returns opposite-gender-only
   // profiles in `sections` (gender is locked to !me.gender), so we skip the
@@ -416,10 +455,9 @@ export default function Home() {
   };
 
   const ProfileCard = ({ p }) => {
-    const [slide, setSlide] = useState(0); // 0 = details, 1 = brief summary
-    const summary = slide === 1 ? buildSummary(p) : null;
-    const isTa = i18n.language === 'ta';
-    const briefText = summary ? (isTa ? summary.ta : summary.en) : '';
+    const [slide, setSlide] = useState(1); // 1 = Tamil summary (default), 0 = details
+    const summary = buildSummary(p);
+    const briefText = summary.ta;
     const isViewed = sections.viewed.some(v => v.id === p.id);
 
     return (
@@ -468,7 +506,7 @@ export default function Home() {
         {/* Carousel swap arrow — top-right of the right pane */}
         <button
           type="button"
-          aria-label={slide === 0 ? 'Show brief summary' : 'Show details'}
+          aria-label={slide === 1 ? 'Show details' : 'Show Tamil summary'}
           onClick={e => { e.stopPropagation(); setSlide(s => (s === 0 ? 1 : 0)); }}
           style={{ position:'absolute', top:6, right:6, width:22, height:22, borderRadius:'50%', background:'#fff', border:'1px solid #e5e7eb', color:'#0D7B6A', display:'inline-flex', alignItems:'center', justifyContent:'center', cursor:'pointer', padding:0, zIndex:1, boxShadow:'0 1px 2px rgba(0,0,0,0.06)' }}
         >
@@ -524,7 +562,7 @@ export default function Home() {
                 onClick={e => { e.stopPropagation(); }}
                 style={{ fontSize:15, fontWeight:700, color:'#0D7B6A', textDecoration:'none' }}
               >
-                {isTa ? 'மேலும் படிக்க →' : 'Read more →'}
+                மேலும் படிக்க →
               </a>
             </div>
           </>
@@ -706,27 +744,74 @@ export default function Home() {
       )}
 
       {/* Search */}
-      <div style={{ padding:'4px 12px 10px', background:'#fff', borderBottom:'1px solid #f0f0f0', position:'relative' }}>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ position:'absolute', left:24, top:'50%', transform:'translateY(-40%)', pointerEvents:'none' }}>
-          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-        </svg>
+      <div ref={suggRef} style={{ padding:'4px 12px 10px', background:'#fff', borderBottom:'1px solid #f0f0f0', position:'relative' }}>
+        {/* Search icon or spinner */}
+        {suggLoading
+          ? <div style={{ position:'absolute', left:24, top:'50%', transform:'translateY(-40%)', width:14, height:14, border:'2px solid #e0e0e0', borderTopColor:'#0D7B6A', borderRadius:'50%', animation:'spin 0.7s linear infinite', pointerEvents:'none' }} />
+          : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ position:'absolute', left:24, top:'50%', transform:'translateY(-40%)', pointerEvents:'none' }}>
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+        }
         <input
           type="text"
           value={searchQuery}
-          onChange={e=>setSearchQuery(e.target.value)}
+          onChange={e => { setSearchQuery(e.target.value); fetchSuggestions(e.target.value); }}
+          onKeyDown={handleSuggKey}
+          onFocus={e => { e.target.style.borderColor='#0D7B6A'; e.target.style.background='#fff'; if (suggList.length) setShowSugg(true); }}
+          onBlur={e => { e.target.style.borderColor='#e8e8e8'; e.target.style.background='#fafafa'; }}
           placeholder="Search by name or profile ID…"
+          autoComplete="off"
           style={{ width:'100%', padding:'8px 34px 8px 34px', border:'1.5px solid #e8e8e8', borderRadius:20, fontSize:17, outline:'none', background:'#fafafa', boxSizing:'border-box' }}
-          onFocus={e=>{e.target.style.borderColor='#0D7B6A';e.target.style.background='#fff';}}
-          onBlur={e=>{e.target.style.borderColor='#e8e8e8';e.target.style.background='#fafafa';}}
         />
         {searchQuery && (
-          <button
-            onClick={()=>setSearchQuery('')}
+          <button onClick={() => { setSearchQuery(''); setSuggList([]); setShowSugg(false); }}
             aria-label="Clear search"
             style={{ position:'absolute', right:22, top:'50%', transform:'translateY(-40%)', background:'transparent', border:'none', fontSize:20, color:'#999', cursor:'pointer', padding:'2px 6px', lineHeight:1 }}>
             ×
           </button>
         )}
+
+        {/* Autocomplete dropdown */}
+        {showSugg && suggList.length > 0 && (
+          <div style={{ position:'absolute', top:'calc(100% - 4px)', left:12, right:12, background:'#fff',
+            border:'1.5px solid #e0e0e0', borderRadius:14, boxShadow:'0 8px 28px rgba(0,0,0,0.13)',
+            zIndex:300, overflow:'hidden' }}>
+            {suggList.map((p, i) => {
+              const urls = getPhotoUrls(p.photoRaw || p.photo);
+              const thumb = urls ? urls.thumb : (p.photo || null);
+              const fallback = p.gender === 'Male' ? '/default-male.png' : '/default-female.png';
+              return (
+                <div key={p.id}
+                  onMouseDown={() => { window.open(`${PREFIX}/detail/${p.id}`, '_blank'); setShowSugg(false); setSearchQuery(''); setSuggIdx(-1); }}
+                  onMouseEnter={() => setSuggIdx(i)}
+                  style={{ display:'flex', alignItems:'center', gap:10, padding:'9px 14px',
+                    background: i === suggIdx ? '#f0fdf4' : '#fff', cursor:'pointer',
+                    borderBottom: i < suggList.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
+                  <img src={thumb || fallback} alt={p.name}
+                    style={{ width:42, height:42, borderRadius:'50%', objectFit:'cover', objectPosition:'top', flexShrink:0, border:'2px solid #e8e8e8' }}
+                    onError={e => { e.target.onerror=null; e.target.src=fallback; }} />
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div style={{ fontWeight:700, fontSize:15, color:'#1a1a2e', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.name}</div>
+                    <div style={{ fontSize:12, color:'#888', display:'flex', gap:8, flexWrap:'wrap', marginTop:1 }}>
+                      <span style={{ color:'#0D7B6A', fontWeight:600 }}>{p.id}</span>
+                      {p.age     && <span>{p.age} yrs</span>}
+                      {p.height  && <span>{p.height}</span>}
+                      {p.caste   && <span>{p.caste}</span>}
+                      {p.district && <span>📍 {p.district}</span>}
+                    </div>
+                  </div>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ccc" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+              );
+            })}
+            <div style={{ padding:'8px 14px', fontSize:12, color:'#0D7B6A', fontWeight:600,
+              borderTop:'1px solid #f3f4f6', textAlign:'center', cursor:'pointer', background:'#f9fffe' }}
+              onMouseDown={() => { setShowSugg(false); }}>
+              Showing top {suggList.length} matches · type more to narrow down
+            </div>
+          </div>
+        )}
+        <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
       </div>
 
       {/* Filter buttons — pick which slice of profiles to show below */}
