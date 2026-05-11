@@ -157,3 +157,26 @@ jobs:
           done
           echo "::error::deploy failed after $MAX attempts (last HTTP $HTTP)"
           exit 1
+
+      - name: Run DB migrations
+        env:
+          DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
+          DEPLOY_HMAC_SECRET: ${{ secrets.DEPLOY_HMAC_SECRET }}
+        run: |
+          set -euo pipefail
+          MIGRATE_URL="${DEPLOY_URL/deploy.php/migrate-runner.php}"
+          TS=$(date +%s)
+          SIG=$(printf '%s' "${TS}:migrate" \
+            | openssl dgst -sha256 -hmac "$DEPLOY_HMAC_SECRET" -r \
+            | awk '{print $1}')
+          HTTP=$(curl -sS -o migrate-result.json -w '%{http_code}' \
+            -X POST "$MIGRATE_URL" \
+            -H "X-Deploy-Timestamp: $TS" \
+            -H "X-Deploy-Signature: sha256=$SIG" \
+            --max-time 30 || echo "000")
+          echo "Migration → HTTP $HTTP"
+          cat migrate-result.json 2>/dev/null || true
+          echo
+          if [ "$HTTP" != "200" ]; then
+            echo "::warning::Migration returned HTTP $HTTP — check migrate-result.json"
+          fi
