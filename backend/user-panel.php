@@ -1647,6 +1647,7 @@ async function launchApp() {
     history.replaceState({}, '', location.pathname);
     setTimeout(() => openCreate(), 150);
   }
+  triggerPendingBuy();
 }
 
 async function showWelcomeBalance() {
@@ -4026,16 +4027,21 @@ async function initPointsBuy(pkgId, returnCp) {
   const pkg = pkgId;
   if (!pkg) return;
   const msg = document.getElementById('ptsPayMsg');
-  if (msg) { msg.style.display=''; msg.textContent = 'Initiating payment…'; }
+  if (msg) { msg.style.cssText='display:block;background:#e8f5f2;border:1px solid #0D7B6A;border-radius:10px;padding:14px;font-size:16px;color:#0D7B6A;margin-top:8px'; msg.textContent = 'Initiating payment…'; }
   try {
     const r = await fetch('api/points.php?action=buy_init', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ pkg_id: pkg, return_cp: returnCp || '' }), credentials:'include'
     });
     const d = await r.json();
-    if (!d.ok) { if (msg) msg.textContent = d.error || 'Error'; return; }
+    if (!d.ok) {
+      const errText = d.error || 'Payment initiation failed. Try again.';
+      toast(errText, 'err');
+      if (msg) { msg.style.cssText='display:block;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:14px;font-size:16px;color:#991b1b;margin-top:8px'; msg.textContent = errText; }
+      return;
+    }
     if (d.payu) {
-      // Build and submit PayU form
+      if (msg) msg.textContent = 'Redirecting to payment…';
       const form = document.createElement('form');
       form.method = 'post'; form.action = d.endpoint;
       Object.entries(d.params).forEach(([k,v]) => {
@@ -4044,9 +4050,14 @@ async function initPointsBuy(pkgId, returnCp) {
       });
       document.body.appendChild(form); form.submit();
     } else {
-      if (msg) { msg.style.background='#fef2f2'; msg.style.borderColor='#fecaca'; msg.style.color='#991b1b'; msg.textContent = d.error || 'Payment gateway unavailable. Please contact admin.'; }
+      const errText = d.error || 'Payment gateway unavailable. Please contact admin.';
+      toast(errText, 'err');
+      if (msg) { msg.style.cssText='display:block;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:14px;font-size:16px;color:#991b1b;margin-top:8px'; msg.textContent = errText; }
     }
-  } catch(e) { if (msg) msg.textContent = 'Network error. Try again.'; }
+  } catch(e) {
+    toast('Network error. Try again.', 'err');
+    if (msg) { msg.style.cssText='display:block;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:14px;font-size:16px;color:#991b1b;margin-top:8px'; msg.textContent = 'Network error. Try again.'; }
+  }
 }
 
 // Auto-load points balance on page load
@@ -4084,9 +4095,7 @@ function triggerPendingBuy() {
   const pkgId = window._pendingBuyPkg;
   const returnCp = window._pendingBuyCp || '';
   window._pendingBuyPkg = null;
-  const btn = document.querySelector('[data-page="page_points"]');
-  if (btn) btn.click();
-  setTimeout(() => initPointsBuy(pkgId, returnCp), 350);
+  initPointsBuy(pkgId, returnCp);
 }
 </script>
 

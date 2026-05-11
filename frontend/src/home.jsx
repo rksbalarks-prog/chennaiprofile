@@ -367,7 +367,14 @@ export default function Home() {
       if (res.status === 402 && tv && tv.need_points) {
         setPointsBalance(tv.balance ?? 0);
         setPendingContactId(profileId);
-        setShowPointsModal(true);
+        if (tv.not_logged_in) {
+          setOtpIntent('view');
+          setOtpMobile(''); setOtpValue(['','','','']); setOtpSent(false); setOtpMsg('');
+          setGatePromptMsg('Verify your mobile number to purchase and view contact details.');
+          setShowOtpModal(true);
+        } else {
+          setShowPointsModal(true);
+        }
         return;
       }
       if (!IS_CHENNAI_PROFILE && !res.ok && tv && tv.gate_required) {

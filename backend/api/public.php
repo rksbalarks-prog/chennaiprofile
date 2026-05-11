@@ -603,7 +603,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $viewerMob = $_SESSION['mobile'] ?? $_SESSION['contact_mobile'] ?? '';
                 if (!$viewerMob) {
                     http_response_code(402);
-                    echo json_encode(['ok' => false, 'need_points' => true, 'balance' => 0, 'required' => POINTS_PER_CONTACT, 'error' => 'Login and points required to view contact.']);
+                    echo json_encode(['ok' => false, 'need_points' => true, 'not_logged_in' => true, 'balance' => 0, 'required' => POINTS_PER_CONTACT, 'error' => 'Login and points required to view contact.']);
                     exit;
                 }
                 if ($hasContact) {

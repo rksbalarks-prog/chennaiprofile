@@ -249,7 +249,13 @@ export default function Detail() {
       }));
       if (res.status === 402 && tv && tv.need_points) {
         setPointsBalance(tv.balance ?? 0);
-        setShowPointsModal(true);
+        if (tv.not_logged_in) {
+          setOtpMobile(''); setOtpValue(['','','','']); setOtpSent(false); setOtpMsg('');
+          setGatePromptMsg('Verify your mobile number to purchase and view contact details.');
+          setShowOtpModal(true);
+        } else {
+          setShowPointsModal(true);
+        }
         return;
       }
       if (!res.ok && tv && tv.gate_required) {
