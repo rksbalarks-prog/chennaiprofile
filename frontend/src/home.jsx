@@ -455,7 +455,7 @@ export default function Home() {
   };
 
   const ProfileCard = ({ p }) => {
-    const [slide, setSlide] = useState(1); // 1 = Tamil summary (default), 0 = details
+    const [slide, setSlide] = useState(0); // 0 = details (default), 1 = Tamil summary on hover
     const summary = buildSummary(p);
     const briefText = summary.ta;
     const isViewed = sections.viewed.some(v => v.id === p.id);

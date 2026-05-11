@@ -949,7 +949,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $t = trim((string)$v);
             if ($t === '') return true;
             $low = strtolower($t);
-            return in_array($low, ['any', 'doesn\'t matter', "doesn't matter", 'not applicable', 'all'], true);
+            // Exact no-preference tokens
+            if (in_array($low, ['any', "doesn't matter", 'not applicable', 'all',
+                                 'not interested', 'no preference', 'no caste preference',
+                                 'open', 'open to all', 'no preference/caste'], true)) return true;
+            // Values that start with "any " cover "Any Degree", "Any Job", etc.
+            if (str_starts_with($low, 'any ')) return true;
+            return false;
+        };
+
+        // Normalise partner_diet from verbose dropdown labels to profile column values.
+        // Partner-prefs form uses "Vegetarian"/"Non-Vegetarian"; profile diet column
+        // stores "Veg"/"Non-veg"/"Occasionally Non-veg".
+        $normDiet = function($v) {
+            $map = [
+                'vegetarian'            => 'Veg',
+                'veg'                   => 'Veg',
+                'non-vegetarian'        => 'Non-veg',
+                'non vegetarian'        => 'Non-veg',
+                'nonvegetarian'         => 'Non-veg',
+                'non veg'               => 'Non-veg',
+                'non-veg'               => 'Non-veg',
+                'occasionally non-veg'  => 'Occasionally Non-veg',
+                'occasionally non veg'  => 'Occasionally Non-veg',
+                'occasionally nonveg'   => 'Occasionally Non-veg',
+            ];
+            return $map[strtolower(trim((string)$v))] ?? $v;
         };
 
         // ── Build "MY partner prefs satisfied by candidate" filter ──────────
@@ -959,7 +984,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$isWild($me['partner_caste']))           { $where[] = "p.caste = ?";      $params[] = $me['partner_caste']; }
         if (!$isWild($me['partner_sub_caste']))       { $where[] = "p.sub_caste = ?";  $params[] = $me['partner_sub_caste']; }
         if (!$isWild($me['partner_marital_status'])) { $where[] = "p.marital = ?";    $params[] = $me['partner_marital_status']; }
-        if (!$isWild($me['partner_diet']))            { $where[] = "p.diet = ?";       $params[] = $me['partner_diet']; }
+        if (!$isWild($me['partner_diet']))            { $where[] = "p.diet = ?";       $params[] = $normDiet($me['partner_diet']); }
         if (!$isWild($me['partner_qualification']))   { $where[] = "p.qualification = ?"; $params[] = $me['partner_qualification']; }
         if (!$isWild($me['partner_job']))             { $where[] = "p.job = ?";        $params[] = $me['partner_job']; }
         if (!empty($me['partner_age_from'])) { $where[] = "p.age >= ?"; $params[] = (int)$me['partner_age_from']; }
@@ -969,7 +994,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($act === 'mutual_matches') {
             // Candidate's partner_caste either wild or = my caste, etc.
             $oppExpr = function($prefCol, $myVal) use (&$where, &$params) {
-                $where[] = "(p.$prefCol IS NULL OR p.$prefCol = '' OR LOWER(p.$prefCol) IN ('any','doesn\\'t matter','not applicable','all') OR p.$prefCol = ?)";
+                $where[] = "(p.$prefCol IS NULL OR p.$prefCol = '' OR LOWER(p.$prefCol) IN ('any','doesn\\'t matter','not applicable','all','not interested','no preference','open','open to all') OR LOWER(p.$prefCol) LIKE 'any %' OR p.$prefCol = ?)";
                 $params[] = (string)($myVal ?? '');
             };
             $oppExpr('partner_caste',           $me['caste']);
@@ -993,7 +1018,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $sql = "SELECT p.cp_id, p.name, p.age, p.gender, p.caste, p.sub_caste, p.star, p.raasi,
                        p.photo1, p.qualification, p.job, p.height, p.marital, p.religion,
-                       p.present_city, p.present_district, p.present_state
+                       p.diet, p.present_city, p.present_district, p.present_state
                 FROM profiles p
                 WHERE " . implode(' AND ', $where) . "
                 ORDER BY p.id DESC
@@ -1007,6 +1032,102 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $cntStmt = $db->prepare($cntSql);
         $cntStmt->execute($params);
         $total = (int)$cntStmt->fetchColumn();
+
+        // ── Compute match score for each profile, then sort best first ───────
+        // Score reflects how many of the user's partner preferences this profile
+        // satisfies, plus soft bonuses for photo quality, star data, and age
+        // proximity. All returned profiles already pass the hard filters, so the
+        // score differentiates them by optional/soft criteria.
+        foreach ($rows as &$row) {
+            $sc = 0; $mx = 0; $matched = [];
+
+            // Caste (3 pts)
+            $mx += 3;
+            if (!$isWild($me['partner_caste'])) {
+                $sc += 3; $matched[] = 'Caste';          // guaranteed by WHERE
+            } else {
+                $sc += 1;                                 // user has no preference
+            }
+
+            // Sub-caste (1 pt) — not in hard filter, check directly
+            if (!$isWild($me['partner_sub_caste'])) {
+                $mx += 1;
+                if (strtolower(trim($row['sub_caste'] ?? '')) === strtolower(trim($me['partner_sub_caste']))) {
+                    $sc += 1; $matched[] = 'Sub-caste';
+                }
+            }
+
+            // Age in range (2 pts) + proximity bonus (up to 0.5 pt)
+            $mx += 2.5;
+            $age     = (int)($row['age'] ?? 0);
+            $ageFrom = !empty($me['partner_age_from']) ? (int)$me['partner_age_from'] : 0;
+            $ageTo   = !empty($me['partner_age_to'])   ? (int)$me['partner_age_to']   : 99;
+            if ($age >= $ageFrom && $age <= $ageTo) {
+                $sc += 2; $matched[] = 'Age';
+                // Bonus: closer to the centre of the preferred range = higher score
+                if ($ageFrom > 0 && $ageTo < 99 && $ageTo > $ageFrom) {
+                    $half = ($ageTo - $ageFrom) / 2;
+                    $centre = $ageFrom + $half;
+                    $sc += max(0, (1 - abs($age - $centre) / ($half + 1)) * 0.5);
+                }
+            }
+
+            // Marital status (2 pts)
+            $mx += 2;
+            if (!$isWild($me['partner_marital_status'])) {
+                $sc += 2; $matched[] = 'Marital';        // guaranteed by WHERE
+            } else {
+                $sc += 1;
+            }
+
+            // Diet (1 pt)
+            $mx += 1;
+            if (!$isWild($me['partner_diet'])) {
+                $sc += 1; $matched[] = 'Diet';           // guaranteed by WHERE
+            } else {
+                $sc += 0.5;
+            }
+
+            // Qualification (1 pt)
+            $mx += 1;
+            if (!$isWild($me['partner_qualification'])) {
+                $sc += 1; $matched[] = 'Education';      // guaranteed by WHERE
+            } else {
+                $sc += 0.5;
+            }
+
+            // Job (1 pt)
+            $mx += 1;
+            if (!$isWild($me['partner_job'])) {
+                $sc += 1; $matched[] = 'Job';            // guaranteed by WHERE
+            } else {
+                $sc += 0.5;
+            }
+
+            // Photo available (1 pt)
+            $mx += 1;
+            if (!empty($row['photo1']) && !str_starts_with($row['photo1'], 'default_')) {
+                $sc += 1; $matched[] = 'Photo';
+            }
+
+            // Has star / horoscope data (0.5 pt)
+            $mx += 0.5;
+            if (!empty($row['star'])) {
+                $sc += 0.5; $matched[] = 'Horoscope';
+            }
+
+            $row['match_score']    = round($sc, 2);
+            $row['match_pct']      = $mx > 0 ? (int)round($sc / $mx * 100) : 0;
+            $row['matched_fields'] = $matched;
+        }
+        unset($row);
+
+        // Resolve photo1 to S3/CDN URLs (same as every other profile API endpoint)
+        foreach ($rows as &$r) resolve_profile_photos($r);
+        unset($r);
+
+        // Sort: highest match_score first
+        usort($rows, fn($a, $b) => $b['match_score'] <=> $a['match_score']);
 
         json_ok([
             'profiles' => $rows,

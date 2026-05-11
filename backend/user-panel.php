@@ -3185,6 +3185,23 @@ function _viewToggleHtml(countLabel, onToggle) {
   </div>`;
 }
 
+// Returns a coloured "XX% match" badge — only when match data is present
+function _matchBadgeHtml(p) {
+  if (!p.match_pct) return '';
+  const pct = p.match_pct;
+  const [color, bg] = pct >= 80 ? ['#15803d','#dcfce7'] : pct >= 60 ? ['#0D7B6A','#d1fae5'] : pct >= 40 ? ['#b45309','#fef3c7'] : ['#6b7280','#f3f4f6'];
+  return `<span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10.5px;font-weight:700;color:${color};background:${bg};white-space:nowrap;letter-spacing:0.2px">${pct}% match</span>`;
+}
+
+// Returns small green chips for each matched preference field
+function _matchedChipsHtml(p) {
+  const fields = p.matched_fields;
+  if (!fields || !fields.length) return '';
+  return `<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:4px">${
+    fields.map(f => `<span style="font-size:9px;padding:1px 5px;border-radius:8px;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;font-weight:600">${f} ✓</span>`).join('')
+  }</div>`;
+}
+
 function _profileTableRow(p, i) {
   const photoBase = 'api/uploads/';
   const src = p.photo1 && !p.photo1.startsWith('default_')
@@ -3193,9 +3210,13 @@ function _profileTableRow(p, i) {
     ? `<img src="${src}" style="width:40px;height:48px;object-fit:cover;border-radius:6px;display:block" onerror="this.style.display='none'">`
     : `<div style="width:40px;height:48px;border-radius:6px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px;color:#9ca3af">${esc((p.name||'?').charAt(0))}</div>`;
   const loc = [p.present_city||p.present_district, p.nativity].filter(Boolean).join(', ');
+  const matchCell = p.match_pct
+    ? `<td style="padding:7px 8px;text-align:center;white-space:nowrap">${_matchBadgeHtml(p)}</td>`
+    : '';
   return `<tr style="cursor:pointer" onclick="window.open(FRONTEND_PREFIX+'/detail/${esc(p.cp_id)}','_blank')"
     onmouseover="this.style.background='#fef9f9'" onmouseout="this.style.background=''">
     <td style="padding:7px 8px;color:var(--ink4);font-size:17px;text-align:center">${i+1}</td>
+    ${matchCell}
     <td style="padding:7px 8px">${thumb}</td>
     <td style="padding:7px 8px">
       <div style="font-weight:700;font-size:12.5px;color:#1a1a2e">${esc(p.name)}</div>
@@ -3210,8 +3231,10 @@ function _profileTableRow(p, i) {
 }
 
 function _profileTableHtml(list) {
+  const hasMatch = list.some(p => p.match_pct);
+  const matchTh = hasMatch ? '<th>Match</th>' : '';
   return `<div class="u-tw"><table class="u-tbl">
-    <thead><tr><th>#</th><th>Photo</th><th>Name / ID</th><th>Age</th><th>Caste</th><th>Education / Job</th><th>Location</th><th></th></tr></thead>
+    <thead><tr><th>#</th>${matchTh}<th>Photo</th><th>Name / ID</th><th>Age</th><th>Caste</th><th>Education / Job</th><th>Location</th><th></th></tr></thead>
     <tbody>${list.map((p,i) => _profileTableRow(p,i)).join('')}</tbody>
   </table></div>`;
 }
@@ -3224,21 +3247,28 @@ function _profileCardHtml(list) {
     const imgHtml = src ? `<img src="${src}" style="width:54px;height:54px;border-radius:50%;object-fit:cover;border:2px solid #e5e7eb" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : '';
     const fallback = `<div style="${src?'display:none;':'display:flex;'}width:54px;height:54px;border-radius:50%;background:var(--bg);align-items:center;justify-content:center;font-size:16px;color:var(--ink3);font-weight:700;border:2px solid #e5e7eb">${esc((p.name||'?').charAt(0))}</div>`;
     const where = [p.present_city, p.present_district].filter(Boolean).join(', ');
-    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border-radius:10px;border:1.5px solid #f0e0e4;cursor:pointer"
+    const badge = _matchBadgeHtml(p);
+    const chips = _matchedChipsHtml(p);
+    return `<div style="position:relative;display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:#fff;border-radius:10px;border:1.5px solid #f0e0e4;cursor:pointer"
       onclick="window.open(FRONTEND_PREFIX+'/detail/${esc(p.cp_id)}','_blank')"
       onmouseover="this.style.boxShadow='0 4px 12px rgba(139,0,0,0.1)'" onmouseout="this.style.boxShadow='none'">
-      <div style="flex-shrink:0">${imgHtml}${fallback}</div>
-      <div style="flex:1;min-width:0">
+      ${badge ? `<div style="position:absolute;top:8px;right:8px">${badge}</div>` : ''}
+      <div style="flex-shrink:0;margin-top:2px">${imgHtml}${fallback}</div>
+      <div style="flex:1;min-width:0;padding-right:${badge?'68px':'0'}">
         <div style="font-weight:700;font-size:16px;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.name)}</div>
-        <div style="font-size:17px;color:var(--ink3)">${esc(p.cp_id)} · ${p.age||''} yrs · ${esc(p.caste||'')}</div>
+        <div style="font-size:11.5px;color:var(--ink3)">${esc(p.cp_id)} · ${p.age||''} yrs · ${esc(p.caste||'')}</div>
         <div style="font-size:10.5px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc([p.qualification,p.job,where].filter(Boolean).join(' · '))}</div>
+        ${chips}
       </div>
     </div>`;
   }).join('')}</div>`;
 }
 
 function _renderProfileList(container, list, total, toggleFn) {
-  const label = `${list.length} of ${total||list.length} profiles`;
+  const hasMatch = list.some(p => p.match_pct);
+  const label = hasMatch
+    ? `${list.length} of ${total||list.length} profiles — sorted by match score`
+    : `${list.length} of ${total||list.length} profiles`;
   const body = _viewMode === 'table' ? _profileTableHtml(list) : _profileCardHtml(list);
   container.innerHTML = _viewToggleHtml(label, toggleFn) + body;
 }
@@ -3295,9 +3325,14 @@ async function renderAllProfiles() {
   if (!grid) return;
   grid.innerHTML = '<div style="padding:24px;text-align:center;color:var(--ink3);grid-column:1/-1">Loading profiles…</div>';
   try {
+    const userGender = profile?.gender;
+    const oppGender  = userGender === 'Male' ? 'female' : userGender === 'Female' ? 'male' : null;
     const resp = await fetch('api/public.php?action=bootstrap&limit=24', { credentials:'same-origin' });
     const data = await resp.json();
-    const profiles = [...(data.female?.profiles || data.female || []), ...(data.male?.profiles || data.male || [])];
+    // Show only opposite-gender profiles; fall back to both if no profile/gender
+    const profiles = oppGender
+      ? (data[oppGender]?.profiles || data[oppGender] || [])
+      : [...(data.female?.profiles || data.female || []), ...(data.male?.profiles || data.male || [])];
     if (!profiles.length) { grid.innerHTML = '<div style="padding:24px;text-align:center;color:var(--ink3);grid-column:1/-1">No profiles found.</div>'; return; }
     const photoBase = 'api/uploads/';
     const card = (p) => {
