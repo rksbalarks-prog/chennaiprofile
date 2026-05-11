@@ -3816,6 +3816,7 @@ function installImpersonationGuard() {
         history.replaceState({}, '', location.pathname);
         setTimeout(() => openCreate(), 200);
       }
+      triggerPendingBuy();
       clearTimeout(failSafe);
       removeSplash();
       return;
@@ -3834,6 +3835,7 @@ function installImpersonationGuard() {
           history.replaceState({}, '', location.pathname);
           setTimeout(() => openCreate(), 200);
         }
+        triggerPendingBuy();
         clearTimeout(failSafe);
         removeSplash();
         return;
@@ -4025,16 +4027,13 @@ async function initPointsBuy(pkgId, returnCp) {
 })();
 
 // Handle ?buy_pkg= (or legacy ?buy_pts=) redirect from detail page
+// Store pending buy so it fires AFTER login completes (avoids "Not logged in" race).
 (function() {
   const p = new URLSearchParams(location.search);
   const pkgId = p.get('buy_pkg') || {100:'p100',500:'p500',1000:'p1000'}[parseInt(p.get('buy_pts')||'0')] || null;
-  const returnCp = p.get('return_cp') || '';
   if (pkgId) {
-    document.addEventListener('DOMContentLoaded', () => {
-      const btns = document.querySelectorAll('[data-page="page_points"]');
-      if (btns[0]) btns[0].click();
-      setTimeout(() => initPointsBuy(pkgId, returnCp), 400);
-    });
+    window._pendingBuyPkg = pkgId;
+    window._pendingBuyCp  = p.get('return_cp') || '';
   }
   // Handle PayU return
   if (p.get('pay') === 'pts_ok') {
@@ -4044,6 +4043,16 @@ async function initPointsBuy(pkgId, returnCp) {
     toast('❌ Payment failed. Try again or contact support.', 'error');
   }
 })();
+
+function triggerPendingBuy() {
+  if (!window._pendingBuyPkg) return;
+  const pkgId = window._pendingBuyPkg;
+  const returnCp = window._pendingBuyCp || '';
+  window._pendingBuyPkg = null;
+  const btn = document.querySelector('[data-page="page_points"]');
+  if (btn) btn.click();
+  setTimeout(() => initPointsBuy(pkgId, returnCp), 350);
+}
 </script>
 
 <script>
