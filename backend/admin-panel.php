@@ -1118,7 +1118,8 @@ select.input { cursor: pointer; }
 input[type="date"].filter-select { padding:8px 10px; cursor:pointer; }
 </style>
 <?php
-$_siteTag   = (defined('SITE_ID') && SITE_ID === 'chennaip') ? 'CPA' : 'KFH';
+$_bHost     = strtolower($_SERVER['HTTP_HOST'] ?? '');
+$_siteTag   = (strpos($_bHost, 'kumbakonam') !== false) ? 'KFH' : 'CPA';
 $_siteTagBg = ($_siteTag === 'CPA') ? '#dbeafe' : '#fef3c7';
 $_siteTagFg = ($_siteTag === 'CPA') ? '#1d4ed8' : '#92400e';
 ?>
