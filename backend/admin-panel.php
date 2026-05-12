@@ -2459,7 +2459,7 @@ input[type="date"].filter-select { padding:8px 10px; cursor:pointer; }
             <div id="pkgForm" style="display:none;padding:18px 20px;background:#faf9f7;border-bottom:1px solid #f0ede8">
               <div style="font-weight:700;font-size:13px;margin-bottom:14px" id="pkgFormTitle">Add Package</div>
               <input type="hidden" id="pkgEditId">
-              <div style="display:grid;grid-template-columns:1fr 1.6fr 1fr 100px 100px;gap:10px;margin-bottom:12px">
+              <div style="display:grid;grid-template-columns:1fr 1.6fr 1fr 100px 100px 100px;gap:10px;margin-bottom:12px">
                 <div>
                   <label style="font-size:11.5px;font-weight:600;color:#555;display:block;margin-bottom:4px">Package ID</label>
                   <input id="pkgId" placeholder="e.g. p500" style="border:1px solid #e0ddd8;border-radius:7px;padding:7px 10px;font-size:13px;width:100%;box-sizing:border-box">
@@ -2474,7 +2474,11 @@ input[type="date"].filter-select { padding:8px 10px; cursor:pointer; }
                 </div>
                 <div>
                   <label style="font-size:11.5px;font-weight:600;color:#555;display:block;margin-bottom:4px">Points</label>
-                  <input id="pkgPoints" type="number" min="1" placeholder="500" style="border:1px solid #e0ddd8;border-radius:7px;padding:7px 10px;font-size:13px;width:100%;box-sizing:border-box">
+                  <input id="pkgPoints" type="number" min="1" placeholder="500" oninput="document.getElementById('pkgContacts').value=Math.floor((parseInt(this.value)||0)/10)||''" style="border:1px solid #e0ddd8;border-radius:7px;padding:7px 10px;font-size:13px;width:100%;box-sizing:border-box">
+                </div>
+                <div>
+                  <label style="font-size:11.5px;font-weight:600;color:#0D7B6A;display:block;margin-bottom:4px">Contacts</label>
+                  <input id="pkgContacts" type="number" min="1" placeholder="50" title="Contacts = Points ÷ 10" oninput="document.getElementById('pkgPoints').value=(parseInt(this.value)||0)*10||''" style="border:1.5px solid #A8D9D0;border-radius:7px;padding:7px 10px;font-size:13px;width:100%;box-sizing:border-box;background:#f0faf8;font-weight:700;color:#0D7B6A">
                 </div>
                 <div>
                   <label style="font-size:11.5px;font-weight:600;color:#555;display:block;margin-bottom:4px">Price (₹)</label>
@@ -2493,6 +2497,7 @@ input[type="date"].filter-select { padding:8px 10px; cursor:pointer; }
                 <th style="padding:9px 14px;text-align:left;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0ede8">ID</th>
                 <th style="padding:9px 10px;text-align:left;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0ede8">Label</th>
                 <th style="padding:9px 10px;text-align:right;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0ede8">Points</th>
+                <th style="padding:9px 10px;text-align:right;font-size:11px;font-weight:600;color:#0D7B6A;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0ede8">Contacts</th>
                 <th style="padding:9px 10px;text-align:right;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0ede8">Price (₹)</th>
                 <th style="padding:9px 10px;text-align:left;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0ede8">Badge</th>
                 <th style="padding:9px 10px;text-align:center;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f0ede8">Status</th>
@@ -7627,7 +7632,7 @@ async function loadPtsPackages() {
     const tb = document.getElementById('pkgTbody');
     if (!tb) return;
     if (!_pkgList.length) {
-      tb.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:18px">No packages yet. Click "+ Add Package" to create one.</td></tr>';
+      tb.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#aaa;padding:18px">No packages yet. Click "+ Add Package" to create one.</td></tr>';
       return;
     }
     tb.innerHTML = _pkgList.map(p => `
@@ -7635,6 +7640,7 @@ async function loadPtsPackages() {
         <td style="padding:8px 14px;font-family:monospace;font-size:12px;color:#8B0000;font-weight:700">${_esc(p.pkg_id)}</td>
         <td style="padding:8px 10px;color:#333;font-weight:500">${_esc(p.label)}</td>
         <td style="padding:8px 10px;text-align:right;font-weight:700;color:#1a1a2e">${p.points}</td>
+        <td style="padding:8px 10px;text-align:right;font-weight:700;color:#0D7B6A">${Math.floor(p.points/10)}</td>
         <td style="padding:8px 10px;text-align:right;color:#16a34a;font-weight:600">₹${parseFloat(p.price).toFixed(2)}</td>
         <td style="padding:8px 10px;color:#666">${p.badge ? `<span style="background:#fdf4ff;color:#9333ea;border-radius:5px;padding:2px 8px;font-size:11.5px;font-weight:600">${_esc(p.badge)}</span>` : '<span style="color:#ccc">—</span>'}</td>
         <td style="padding:8px 10px;text-align:center">${p.active==1
@@ -7658,6 +7664,7 @@ function openAddPtsPackage() {
   document.getElementById('pkgLabel').value = '';
   document.getElementById('pkgBadge').value = '';
   document.getElementById('pkgPoints').value = '';
+  document.getElementById('pkgContacts').value = '';
   document.getElementById('pkgPrice').value = '';
   document.getElementById('pkgFormMsg').style.display = 'none';
   document.getElementById('pkgForm').style.display = '';
@@ -7674,6 +7681,7 @@ function editPtsPackage(pkgId) {
   document.getElementById('pkgLabel').value = p.label;
   document.getElementById('pkgBadge').value = p.badge || '';
   document.getElementById('pkgPoints').value = p.points;
+  document.getElementById('pkgContacts').value = Math.floor(p.points / 10);
   document.getElementById('pkgPrice').value = parseFloat(p.price).toFixed(2);
   document.getElementById('pkgFormMsg').style.display = 'none';
   document.getElementById('pkgForm').style.display = '';
