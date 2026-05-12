@@ -54,7 +54,7 @@ switch ($action) {
         }
 
         $otp = str_pad((string) random_int(1000, 9999), 4, '0', STR_PAD_LEFT);
-        $exp = date('Y-m-d H:i:s', time() + 120);
+        $exp = date('Y-m-d H:i:s', time() + 300);
 
         $db->prepare(
             "INSERT INTO otp_sessions (mobile, otp, attempts, expires_at, verified)
@@ -173,7 +173,7 @@ switch ($action) {
         $adm = $admin->fetch();
         if (!$adm) json_err('No admin found with that username and mobile.');
         $otp = str_pad((string) random_int(1000, 9999), 4, '0', STR_PAD_LEFT);
-        $exp = date('Y-m-d H:i:s', time() + 120);
+        $exp = date('Y-m-d H:i:s', time() + 300);
         $db->prepare(
             "INSERT INTO otp_sessions (mobile, otp, attempts, expires_at, verified)
              VALUES (:m, :o, 0, :e, 0)
