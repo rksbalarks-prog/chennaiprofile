@@ -101,12 +101,13 @@ if (!empty($_GET['pay']) && $_GET['pay'] === 'success' && !empty($_GET['order_id
 <style>
 :root{
   --accent:#0D7B6A;--accent2:#0A5A4E;--accent-bg:#E8F5F2;
+  --primary:#0D7B6A;
   --bg:#F4FAF8;--card:#fff;
   --ink:#1A1A2E;--ink2:#44403c;--ink3:#6b7280;--ink4:#a8a29e;
   --border:#C8EDE6;--border2:#A8D9D0;
   --green:#2d6a4f;--green-bg:#edf5f1;
   --amber:#92400e;--amber-bg:#fef9c3;
-  --sidebar:#1a1a2e;
+  --sidebar:#0f4c4c;
   --purple:#6B3FA0;--gold:#C9A84C;
   --radius:12px;--radius2:18px;
   --shadow:0 1px 4px rgba(0,0,0,.05),0 4px 20px rgba(0,0,0,.08);
@@ -238,7 +239,7 @@ input,select,textarea{outline:none}
 .no-profile-chip{font-family:var(--mono);font-size:17px;font-weight:700;color:var(--accent);background:var(--accent-bg);padding:4px 14px;border-radius:7px;display:inline-block;margin-bottom:14px}
 
 .profile-card{background:var(--card);border-radius:var(--radius2);box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px}
-.p-banner{height:100px;background:linear-gradient(135deg,var(--sidebar) 0%,#2d2d5e 50%,#3d1a14 100%);position:relative}
+.p-banner{height:100px;background:linear-gradient(135deg,var(--sidebar) 0%,#0a5a4e 50%,#063e36 100%);position:relative}
 .p-av-wrap{position:absolute;bottom:-34px;left:22px}
 .p-av{width:68px;height:68px;border-radius:50%;border:4px solid #fff;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.18)}
 .p-body{padding:42px 22px 22px}
@@ -3781,7 +3782,7 @@ function installImpersonationGuard() {
   const bar = document.createElement('div');
   bar.id = 'impersonationBar';
   bar.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99998;' +
-    'background:linear-gradient(135deg,#b91c1c,#7f1d1d);color:#fff;' +
+    'background:linear-gradient(135deg,#0f766e,#0f4c4c);color:#fff;' +
     'padding:6px 12px;text-align:center;font-size:15px;font-weight:600;' +
     'letter-spacing:0.3px;box-shadow:0 2px 6px rgba(0,0,0,0.2);' +
     'font-family:system-ui,sans-serif';
