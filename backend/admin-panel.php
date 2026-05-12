@@ -12255,7 +12255,7 @@ async function doLogin() {
         otpHtml += '<br><div style="margin-top:8px;font-size:12.5px;color:#16a34a">Check your mobile for the OTP</div>';
       }
       document.getElementById('otpSentTo').innerHTML = otpHtml;
-      startOtpTimer(300);
+      startOtpTimer(50);
       ['otp1','otp2','otp3','otp4'].forEach(id => {
         const el = document.getElementById(id); if (el) el.value = '';
       });
@@ -12316,7 +12316,7 @@ async function resendOtp() {
     ['otp1','otp2','otp3','otp4'].forEach(id => {
       const el = document.getElementById(id); if (el) el.value = '';
     });
-    startOtpTimer(300);
+    startOtpTimer(50);
     document.getElementById('otp1')?.focus();
   } catch(e) {
     showLoginPopup('error', 'Resend Failed', e.message);
