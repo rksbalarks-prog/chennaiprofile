@@ -615,7 +615,7 @@ export default function Navbar() {
           className={`bottom-nav-item ${morePageOpen ? 'active' : ''}`}
           style={{ background: 'none', border: 'none', cursor: 'pointer' }}
           onClick={() => {
-            if (verified === true) setMorePageOpen(true);
+            if (verified === true) { window.location.href = USER_PANEL_URL; }
             else setLoginPromptOpen(true);
           }}
         >
