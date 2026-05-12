@@ -5,6 +5,8 @@ import { API_BASE, USER_PANEL_URL } from './config';
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [morePageOpen, setMorePageOpen] = useState(false);
+  const [loginPromptOpen, setLoginPromptOpen] = useState(false);
   const [verified, setVerified] = useState(null); // null = loading, true/false = resolved
   const [verifiedMobile, setVerifiedMobile] = useState('');
   const { t, i18n } = useTranslation();
@@ -37,7 +39,7 @@ export default function Navbar() {
       }).catch(() => setVerified(false));
   }, []);
 
-  useEffect(() => { setMenuOpen(false); }, [location.pathname]);
+  useEffect(() => { setMenuOpen(false); setMorePageOpen(false); setLoginPromptOpen(false); }, [location.pathname]);
 
   // Bottom nav visibility — show when the visitor is within EDGE px of the top
   // or bottom of the document, hide otherwise. Also stays visible on short
@@ -309,6 +311,92 @@ export default function Navbar() {
           font-size: 12px; color: #0D7B6A; font-weight: 600; margin-top: 20px;
         }
 
+        /* ── MORE FULL PAGE ── */
+        .more-page {
+          position: fixed; inset: 0; z-index: 3000;
+          background: #f7faf9;
+          display: flex; flex-direction: column;
+          transform: translateY(100%);
+          transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+          overflow-y: auto;
+        }
+        .more-page.open { transform: translateY(0); }
+
+        .more-page-header {
+          background: linear-gradient(135deg, #0D7B6A, #6B3FA0);
+          padding: 48px 22px 24px; color: #fff;
+          display: flex; align-items: center; justify-content: space-between;
+          flex-shrink: 0;
+        }
+        .more-page-user { display: flex; flex-direction: column; gap: 4px; }
+        .more-page-user-name { font-size: 20px; font-weight: 700; }
+        .more-page-user-mobile { font-size: 14px; opacity: 0.85; }
+        .more-page-close {
+          width: 38px; height: 38px; border-radius: 50%;
+          background: rgba(255,255,255,0.2); border: none;
+          color: #fff; font-size: 20px; cursor: pointer;
+          display: flex; align-items: center; justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .more-page-list { flex: 1; padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+
+        .more-page-item {
+          display: flex; align-items: center; gap: 14px;
+          padding: 16px 18px; background: #fff; border-radius: 14px;
+          color: #1A1A2E; text-decoration: none; font-size: 16px; font-weight: 500;
+          box-shadow: 0 1px 4px rgba(0,0,0,0.06); transition: all 0.15s;
+          border: none; cursor: pointer; width: 100%; text-align: left;
+        }
+        .more-page-item:active { background: #E8F5F2; color: #0D7B6A; }
+        .more-page-item.danger { color: #dc2626; }
+        .more-page-item.danger:active { background: #fff5f5; }
+        .more-page-item-icon {
+          width: 40px; height: 40px; border-radius: 10px;
+          background: #F4FAF8; display: flex; align-items: center;
+          justify-content: center; font-size: 20px; flex-shrink: 0;
+        }
+        .more-page-item.danger .more-page-item-icon { background: #fff5f5; }
+
+        .more-page-divider { height: 1px; background: #e5f0ec; margin: 4px 0; }
+
+        .more-page-footer {
+          padding: 20px; text-align: center;
+          font-size: 13px; color: #aaa; flex-shrink: 0;
+        }
+
+        /* ── LOGIN PROMPT BOTTOM SHEET ── */
+        .login-prompt-overlay {
+          position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+          z-index: 3000; opacity: 0; pointer-events: none;
+          transition: opacity 0.25s;
+        }
+        .login-prompt-overlay.open { opacity: 1; pointer-events: auto; }
+
+        .login-prompt-sheet {
+          position: fixed; bottom: -100%; left: 0; right: 0;
+          z-index: 3001; background: #fff;
+          border-radius: 20px 20px 0 0;
+          padding: 28px 24px 40px;
+          transition: bottom 0.3s cubic-bezier(0.4,0,0.2,1);
+          text-align: center;
+        }
+        .login-prompt-sheet.open { bottom: 0; }
+        .login-prompt-sheet h3 { font-size: 20px; font-weight: 700; color: #1A1A2E; margin: 0 0 8px; }
+        .login-prompt-sheet p { font-size: 15px; color: #666; margin: 0 0 24px; line-height: 1.5; }
+        .login-prompt-btn {
+          display: block; width: 100%; padding: 15px;
+          background: linear-gradient(135deg, #0D7B6A, #6B3FA0);
+          color: #fff; font-size: 16px; font-weight: 700;
+          border: none; border-radius: 12px; cursor: pointer;
+          text-decoration: none; margin-bottom: 10px;
+        }
+        .login-prompt-cancel {
+          background: none; border: none; color: #999;
+          font-size: 15px; cursor: pointer; padding: 8px;
+          width: 100%;
+        }
+
         /* ── SPACERS ── */
         .top-spacer { height: 60px; }
         .bottom-spacer { height: 4px; }
@@ -457,6 +545,55 @@ export default function Navbar() {
         </div>
       </div>
 
+      {/* ═══ MORE FULL PAGE (logged in) ═══ */}
+      <div className={`more-page ${morePageOpen ? 'open' : ''}`}>
+        <div className="more-page-header">
+          <div className="more-page-user">
+            <div className="more-page-user-name">👋 Hello!</div>
+            {verifiedMobile && <div className="more-page-user-mobile">📱 {verifiedMobile}</div>}
+          </div>
+          <button className="more-page-close" onClick={() => setMorePageOpen(false)}>✕</button>
+        </div>
+        <div className="more-page-list">
+          <Link to="/" className="more-page-item" onClick={() => setMorePageOpen(false)}>
+            <div className="more-page-item-icon">🏠</div> {t('navbar.home')}
+          </Link>
+          <Link to="/search" className="more-page-item" onClick={() => setMorePageOpen(false)}>
+            <div className="more-page-item-icon">🔍</div> {t('navbar.search')}
+          </Link>
+          <a href={USER_PANEL_URL} className="more-page-item" onClick={() => setMorePageOpen(false)}>
+            <div className="more-page-item-icon">👤</div> My Profile
+          </a>
+          <div className="more-page-divider" />
+          <Link to="/contact" className="more-page-item" onClick={() => setMorePageOpen(false)}>
+            <div className="more-page-item-icon">📞</div> {t('navbar.contact')}
+          </Link>
+          <Link to="/about-us" className="more-page-item" onClick={() => setMorePageOpen(false)}>
+            <div className="more-page-item-icon">ℹ️</div> About Us
+          </Link>
+          <Link to="/privacy-policy" className="more-page-item" onClick={() => setMorePageOpen(false)}>
+            <div className="more-page-item-icon">🔒</div> Privacy Policy
+          </Link>
+          <Link to="/terms-and-conditions" className="more-page-item" onClick={() => setMorePageOpen(false)}>
+            <div className="more-page-item-icon">📄</div> Terms & Conditions
+          </Link>
+          <div className="more-page-divider" />
+          <button className="more-page-item danger" onClick={() => { setMorePageOpen(false); handleLogout(); }}>
+            <div className="more-page-item-icon">🚪</div> Sign Out
+          </button>
+        </div>
+        <div className="more-page-footer">Chennai Profile Matrimony</div>
+      </div>
+
+      {/* ═══ LOGIN PROMPT BOTTOM SHEET (not logged in) ═══ */}
+      <div className={`login-prompt-overlay ${loginPromptOpen ? 'open' : ''}`} onClick={() => setLoginPromptOpen(false)} />
+      <div className={`login-prompt-sheet ${loginPromptOpen ? 'open' : ''}`}>
+        <h3>🔐 Login Required</h3>
+        <p>Please verify your mobile number to access your profile and more options.</p>
+        <a href={USER_PANEL_URL} className="login-prompt-btn">Login / Verify Now</a>
+        <button className="login-prompt-cancel" onClick={() => setLoginPromptOpen(false)}>Cancel</button>
+      </div>
+
       {/* ═══ BOTTOM NAV ═══ */}
       <nav className={`bottom-nav ${bottomNavVisible ? '' : 'is-hidden'}`}>
         <Link to="/" className={`bottom-nav-item ${isActive('/') ? 'active' : ''}`}>
@@ -474,10 +611,17 @@ export default function Navbar() {
           <span className="bottom-nav-fab-label">Register</span>
         </a>
 
-        <a href={USER_PANEL_URL} className="bottom-nav-item">
+        <button
+          className={`bottom-nav-item ${morePageOpen ? 'active' : ''}`}
+          style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+          onClick={() => {
+            if (verified === true) setMorePageOpen(true);
+            else setLoginPromptOpen(true);
+          }}
+        >
           <div className="bottom-nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></div>
           <span className="bottom-nav-label">More</span>
-        </a>
+        </button>
       </nav>
 
       <div className="bottom-spacer" />
