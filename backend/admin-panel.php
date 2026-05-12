@@ -1117,6 +1117,15 @@ select.input { cursor: pointer; }
 .al-ban     { background:#fee2e2; color:#dc2626; }
 input[type="date"].filter-select { padding:8px 10px; cursor:pointer; }
 </style>
+<?php
+$_siteTag   = (defined('SITE_ID') && SITE_ID === 'chennaip') ? 'CPA' : 'KFH';
+$_siteTagBg = ($_siteTag === 'CPA') ? '#dbeafe' : '#fef3c7';
+$_siteTagFg = ($_siteTag === 'CPA') ? '#1d4ed8' : '#92400e';
+?>
+<style>
+:root{--site-tag:"<?= $_siteTag ?>";--site-tag-bg:<?= $_siteTagBg ?>;--site-tag-fg:<?= $_siteTagFg ?>}
+code.cpid::after{content:" " var(--site-tag);font-size:9px;font-weight:700;background:var(--site-tag-bg);color:var(--site-tag-fg);border-radius:3px;padding:1px 5px;margin-left:4px;vertical-align:middle;letter-spacing:.05em;white-space:nowrap}
+</style>
 </head>
 <body>
 
@@ -5647,7 +5656,7 @@ function render() {
       : `<span style="color:#dc2626;font-weight:600;font-size:12px;background:#fef2f2;padding:2px 8px;border-radius:10px;border:1px solid #fecaca">No</span>`;
     return `<tr data-created="${p.created||''}">
       <td>${i+1}</td>
-      <td><code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${p.cpId}</code></td>
+      <td><code class="cpid" style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${p.cpId}</code></td>
       <td style="text-align:center">${picCell}</td>
       <td><div class="name-cell"><div class="avatar">${initials(p.name)}</div>${p.name}</div></td>
       <td>${createdByCell(p)}</td>
@@ -5813,7 +5822,7 @@ function render() {
           return `<span style="font-size:12px;font-weight:600;color:${color};background:${bg};border:1px solid ${border};padding:3px 8px;border-radius:12px">${expiryVal}</span>`;
         })();
     return `<tr data-created="${p.created||''}">
-      <td><code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${p.cpId}</code></td>
+      <td><code class="cpid" style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${p.cpId}</code></td>
       <td><div class="name-cell"><div class="avatar">${initials(p.name)}</div>${p.name}</div></td>
       <td>${createdByCell(p)}</td>
       <td>${manageMobileCell}</td>
@@ -5858,7 +5867,7 @@ function render() {
     : [...deleted].reverse().map((d, ri) => {
       const i = deleted.length - 1 - ri;
       return `<tr data-deletedat="${(d.deletedAt||'').split(' ')[0]}">
-        <td><code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${d.cpId}</code></td>
+        <td><code class="cpid" style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${d.cpId}</code></td>
         <td><div class="name-cell"><div class="avatar" style="background:#fee2e2;color:#dc2626">${initials(d.name)}</div>${d.name}</div></td>
         <td>${mobileCellHtml(d.mobile, -1, false)}</td>
         <td><span style="font-weight:500">${d.deletedBy||'—'}</span></td>
@@ -5886,7 +5895,7 @@ function render() {
         <td style="font-size:12px;color:var(--text-secondary)">${actionLog.length - i}</td>
         <td style="font-size:12px;white-space:nowrap">${log.timestamp}</td>
         <td>${actionBadge}</td>
-        <td><code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${log.cpId}</code></td>
+        <td><code class="cpid" style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${log.cpId}</code></td>
         <td><div class="name-cell"><div class="avatar" style="font-size:10px;width:26px;height:26px">${initials(log.memberName)}</div>${log.memberName}</div></td>
         <td><span style="font-weight:500;font-size:13px">${log.admin}</span></td>
         <td><span style="color:var(--text-secondary);font-size:13px">${log.note}</span></td>
@@ -7031,7 +7040,7 @@ function followRow(f, fi, showEdit=true, showUndo=false) {
   const undoBtn  = showUndo  ? `<button class="btn btn-green btn-sm" onclick="undoClosedFollow(${fi})">↩ Undo</button>` : '';
   const mob = f.mobile || (f.cpId && profiles.find(p=>p.cpId===f.cpId)?.mobile) || '—';
   return `<tr>
-    <td><code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${f.cpId}</code></td>
+    <td><code class="cpid" style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${f.cpId}</code></td>
     <td><div class="name-cell"><div class="avatar" style="font-size:10px;width:26px;height:26px">${initials(f.memberName||'?')}</div>${f.memberName||f.mobile}</div></td>
     <td style="font-size:13px;font-weight:500;color:var(--text-primary)">${mob}</td>
     <td>${typeBadge(f.type)}</td>
@@ -8579,7 +8588,7 @@ function renderUserOrders() {
       <td style="font-size:12px;white-space:nowrap">${o.created_at || '-'}</td>
       <td style="font-weight:600;color:#c0392b">${o.mobile}</td>
       <td>${o.name || '-'}</td>
-      <td><code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${o.cp_id || '-'}</code></td>
+      <td><code class="cpid" style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${o.cp_id || '-'}</code></td>
       <td style="font-weight:600">${o.plan}</td>
       <td>${o.amount || '-'}</td>
       <td style="font-size:12px">${o.method || '-'}</td>
@@ -8654,7 +8663,7 @@ function renderOrderArchive() {
       <td style="font-size:12px;font-weight:600">#${a.order_id||'-'}</td>
       <td style="font-size:12px;color:#c0392b;font-weight:600">${a.mobile||'-'}</td>
       <td>${a.name||'-'}</td>
-      <td><code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${a.cp_id||'-'}</code></td>
+      <td><code class="cpid" style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${a.cp_id||'-'}</code></td>
       <td style="font-weight:600">${a.plan||'-'}</td>
       <td>${a.amount ? 'Rs. '+a.amount : '-'}</td>
       <td style="font-size:12px">${a.method||'-'}</td>
@@ -8728,11 +8737,11 @@ function renderProfileViewLog() {
     if (!l.target_cp_id || l.target_cp_id === '-') {
       pvViewedCell = `<span style="font-size:12px;color:var(--text-secondary)">-</span>`;
     } else if (pvViewedHasFU) {
-      pvViewedCell = `<code style="font-size:12px;background:#f0fdf4;color:#16a34a;padding:2px 7px;border-radius:5px;font-weight:700">${l.target_cp_id}</code>`;
+      pvViewedCell = `<code class="cpid" style="font-size:12px;background:#f0fdf4;color:#16a34a;padding:2px 7px;border-radius:5px;font-weight:700">${l.target_cp_id}</code>`;
     } else if (pvViewedIdx >= 0) {
-      pvViewedCell = `<code style="font-size:12px;background:#fee2e2;color:#dc2626;padding:2px 7px;border-radius:5px;font-weight:700;cursor:pointer;border-bottom:1.5px dashed #dc2626" title="No follow-up — double-click to create" ondblclick="openFollowUp(${pvViewedIdx})">${l.target_cp_id}</code>`;
+      pvViewedCell = `<code class="cpid" style="font-size:12px;background:#fee2e2;color:#dc2626;padding:2px 7px;border-radius:5px;font-weight:700;cursor:pointer;border-bottom:1.5px dashed #dc2626" title="No follow-up — double-click to create" ondblclick="openFollowUp(${pvViewedIdx})">${l.target_cp_id}</code>`;
     } else {
-      pvViewedCell = `<code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${l.target_cp_id}</code>`;
+      pvViewedCell = `<code class="cpid" style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${l.target_cp_id}</code>`;
     }
 
     return `<tr>
@@ -8793,7 +8802,7 @@ function renderDirectLogins() {
       <td>${i+1}</td>
       <td style="font-weight:600;color:#c0392b">${d.mobile}</td>
       <td>${d.name||'-'}</td>
-      <td><code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${d.cp_id||'-'}</code></td>
+      <td><code class="cpid" style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${d.cp_id||'-'}</code></td>
       <td>${statusBadge}</td>
       <td style="font-size:12px">${d.created_by||'-'}</td>
       <td style="font-size:12px">${d.created_at||'-'}</td>
@@ -8833,7 +8842,7 @@ function renderDirectLoginLogs() {
       <td style="font-size:12px;white-space:nowrap">${l.created_at||'-'}</td>
       <td style="font-weight:600;color:#c0392b">${l.mobile||'-'}</td>
       <td>${l.name||'-'}</td>
-      <td><code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${l.cp_id||'-'}</code></td>
+      <td><code class="cpid" style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${l.cp_id||'-'}</code></td>
       <td>${actionBadge}</td>
       <td style="font-size:12px">${l.action_by||'-'}</td>
     </tr>`;
@@ -8975,7 +8984,7 @@ function renderProfileReports() {
     return `<tr>
       <td>${i+1}</td>
       <td style="font-size:12px;white-space:nowrap">${fmtDT(r.reportedAt || r.reported_at)}</td>
-      <td><code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${r.cpId || r.cp_id || ''}</code></td>
+      <td><code class="cpid" style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${r.cpId || r.cp_id || ''}</code></td>
       <td>${r.profileName || r.profile_name || '-'}</td>
       <td style="font-size:12px;color:#c0392b;font-weight:600">${r.profileMobile || r.profile_mobile || '-'}</td>
       <td style="font-size:12px">${r.reporterMobile || r.reporter_mobile || '-'}</td>
@@ -9146,7 +9155,7 @@ function renderUserResponse() {
         return '<tr>'
           + '<td style="font-size:12px;color:var(--text-secondary)">' + (i + 1) + '</td>'
           + '<td style="font-weight:600;font-size:12.5px">' + (l.mobile || 'anonymous') + '</td>'
-          + '<td>' + (l.cp_id ? '<code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">' + l.cp_id + '</code>' : '<span style="color:var(--text-secondary);font-size:11.5px">—</span>') + '</td>'
+          + '<td>' + (l.cp_id ? '<code class="cpid" style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">' + l.cp_id + '</code>' : '<span style="color:var(--text-secondary);font-size:11.5px">—</span>') + '</td>'
           + '<td style="font-size:12.5px">' + (l.name || '—') + '</td>'
           + '<td>' + planBadge + '</td>'
           + '<td style="font-size:12px;color:var(--text-secondary);white-space:nowrap">' + (l.datetime || '—') + '</td>'
@@ -9172,7 +9181,7 @@ function renderUserResponse() {
         return '<tr>'
           + '<td style="font-size:12px;color:var(--text-secondary)">' + (i + 1) + '</td>'
           + '<td style="font-weight:600;font-size:12.5px">' + viewerMobile + '</td>'
-          + '<td>' + (viewerCpId ? '<code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">' + viewerCpId + '</code>' : '<span style="color:var(--text-secondary);font-size:11.5px">Visitor</span>') + '</td>'
+          + '<td>' + (viewerCpId ? '<code class="cpid" style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">' + viewerCpId + '</code>' : '<span style="color:var(--text-secondary);font-size:11.5px">Visitor</span>') + '</td>'
           + '<td style="font-size:12.5px">' + viewerName + '</td>'
           + '<td>' + planBadge + '</td>'
           + '<td style="font-size:12px;color:var(--text-secondary);white-space:nowrap">' + (r.datetime || '—') + '</td>'
@@ -9196,7 +9205,7 @@ function renderUserResponse() {
         return '<tr>'
           + '<td style="font-size:12px;color:var(--text-secondary)">' + (i + 1) + '</td>'
           + '<td style="font-weight:600;font-size:12.5px">' + reporterMobile + '</td>'
-          + '<td>' + (reporterCpId ? '<code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">' + reporterCpId + '</code>' : '<span style="color:var(--text-secondary);font-size:11.5px">—</span>') + '</td>'
+          + '<td>' + (reporterCpId ? '<code class="cpid" style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">' + reporterCpId + '</code>' : '<span style="color:var(--text-secondary);font-size:11.5px">—</span>') + '</td>'
           + '<td style="font-size:12.5px">' + (r.reason || '—') + '</td>'
           + '<td>' + statusBadge + '</td>'
           + '<td style="font-size:12px;color:var(--text-secondary);white-space:nowrap">' + fmtDT(r.reportedAt || r.reported_at) + '</td>'
@@ -9278,7 +9287,7 @@ function renderUserActivity() {
         const targetName = l.target_name || nameByCpId[l.target_cp_id] || '—';
         return '<tr>'
           + '<td style="font-size:12px;color:var(--text-secondary)">' + (i + 1) + '</td>'
-          + '<td>' + (l.target_cp_id ? '<code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">' + l.target_cp_id + '</code>' : '<span style="color:var(--text-secondary);font-size:11.5px">—</span>') + '</td>'
+          + '<td>' + (l.target_cp_id ? '<code class="cpid" style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">' + l.target_cp_id + '</code>' : '<span style="color:var(--text-secondary);font-size:11.5px">—</span>') + '</td>'
           + '<td style="font-size:12.5px">' + targetName + '</td>'
           + '<td style="font-size:12px;color:var(--text-secondary);white-space:nowrap">' + (l.datetime || '—') + '</td>'
           + '</tr>';
@@ -9298,7 +9307,7 @@ function renderUserActivity() {
         const viewedMob = r.viewedMobile || r.target_mobile || '—';
         return '<tr>'
           + '<td style="font-size:12px;color:var(--text-secondary)">' + (i + 1) + '</td>'
-          + '<td>' + (viewedCpId ? '<code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">' + viewedCpId + '</code>' : '<span style="color:var(--text-secondary);font-size:11.5px">—</span>') + '</td>'
+          + '<td>' + (viewedCpId ? '<code class="cpid" style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">' + viewedCpId + '</code>' : '<span style="color:var(--text-secondary);font-size:11.5px">—</span>') + '</td>'
           + '<td style="font-size:12.5px">' + viewedName + '</td>'
           + '<td style="font-weight:600;font-size:12.5px">' + viewedMob + '</td>'
           + '<td style="font-size:12px;color:var(--text-secondary);white-space:nowrap">' + (r.datetime || '—') + '</td>'
@@ -9321,7 +9330,7 @@ function renderUserActivity() {
           : '<span class="badge badge-amber">Pending</span>';
         return '<tr>'
           + '<td style="font-size:12px;color:var(--text-secondary)">' + (i + 1) + '</td>'
-          + '<td>' + (reportedCpId ? '<code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">' + reportedCpId + '</code>' : '<span style="color:var(--text-secondary);font-size:11.5px">—</span>') + '</td>'
+          + '<td>' + (reportedCpId ? '<code class="cpid" style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">' + reportedCpId + '</code>' : '<span style="color:var(--text-secondary);font-size:11.5px">—</span>') + '</td>'
           + '<td style="font-size:12.5px">' + reportedName + '</td>'
           + '<td style="font-size:12.5px">' + (r.reason || '—') + '</td>'
           + '<td>' + statusBadge + '</td>'
@@ -9991,7 +10000,7 @@ function renderUserOverrideTable() {
           <div><div style="font-size:13px;font-weight:600">${ov.name}</div><div style="font-size:11px;color:var(--text-secondary)">${ov.mobile}</div></div>
         </div>
       </td>
-      <td><code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${ov.mobile || ov.cpId}</code></td>
+      <td><code class="cpid" style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${ov.mobile || ov.cpId}</code></td>
       <td>
         <div style="display:flex;flex-wrap:wrap;gap:3px;align-items:center">${enabledBadges}${disabledBadges}</div>
         <div style="font-size:10px;color:var(--text-secondary);margin-top:3px">${visibleCount} on · ${hiddenCount} off</div>
@@ -11032,7 +11041,7 @@ function renderOtp() {
   const rows=filtered.map((o,i)=>{
     const realIdx=otpLogs.indexOf(o);
     const otpPIdx=profiles.findIndex(p=>p.mobile===o.mobile);
-    const cpCell=o.cpId?`<code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${o.cpId}</code>`:`<span style="color:#d1d5db;font-size:12px">—</span>`;
+    const cpCell=o.cpId?`<code class="cpid" style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${o.cpId}</code>`:`<span style="color:#d1d5db;font-size:12px">—</span>`;
     const nameCell=o.name?`<div class="name-cell"><div class="avatar" style="width:26px;height:26px;font-size:10px">${initials(o.name)}</div>${o.name}</div>`:`<span style="color:#d1d5db;font-size:12px">Not registered</span>`;
     const st = normStatus(o.verified);
     const vBadge = st === 'verified'
@@ -11153,7 +11162,7 @@ function renderBills() {
   if(countEl) countEl.textContent=filtered.length+' / '+bills.length;
   const rows=filtered.map((b,i)=>`<tr>
     <td style="font-size:12px;color:var(--text-secondary)">${i+1}</td>
-    <td><code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${b.cpId}</code></td>
+    <td><code class="cpid" style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${b.cpId}</code></td>
     <td><div class="name-cell"><div class="avatar" style="width:26px;height:26px;font-size:10px">${initials(b.name)}</div>${b.name}</div></td>
     <td style="font-size:13px">${b.mobile}</td>
     <td style="font-weight:600;font-size:13px">${b.planName||b.plan||'—'}</td>
@@ -11192,7 +11201,7 @@ function renderBillHistory() {
     return `<tr>
       <td style="font-size:12px;color:var(--text-secondary)">${i+1}</td>
       <td>${ab}</td>
-      <td><code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${b.cpId}</code></td>
+      <td><code class="cpid" style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${b.cpId}</code></td>
       <td><div class="name-cell"><div class="avatar" style="width:24px;height:24px;font-size:9px">${initials(b.name||'?')}</div>${b.name||'—'}</div></td>
       <td style="font-size:13px">${b.mobile||'—'}</td>
       <td style="font-weight:600;font-size:13px">${b.planName||b.plan||'—'}</td>
@@ -11391,7 +11400,7 @@ function renderExpired() {
     const realIdx = expiredProfiles.indexOf(e);
     return `<tr style="background:#fffdf9">
       <td style="font-size:12px;color:var(--text-secondary)">${i + 1}</td>
-      <td><code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${e.cpId}</code></td>
+      <td><code class="cpid" style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${e.cpId}</code></td>
       <td><div class="name-cell">
         <div class="avatar" style="background:#fff8f0;color:#d97706;width:28px;height:28px;font-size:10px">${initials(e.name)}</div>
         ${e.name}
@@ -11749,7 +11758,7 @@ function renderAlerts() {
       <td style="font-size:12px;color:var(--text-secondary)">${i+1}</td>
       <td>${sevBadge}</td>
       <td style="font-weight:600">${a.mobile}</td>
-      <td><code style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${a.cpId}</code></td>
+      <td><code class="cpid" style="font-size:12px;background:#f3f4f6;padding:2px 7px;border-radius:5px">${a.cpId}</code></td>
       <td>${a.name !== '—' ? `<div class="name-cell"><div class="avatar" style="width:24px;height:24px;font-size:9px">${initials(a.name)}</div>${a.name}</div>` : '—'}</td>
       <td style="font-size:13px;font-weight:500">${a.reason}</td>
       <td><span class="badge badge-amber">${a.value}</span></td>
@@ -12788,7 +12797,7 @@ function showInterestDetail(mobile) {
     const p = profiles.find(pr => pr.cpId === s.cpId);
     if (!p) return '';
     return `<tr style="background:${s.contactViewed?'#f0fdf4':''}">
-      <td><code style="font-size:11px;background:#f3f4f6;padding:2px 6px;border-radius:4px">${p.cpId}</code></td>
+      <td><code class="cpid" style="font-size:11px;background:#f3f4f6;padding:2px 6px;border-radius:4px">${p.cpId}</code></td>
       <td>${p.name}</td>
       <td>${p.gender}</td>
       <td>${p.age}</td>
